@@ -121,8 +121,8 @@ img {
 .hero-center,
 .hero-meta {
   transition:
-    opacity 0.9s var(--ease-out),
-    transform 0.9s var(--ease-out);
+    opacity 0.7s var(--ease-out),
+    transform 0.7s var(--ease-out);
 }
 
 .panel:not(.is-inview) > .panel-fade,
@@ -131,7 +131,13 @@ img {
 .panel:not(.is-inview) > .invite-compose,
 .panel:not(.is-inview) > .sponsors-compose {
   opacity: 0;
-  transform: translate3d(0, 28px, 0);
+  transform: translate3d(0, 18px, 0);
+}
+
+/* Skip layout/paint work for offscreen sections (keep home/invite live for scroll morph). */
+.panel:not(.home-panel):not(.story-panel) {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 100svh;
 }
 
 .panel.is-inview > .panel-fade,
@@ -148,8 +154,8 @@ img {
 .invite-compose,
 .sponsors-compose {
   transition:
-    opacity 0.9s var(--ease-out),
-    transform 0.9s var(--ease-out);
+    opacity 0.7s var(--ease-out),
+    transform 0.7s var(--ease-out);
 }
 
 .panel.is-inview > .stage,
@@ -161,15 +167,15 @@ img {
 
 .panel:not(.is-inview) > .stage,
 .panel:not(.is-inview) > .join-stage {
-  transform: translate3d(-36px, 0, 0);
+  transform: translate3d(-22px, 0, 0);
 }
 
 .panel:not(.is-inview) > .sponsors-compose {
-  transform: translate3d(0, 36px, 0) scale(0.985);
+  transform: translate3d(0, 22px, 0) scale(0.99);
 }
 
 .panel:not(.is-inview) > .invite-compose {
-  transform: translate3d(0, 42px, 0) scale(0.97);
+  transform: translate3d(0, 26px, 0) scale(0.985);
 }
 
 /* Mixed-origin fades for dense sections */
@@ -818,8 +824,9 @@ body.is-sealed .hero-monogram {
 .scene-run {
   position: relative;
   --scene-photo-lift: 50svh;
+  --scene-photo-y-start: 0%;
   --scene-photo-y-end: 50%;
-  --scene-photo-y: 0%;
+  --scene-photo-y: var(--scene-photo-y-start);
   --scene-pan: 0;
   --scene-title-travel: 36svh;
   --brand-ghost-opacity: 0;
@@ -853,7 +860,7 @@ body.is-sealed .hero-monogram {
   height: 100%;
   max-width: none;
   object-fit: cover;
-  object-position: center var(--scene-photo-y, 0%);
+  object-position: center var(--scene-photo-y, var(--scene-photo-y-start, 0%));
   user-select: none;
   transform-origin: 50% 40%;
   animation: hero-ken 22s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
@@ -861,7 +868,8 @@ body.is-sealed .hero-monogram {
 
 /* Pause Ken Burns once the park photo is anchored under Invite, or while sealed. */
 .scene-run.is-photo-anchored .scene-run-photo,
-body.is-sealed .scene-run-photo {
+body.is-sealed .scene-run-photo,
+.scene-run.is-photo-ken-paused .scene-run-photo {
   animation-play-state: paused;
 }
 
@@ -5131,6 +5139,16 @@ body.is-sealed .hero-meta {
   }
 }
 
+/* Mobile: gentler zoom; slight downward nudge keeps faces in frame */
+@keyframes hero-ken-mobile {
+  from {
+    transform: scale(1.02) translate3d(0, 0.25%, 0);
+  }
+  to {
+    transform: scale(1.045) translate3d(-0.25%, 0.45%, 0);
+  }
+}
+
 @keyframes monogram-glow {
   from {
     filter: drop-shadow(0 8px 24px rgba(75, 29, 36, 0.35));
@@ -5294,6 +5312,22 @@ body.is-sealed .hero-meta {
 }
 
 @media (max-width: 820px) {
+  /* Portrait park photo: the desktop 50svh lift mapped heads above the fold.
+     Zero lift so the viewport shows the image top; bias Y toward faces (~30%). */
+  .scene-run {
+    --scene-photo-lift: 0px;
+    --scene-photo-y-start: 28%;
+    --scene-photo-y-end: 44%;
+    --scene-photo-y: var(--scene-photo-y-start);
+  }
+
+  .scene-run-photo {
+    object-position: center var(--scene-photo-y, 28%);
+    transform-origin: 50% 32%;
+    animation-name: hero-ken-mobile;
+    animation-duration: 28s;
+  }
+
   .day-stage {
     padding-top: clamp(1.1rem, 3vh, 1.75rem);
     padding-bottom: clamp(1.1rem, 3vh, 1.75rem);
@@ -5329,7 +5363,15 @@ body.is-sealed .hero-meta {
   }
 
   .hero-title {
-    max-width: 92vw;
+    max-width: min(92vw, 100%);
+    box-sizing: border-box;
+  }
+
+  .hero-center {
+    padding-top: clamp(2vh, 5vh, 7vh);
+    /* Keep “Heavens Agreed” clear of the fixed pill rail */
+    padding-inline-end: clamp(7.6rem, 22vw, 8.75rem);
+    box-sizing: border-box;
   }
 
   .hero-title-main {
@@ -5351,10 +5393,6 @@ body.is-sealed .hero-meta {
 
   .story-panel .hero-date-day {
     font-size: clamp(2.35rem, 11vw, 3.25rem);
-  }
-
-  .hero-center {
-    padding-top: clamp(2vh, 5vh, 7vh);
   }
 
   .stage-layout,
@@ -5651,5 +5689,19 @@ body.is-sealed .hero-meta {
 
   .invite-card > .hero-meta {
     padding-inline: 0.15rem;
+  }
+
+  /* Phone: face-centered crop; no Ken Burns so zoom can’t clip heads */
+  .scene-run {
+    --scene-photo-lift: 0px;
+    --scene-photo-y-start: 30%;
+    --scene-photo-y-end: 42%;
+    --scene-photo-y: var(--scene-photo-y-start);
+  }
+
+  .scene-run-photo {
+    object-position: center var(--scene-photo-y, 30%);
+    transform-origin: 50% 30%;
+    animation: none;
   }
 }

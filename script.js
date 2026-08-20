@@ -17,8 +17,18 @@ const scenePhoto = document.querySelector(".scene-run-photo");
 const homePanel = document.getElementById("home");
 const storyPanel = document.getElementById("story");
 
-/* Top half of image = page 1, bottom half = page 2 */
-const SCENE_PHOTO_Y_END = 50;
+/* Desktop: top half = page 1, bottom half = page 2 (0% → 50%).
+   Mobile: faces sit ~30–40% down the portrait; keep object-position
+   there. (CSS also zeros --scene-photo-lift so the tall frame cannot
+   push heads above the fold.) */
+const mqSceneNarrow = window.matchMedia("(max-width: 820px)");
+const mqScenePhone = window.matchMedia("(max-width: 560px)");
+
+function getScenePhotoYRange() {
+  if (mqScenePhone.matches) return { start: 30, end: 42 };
+  if (mqSceneNarrow.matches) return { start: 28, end: 44 };
+  return { start: 0, end: 50 };
+}
 
 function getStoryScrollTop() {
   if (!storyPanel) return 0;
@@ -48,7 +58,8 @@ function updateScenePan() {
     ? window.scrollY >= anchorLeave
     : window.scrollY >= anchorEnter && progress >= 0.97;
   const pan = Math.min(1, progress);
-  const photoY = progress * SCENE_PHOTO_Y_END;
+  const { start, end } = getScenePhotoYRange();
+  const photoY = start + progress * (end - start);
 
   sceneRun.style.setProperty("--scene-pan", pan.toFixed(4));
   sceneRun.style.setProperty("--scene-photo-y", `${photoY.toFixed(2)}%`);
@@ -63,12 +74,13 @@ function scrollToSection(id) {
   if (!target) return;
 
   const scrollBehavior = prefersReducedMotion ? "auto" : "smooth";
+  const { start: photoYStart, end: photoYEnd } = getScenePhotoYRange();
 
   if (id === "story" && scenePhoto && !prefersReducedMotion) {
     sceneRun?.classList.add("is-photo-anchored");
     sceneRun?.style.setProperty("--scene-pan", "1");
-    sceneRun?.style.setProperty("--scene-photo-y", `${SCENE_PHOTO_Y_END}%`);
-    scenePhoto.style.objectPosition = `center ${SCENE_PHOTO_Y_END}%`;
+    sceneRun?.style.setProperty("--scene-photo-y", `${photoYEnd}%`);
+    scenePhoto.style.objectPosition = `center ${photoYEnd}%`;
   }
 
   /* Sticky #home already sits at top≈0 while Invite covers it, so
@@ -77,8 +89,8 @@ function scrollToSection(id) {
     if (scenePhoto && !prefersReducedMotion) {
       sceneRun?.classList.remove("is-photo-anchored");
       sceneRun?.style.setProperty("--scene-pan", "0");
-      sceneRun?.style.setProperty("--scene-photo-y", "0%");
-      scenePhoto.style.objectPosition = "center top";
+      sceneRun?.style.setProperty("--scene-photo-y", `${photoYStart}%`);
+      scenePhoto.style.objectPosition = `center ${photoYStart}%`;
     }
 
     window.scrollTo({ top: 0, behavior: scrollBehavior });
@@ -539,32 +551,49 @@ if (panels.length) {
   }
 
   let sceneTick = false;
-  window.addEventListener(
-    "scroll",
-    () => {
-      if (sceneTick) return;
-      sceneTick = true;
-      requestAnimationFrame(() => {
-        sceneTick = false;
-        updateScenePan();
-        updateInviteWash();
-        updateBrandMorph();
-      });
-    },
-    { passive: true }
-  );
-  window.addEventListener(
-    "resize",
-    () => {
+  const scheduleSceneTick = (forceMeasure = false) => {
+    if (sceneTick) return;
+    sceneTick = true;
+    requestAnimationFrame(() => {
+      sceneTick = false;
       updateScenePan();
       updateInviteWash();
-      updateBrandMorph(true);
-    },
-    { passive: true }
-  );
+      updateBrandMorph(forceMeasure);
+    });
+  };
+  window.addEventListener("scroll", () => scheduleSceneTick(false), {
+    passive: true,
+  });
+  window.addEventListener("resize", () => scheduleSceneTick(true), {
+    passive: true,
+  });
+  const onSceneMqChange = () => scheduleSceneTick(true);
+  if (typeof mqSceneNarrow.addEventListener === "function") {
+    mqSceneNarrow.addEventListener("change", onSceneMqChange);
+    mqScenePhone.addEventListener("change", onSceneMqChange);
+  } else if (typeof mqSceneNarrow.addListener === "function") {
+    mqSceneNarrow.addListener(onSceneMqChange);
+    mqScenePhone.addListener(onSceneMqChange);
+  }
   updateScenePan();
   updateInviteWash();
   updateBrandMorph(true);
+
+  /* Pause Ken Burns while the park photo isn’t on screen (saves paint). */
+  if (sceneRun && scenePhoto && !prefersReducedMotion) {
+    const kenIo = new IntersectionObserver(
+      ([entry]) => {
+        sceneRun.classList.toggle(
+          "is-photo-ken-paused",
+          !(entry?.isIntersecting)
+        );
+      },
+      { root: null, rootMargin: "8% 0px", threshold: 0 }
+    );
+    const kenTarget =
+      sceneRun.querySelector(".scene-run-photo-frame") || scenePhoto;
+    kenIo.observe(kenTarget);
+  }
 
   const observer = new IntersectionObserver(
     (entries) => {
@@ -1237,6 +1266,7 @@ document.querySelectorAll("img[data-photo-fallback]").forEach((img) => {
   };
 
   let clipRaf = 0;
+  let clipListening = false;
   const scheduleMediaClip = () => {
     if (clipRaf) return;
     clipRaf = requestAnimationFrame(() => {
@@ -1245,8 +1275,28 @@ document.querySelectorAll("img[data-photo-fallback]").forEach((img) => {
     });
   };
 
-  window.addEventListener("scroll", scheduleMediaClip, { passive: true });
-  window.addEventListener("resize", scheduleMediaClip);
+  const setClipListening = (on) => {
+    if (on === clipListening) return;
+    clipListening = on;
+    if (on) {
+      window.addEventListener("scroll", scheduleMediaClip, { passive: true });
+      window.addEventListener("resize", scheduleMediaClip);
+      scheduleMediaClip();
+    } else {
+      window.removeEventListener("scroll", scheduleMediaClip);
+      window.removeEventListener("resize", scheduleMediaClip);
+      if (mediaFixed) mediaFixed.style.clipPath = "inset(100% 0 0 0)";
+    }
+  };
+
+  const clipObserver = new IntersectionObserver(
+    (entries) => {
+      const visible = entries.some((entry) => entry.isIntersecting);
+      setClipListening(visible);
+    },
+    { rootMargin: "20% 0px" }
+  );
+  clipObserver.observe(panel);
   window.addEventListener("hashchange", scheduleMediaClip);
   syncEntourageMediaClip();
 
