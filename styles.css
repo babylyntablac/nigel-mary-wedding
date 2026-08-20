@@ -5374,8 +5374,15 @@ body.is-sealed .hero-meta {
     box-sizing: border-box;
   }
 
-  .hero-title-main {
-    font-size: clamp(2.4rem, 11vw, 3.6rem);
+  /* Home date/venue: full-width viewport center (ignore title’s nav-rail pad) */
+  .home-panel .hero-meta {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    margin-inline: auto;
+    justify-self: center;
+    padding-inline: clamp(1.25rem, 4vw, 2rem);
+    text-align: center;
   }
 
   .hero-date-block {
@@ -5383,8 +5390,18 @@ body.is-sealed .hero-meta {
     gap: 0.55rem;
   }
 
+  .home-panel .hero-date-block {
+    min-width: 0;
+    width: min(18rem, 100%);
+    margin-inline: auto;
+  }
+
   .story-panel .hero-date-block {
     min-width: 0;
+  }
+
+  .hero-title-main {
+    font-size: clamp(2.4rem, 11vw, 3.6rem);
   }
 
   .hero-date-day {
@@ -5682,8 +5699,9 @@ body.is-sealed .hero-meta {
     letter-spacing: 0.18em;
   }
 
-  .hero-meta {
-    padding-inline: 2.5rem;
+  .home-panel .hero-meta {
+    /* Equal inset both sides so the date block stays viewport-centered */
+    padding-inline: clamp(1.5rem, 5vw, 2.5rem);
     text-align: center;
   }
 
