@@ -130,17 +130,23 @@ const MORE_TARGET_VOLUME = 0.65;
 
 const morePanel = document.querySelector('[data-panel="more"]');
 const moreAudio = new Audio(MORE_PREVIEW_URL);
-moreAudio.preload = "auto";
+moreAudio.preload = "none";
 moreAudio.loop = true;
 moreAudio.volume = 0;
 
 let moreAudioUnlocked = false;
 let moreAudioWanted = false;
 let moreFadeRaf = null;
+/* True after user engages Spotify embed — blocks preview until leaving More */
+let morePausedForSpotify = false;
 
 function unlockMoreAudio() {
   if (moreAudioUnlocked) return;
   moreAudioUnlocked = true;
+  if (moreAudio.preload !== "auto") {
+    moreAudio.preload = "auto";
+    moreAudio.load();
+  }
   moreAudio.volume = 0;
   const playPromise = moreAudio.play();
   if (playPromise && typeof playPromise.then === "function") {
@@ -193,7 +199,35 @@ function fadeMoreAudio(fadeIn) {
 }
 
 function setMoreAudioActive(active) {
+  if (active && morePausedForSpotify) return;
+  if (active && moreAudio.preload !== "auto") {
+    moreAudio.preload = "auto";
+    moreAudio.load();
+  }
   fadeMoreAudio(Boolean(active));
+}
+
+function pauseMorePreviewForSpotify() {
+  if (morePausedForSpotify) return;
+  morePausedForSpotify = true;
+  fadeMoreAudio(false);
+}
+
+const spotifyEmbed = document.querySelector("[data-spotify-embed]");
+if (spotifyEmbed) {
+  const catcher = spotifyEmbed.querySelector(".playlist-spotify-catcher");
+  const engageSpotify = () => {
+    pauseMorePreviewForSpotify();
+    spotifyEmbed.classList.add("is-spotify-engaged");
+  };
+
+  if (catcher) {
+    /* Hide catcher on pointerdown so the following click can reach the iframe */
+    catcher.addEventListener("pointerdown", engageSpotify);
+  } else {
+    spotifyEmbed.addEventListener("pointerdown", pauseMorePreviewForSpotify);
+    spotifyEmbed.addEventListener("focusin", pauseMorePreviewForSpotify);
+  }
 }
 
 /* HOME → INVITE shared-element morph (scroll-driven FLIP ghosts) */
@@ -460,7 +494,7 @@ function updateBrandMorph(forceMeasure = false) {
       brandMorphState = "settled";
       setBrandMorphVars(0, 1);
       if (brandMorphLayer) brandMorphLayer.classList.remove("is-active");
-    } else {
+    } else if (forceMeasure) {
       setBrandMorphVars(0, 1);
     }
     return;
@@ -542,6 +576,10 @@ if (panels.length) {
         panel.classList.toggle("is-inview", nowInview);
 
         if (panel === morePanel && wasInview !== nowInview) {
+          if (!nowInview) {
+            morePausedForSpotify = false;
+            spotifyEmbed?.classList.remove("is-spotify-engaged");
+          }
           setMoreAudioActive(nowInview);
         }
       });
@@ -727,6 +765,82 @@ if (panels.length) {
   syncVisibility();
 })();
 
+/* Love Story — type “Once upon a time” once when the panel enters view */
+(function initLoveStoryTypewriter() {
+  const lovePanel = document.querySelector('[data-panel="love"]');
+  const kicker = document.querySelector(".love-story-kicker[data-typewriter]");
+  const textEl = kicker?.querySelector(".love-story-kicker-text");
+  if (!lovePanel || !kicker || !textEl) return;
+
+  const fullText = (textEl.textContent || "Once upon a time").trim();
+  let started = false;
+  let cursorTimer = null;
+
+  function finishCursor() {
+    kicker.classList.remove("is-typing");
+    kicker.classList.add("is-cursor");
+    if (cursorTimer) clearTimeout(cursorTimer);
+    cursorTimer = setTimeout(() => {
+      kicker.classList.remove("is-cursor");
+    }, 4200);
+  }
+
+  function showFull() {
+    textEl.textContent = fullText;
+    kicker.classList.remove("is-typing", "is-cursor");
+  }
+
+  function typeOnce() {
+    if (started) return;
+    started = true;
+
+    if (prefersReducedMotion) {
+      showFull();
+      return;
+    }
+
+    textEl.textContent = "";
+    kicker.classList.add("is-typing");
+    kicker.classList.remove("is-cursor");
+
+    let i = 0;
+    const speed = 52;
+
+    const tick = () => {
+      if (i < fullText.length) {
+        textEl.textContent = fullText.slice(0, i + 1);
+        i += 1;
+        setTimeout(tick, speed);
+        return;
+      }
+      finishCursor();
+    };
+
+    /* Sync with .love-story entrance delay (~380ms) */
+    setTimeout(tick, 420);
+  }
+
+  if (prefersReducedMotion) {
+    showFull();
+    return;
+  }
+
+  textEl.textContent = "";
+  kicker.classList.add("is-typing");
+
+  const sync = () => {
+    if (lovePanel.classList.contains("is-inview")) typeOnce();
+  };
+
+  const visibilityObserver = new MutationObserver(sync);
+  visibilityObserver.observe(lovePanel, {
+    attributes: true,
+    attributeFilter: ["class"],
+  });
+
+  sync();
+})();
+
 let envelopeOpened = false;
 
 function openEnvelope() {
@@ -865,10 +979,48 @@ document.querySelectorAll("img[data-photo-fallback]").forEach((img) => {
   if (img.complete && img.naturalWidth === 0) markEmpty();
 });
 
-/* Entourage overlay tint + name alignment */
+/* Entourage: fixed bg clipped to section bounds + overlay/align controls */
 (function initEntourageControls() {
   const panel = document.getElementById("entourage");
   if (!panel) return;
+
+  const mediaFixed = panel.querySelector(".entourage-media-fixed");
+
+  /* Always position:fixed (no layout toggle). Clip to the section’s
+     intersection with the viewport so the pin never changes scrollHeight
+     and cannot bleed onto Day / More. */
+  const syncEntourageMediaClip = () => {
+    if (!mediaFixed) return;
+
+    const rect = panel.getBoundingClientRect();
+    const vh = window.innerHeight || document.documentElement.clientHeight;
+    const vw = document.documentElement.clientWidth || window.innerWidth;
+
+    if (rect.bottom <= 0 || rect.top >= vh || rect.right <= 0 || rect.left >= vw) {
+      mediaFixed.style.clipPath = "inset(100% 0 0 0)";
+      return;
+    }
+
+    const top = Math.max(0, rect.top);
+    const right = Math.max(0, vw - rect.right);
+    const bottom = Math.max(0, vh - rect.bottom);
+    const left = Math.max(0, rect.left);
+    mediaFixed.style.clipPath = `inset(${top}px ${right}px ${bottom}px ${left}px)`;
+  };
+
+  let clipRaf = 0;
+  const scheduleMediaClip = () => {
+    if (clipRaf) return;
+    clipRaf = requestAnimationFrame(() => {
+      clipRaf = 0;
+      syncEntourageMediaClip();
+    });
+  };
+
+  window.addEventListener("scroll", scheduleMediaClip, { passive: true });
+  window.addEventListener("resize", scheduleMediaClip);
+  window.addEventListener("hashchange", scheduleMediaClip);
+  syncEntourageMediaClip();
 
   const swatches = [...panel.querySelectorAll(".entourage-swatch")];
   const alignButtons = [...panel.querySelectorAll(".entourage-align")];
