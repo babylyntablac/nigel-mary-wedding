@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 150" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Original lily-of-the-valley arch for Nigel & Mary. -->
+  <path stroke-width="1.22" d="M18 138 C48 72 118 18 210 22" />
+  <path stroke-width="1.22" d="M402 138 C372 72 302 18 210 22" />
+
+  <!-- Pointed leaves, left -->
+  <path stroke-width="1.12" d="M58 108 C36 96 24 74 34 56 C48 68 62 88 70 104" />
+  <path stroke-width="1.12" d="M112 58 C94 46 86 26 98 12 C110 24 120 42 124 56" />
+  <!-- Pointed leaves, right -->
+  <path stroke-width="1.12" d="M362 108 C384 96 396 74 386 56 C372 68 358 88 350 104" />
+  <path stroke-width="1.12" d="M308 58 C326 46 334 26 322 12 C310 24 300 42 296 56" />
+
+  <!-- Hanging bells, left -->
+  <g stroke-width="1.1">
+    <path d="M86 86 L86 96" />
+    <path d="M80 96 C80 96 78 110 86 116 C94 110 92 96 92 96" />
+    <path d="M132 52 L132 62" />
+    <path d="M126 62 C126 62 124 76 132 82 C140 76 138 62 138 62" />
+    <path d="M170 34 L170 44" />
+    <path d="M164 44 C164 44 162 56 170 62 C178 56 176 44 176 44" />
+  </g>
+  <!-- Hanging bells, right -->
+  <g stroke-width="1.1">
+    <path d="M334 86 L334 96" />
+    <path d="M328 96 C328 96 326 110 334 116 C342 110 340 96 340 96" />
+    <path d="M288 52 L288 62" />
+    <path d="M282 62 C282 62 280 76 288 82 C296 76 294 62 294 62" />
+    <path d="M250 34 L250 44" />
+    <path d="M244 44 C244 44 242 56 250 62 C258 56 256 44 256 44" />
+  </g>
+</svg>

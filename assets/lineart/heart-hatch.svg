@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 60" fill="none">
+  <!-- Original sketchy hatch heart for Nigel & Mary. -->
+  <defs>
+    <clipPath id="h">
+      <path d="M32 53C23.8 46.2 12.4 37.6 7.6 27.8 2.6 17.4 10.2 7.6 18.6 8.4c6.2.6 10.8 5.6 13.4 11.2C34.4 13.8 39.4 8.6 46 8.5 54.4 8.4 61.4 17.8 56.6 28.2 52 38.4 40.2 46.6 32 53Z"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#h)" stroke="currentColor" stroke-width="1.15" stroke-linecap="round">
+    <path d="M2 46 L58 8"/>
+    <path d="M0 40 L56 2"/>
+    <path d="M4 52 L62 14"/>
+    <path d="M8 56 L64 20"/>
+    <path d="M-2 34 L52 -2"/>
+    <path d="M6 58 L64 26"/>
+    <path d="M12 60 L66 32"/>
+  </g>
+  <path
+    d="M32 53C23.8 46.2 12.4 37.6 7.6 27.8 2.6 17.4 10.2 7.6 18.6 8.4c6.2.6 10.8 5.6 13.4 11.2C34.4 13.8 39.4 8.6 46 8.5 54.4 8.4 61.4 17.8 56.6 28.2 52 38.4 40.2 46.6 32 53Z"
+    stroke="currentColor"
+    stroke-width="2.4"
+    stroke-linejoin="round"
+  />
+</svg>
