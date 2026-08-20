@@ -4770,9 +4770,9 @@ body.is-sealed .hero-meta {
   }
 }
 
-@media (max-width: 820px) {
-  /* Portrait park photo: the desktop 50svh lift mapped heads above the fold.
-     Zero lift so the viewport shows the image top; bias Y toward faces (~30%). */
+@media (max-width: 1100px) {
+  /* Tablet + narrow: desktop 50svh lift crops heads. Zero lift and face-bias
+     object-position (phone keeps a tighter override at ≤560px). */
   .scene-run {
     --scene-photo-lift: 0px;
     --scene-photo-y-start: 28%;

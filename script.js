@@ -2,7 +2,7 @@ const pills = [...document.querySelectorAll(".pill-nav .pill")];
 const panels = [...document.querySelectorAll("[data-panel]")];
 const pillNav = document.querySelector(".pill-nav");
 const navToggle = document.querySelector(".nav-toggle");
-const mqMobileNav = window.matchMedia("(max-width: 820px)");
+const mqMobileNav = window.matchMedia("(max-width: 1100px)");
 
 // Paste your Google Apps Script Web App URL here after deploying Code.gs
 const GOOGLE_SCRIPT_URL = "";
@@ -20,11 +20,10 @@ const scenePhoto = document.querySelector(".scene-run-photo");
 const homePanel = document.getElementById("home");
 const storyPanel = document.getElementById("story");
 
-/* Desktop: top half = page 1, bottom half = page 2 (0% → 50%).
-   Mobile: faces sit ~30–40% down the portrait; keep object-position
-   there. (CSS also zeros --scene-photo-lift so the tall frame cannot
-   push heads above the fold.) */
-const mqSceneNarrow = window.matchMedia("(max-width: 820px)");
+/* Desktop (>1100): top half = page 1, bottom half = page 2 (0% → 50%).
+   Tablet/narrow (≤1100): faces ~28–44%; phone (≤560): ~30–42%.
+   CSS zeros --scene-photo-lift in those ranges so heads stay in frame. */
+const mqSceneNarrow = window.matchMedia("(max-width: 1100px)");
 const mqScenePhone = window.matchMedia("(max-width: 560px)");
 
 function getScenePhotoYRange() {
