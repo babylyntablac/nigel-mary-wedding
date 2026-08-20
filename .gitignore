@@ -1,0 +1,24 @@
+# Dependencies / local tooling
+node_modules/
+.DS_Store
+Thumbs.db
+*.log
+
+# Editor / agent tooling (not part of the wedding site)
+.agents/
+.cursor/
+.interface-design/
+skills-lock.json
+
+# Local scratch / generated reference dumps in project root
+0-02-06-*.jpg
+0-02-06-*.png
+0-02-06-*.webp
+
+# Optional local-only references (not used by the live site)
+banner photo.jpg
+wedding reminders.jpg
+our story.jpg
+secondary sponsors.jpg
+wedding monogram.png
+"officiating minister, groom, bride, parent of the groom, parent of the bride, principal sponsors.jpg"
