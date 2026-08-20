@@ -707,17 +707,25 @@ body.is-nav-open {
   height: 2.75rem;
   align-items: center;
   justify-content: center;
-  border: 1px solid color-mix(in srgb, var(--cherry) 42%, transparent);
+  border: 1px solid color-mix(in srgb, var(--cherry) 36%, transparent);
   border-radius: 0;
-  background: color-mix(in srgb, var(--paper-bg) 82%, transparent);
-  box-shadow: 0 6px 20px rgba(26, 31, 28, 0.12);
+  background: color-mix(in srgb, var(--paper-bg) 48%, transparent);
+  box-shadow: 0 6px 20px rgba(26, 31, 28, 0.08);
   backdrop-filter: blur(10px);
   color: var(--olive);
   cursor: pointer;
   transition:
     opacity 0.6s var(--ease-out),
     background 0.22s var(--ease-out),
-    border-color 0.22s var(--ease-out);
+    border-color 0.22s var(--ease-out),
+    box-shadow 0.22s var(--ease-out);
+}
+
+.nav-toggle:hover,
+.nav-toggle:focus-visible {
+  background: color-mix(in srgb, var(--paper-bg) 72%, transparent);
+  border-color: color-mix(in srgb, var(--cherry) 48%, transparent);
+  box-shadow: 0 6px 20px rgba(26, 31, 28, 0.12);
 }
 
 .nav-toggle:focus-visible {
@@ -743,7 +751,7 @@ body.is-nav-open {
 }
 
 .nav-toggle[aria-expanded="true"] {
-  background: color-mix(in srgb, var(--cream) 88%, white);
+  background: color-mix(in srgb, var(--cream) 78%, transparent);
   border-color: color-mix(in srgb, var(--cherry) 55%, transparent);
   color: var(--cherry);
 }
