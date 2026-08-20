@@ -641,96 +641,144 @@
         </div>
       </section>
 
-      <section id="entourage" class="panel entourage-panel" data-panel="entourage">
+      <section
+        id="entourage"
+        class="panel entourage-panel entourage-overlay-light"
+        data-panel="entourage"
+        data-overlay="1"
+        data-align="center"
+      >
+        <div class="entourage-media" aria-hidden="true">
+          <div class="entourage-media-fixed">
+            <div class="entourage-media-photo"></div>
+            <div class="entourage-media-wash"></div>
+          </div>
+        </div>
+
+        <div class="entourage-overlay-switcher">
+          <div
+            class="entourage-align-switcher"
+            role="radiogroup"
+            aria-label="Name list alignment"
+          >
+            <button
+              type="button"
+              class="entourage-align"
+              data-align="left"
+              aria-label="Align names flush left"
+              aria-checked="false"
+              title="Flush left"
+            >
+              <svg class="entourage-align-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                <path d="M2 3.25h12M2 8h8M2 12.75h10" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/>
+              </svg>
+            </button>
+            <button
+              type="button"
+              class="entourage-align is-active"
+              data-align="center"
+              aria-label="Align names to the middle"
+              aria-checked="true"
+              title="Middle"
+            >
+              <svg class="entourage-align-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                <path d="M2 3.25h12M4 8h8M3 12.75h10" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/>
+              </svg>
+            </button>
+            <button
+              type="button"
+              class="entourage-align"
+              data-align="right"
+              aria-label="Align names flush right"
+              aria-checked="false"
+              title="Flush right"
+            >
+              <svg class="entourage-align-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                <path d="M2 3.25h12M6 8h8M4 12.75h10" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+
+          <div
+            class="entourage-tint-switcher"
+            role="radiogroup"
+            aria-label="Entourage background tint"
+          >
+            <button
+              type="button"
+              class="entourage-swatch is-active"
+              data-overlay="1"
+              aria-label="Champagne cream wash"
+              aria-checked="true"
+              title="Champagne"
+            ></button>
+            <button
+              type="button"
+              class="entourage-swatch"
+              data-overlay="2"
+              aria-label="Deep forest olive"
+              aria-checked="false"
+              title="Forest"
+            ></button>
+            <button
+              type="button"
+              class="entourage-swatch"
+              data-overlay="3"
+              aria-label="Burgundy cherry wine"
+              aria-checked="false"
+              title="Burgundy"
+            ></button>
+            <button
+              type="button"
+              class="entourage-swatch"
+              data-overlay="4"
+              aria-label="Navy ink wash"
+              aria-checked="false"
+              title="Navy"
+            ></button>
+            <button
+              type="button"
+              class="entourage-swatch"
+              data-overlay="5"
+              aria-label="Sage muted teal"
+              aria-checked="false"
+              title="Sage"
+            ></button>
+          </div>
+        </div>
+
         <div class="sponsors-compose">
           <div class="sponsors-band">
-            <div
-              class="sponsors-band-photo"
-              role="img"
-              aria-label="Hands forming a heart"
-            ></div>
-
             <article class="sponsors-card">
-              <svg class="sponsors-flourish sponsors-flourish--tl" viewBox="0 0 64 64" aria-hidden="true">
-                <path
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.15"
-                  d="M8 56 C10 34 18 18 36 10 M14 52 C18 38 28 26 44 20 M20 58 C24 44 36 32 52 28 M36 10 C42 8 50 12 54 20 M44 20 C50 18 56 24 58 32"
-                />
-                <path
-                  fill="currentColor"
-                  d="M34 12 C36 8 40 8 42 12 C40 14 36 14 34 12 Z M46 22 C48 18 52 18 54 22 C52 24 48 24 46 22 Z"
-                />
-              </svg>
-              <svg class="sponsors-flourish sponsors-flourish--tr" viewBox="0 0 64 64" aria-hidden="true">
-                <path
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.15"
-                  d="M56 56 C54 34 46 18 28 10 M50 52 C46 38 36 26 20 20 M44 58 C40 44 28 32 12 28 M28 10 C22 8 14 12 10 20 M20 20 C14 18 8 24 6 32"
-                />
-                <path
-                  fill="currentColor"
-                  d="M30 12 C28 8 24 8 22 12 C24 14 28 14 30 12 Z M18 22 C16 18 12 18 10 22 C12 24 16 24 18 22 Z"
-                />
-              </svg>
-              <svg class="sponsors-flourish sponsors-flourish--bl" viewBox="0 0 64 64" aria-hidden="true">
-                <path
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.15"
-                  d="M8 8 C10 30 18 46 36 54 M14 12 C18 26 28 38 44 44 M20 6 C24 20 36 32 52 36 M36 54 C42 56 50 52 54 44 M44 44 C50 46 56 40 58 32"
-                />
-                <path
-                  fill="currentColor"
-                  d="M34 52 C36 56 40 56 42 52 C40 50 36 50 34 52 Z M46 42 C48 46 52 46 54 42 C52 40 48 40 46 42 Z"
-                />
-              </svg>
-              <svg class="sponsors-flourish sponsors-flourish--br" viewBox="0 0 64 64" aria-hidden="true">
-                <path
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.15"
-                  d="M56 8 C54 30 46 46 28 54 M50 12 C46 26 36 38 20 44 M44 6 C40 20 28 32 12 36 M28 54 C22 56 14 52 10 44 M20 44 C14 46 8 40 6 32"
-                />
-                <path
-                  fill="currentColor"
-                  d="M30 52 C28 56 24 56 22 52 C24 50 28 50 30 52 Z M18 42 C16 46 12 46 10 42 C12 40 16 40 18 42 Z"
-                />
-              </svg>
-
               <div class="sponsors-frame">
                 <header class="sponsors-block sponsors-block--center">
-                  <h2 class="sponsors-script sponsors-script--lead">With the blessing of our parents</h2>
+                  <h2 class="sponsors-script sponsors-script--lead sponsors-script--names">With the blessing of our parents</h2>
                 </header>
 
                 <div class="sponsors-parents" aria-label="Parents of the couple">
                   <div class="sponsors-side">
-                    <h3 class="sponsors-script sponsors-script--role">Bride</h3>
+                    <h3 class="sponsors-script sponsors-script--role">Bride Parents</h3>
                     <p class="sponsors-name">Mr. Donato Tablac</p>
                     <p class="sponsors-name">Mrs. Estella Tablac</p>
                   </div>
                   <div class="sponsors-parents-flora" aria-hidden="true">
-                    <svg viewBox="0 0 48 72" fill="none">
-                      <g stroke="currentColor" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M24 68 V22" />
-                        <path d="M24 48 C14 42 10 30 16 22" />
-                        <path d="M24 42 C34 36 38 24 32 16" />
-                        <path d="M16 22 C12 14 18 8 24 12 C30 8 36 14 32 22 C28 18 20 18 16 22 Z" />
-                        <path d="M32 16 C28 8 34 2 40 6 C46 10 44 18 38 20 C36 14 34 12 32 16 Z" />
-                        <path d="M18 34 C12 30 8 34 10 40 C14 42 18 40 18 34 Z" />
-                      </g>
-                    </svg>
+                    <img
+                      class="sponsors-parents-flora-img"
+                      src="assets/entourage-center-flower.png"
+                      alt=""
+                      width="771"
+                      height="900"
+                      decoding="async"
+                    />
                   </div>
                   <div class="sponsors-side">
-                    <h3 class="sponsors-script sponsors-script--role">Groom</h3>
+                    <h3 class="sponsors-script sponsors-script--role">Groom Parents</h3>
                     <p class="sponsors-name">Mrs. Mary Jane Arugay</p>
                   </div>
                 </div>
 
                 <section class="sponsors-block sponsors-block--center sponsors-principals" aria-labelledby="ninong-ninang-heading">
-                  <h2 id="ninong-ninang-heading" class="sponsors-script">Ninong and Ninang</h2>
+                  <h2 id="ninong-ninang-heading" class="sponsors-script sponsors-script--names">Ninong and Ninang</h2>
                   <div class="sponsors-cols">
                     <ul class="sponsors-list sponsors-list--col">
                       <li>Apostle Jhun Aragon</li>
@@ -763,7 +811,7 @@
                 </section>
 
                 <section class="sponsors-block sponsors-block--center" aria-labelledby="best-maid-heading">
-                  <h2 id="best-maid-heading" class="sponsors-script">Best Man &amp; Maid of Honor</h2>
+                  <h2 id="best-maid-heading" class="sponsors-script sponsors-script--names">Best Man &amp; Maid of Honor</h2>
                   <div class="sponsors-pair-roles">
                     <div class="sponsors-side">
                       <p class="sponsors-script sponsors-script--sm">Best Man</p>
@@ -777,7 +825,7 @@
                 </section>
 
                 <section class="sponsors-block sponsors-block--center" aria-labelledby="secondary-sponsors-heading">
-                  <h2 id="secondary-sponsors-heading" class="sponsors-script">Secondary Sponsors</h2>
+                  <h2 id="secondary-sponsors-heading" class="sponsors-script sponsors-script--names">Secondary Sponsors</h2>
                   <div class="sponsors-secondary-row">
                     <div class="sponsors-side">
                       <h3 class="sponsors-script sponsors-script--role">Veil</h3>
@@ -798,15 +846,36 @@
                 </section>
 
                 <section class="sponsors-block sponsors-block--center" aria-labelledby="party-heading">
-                  <h2 id="party-heading" class="sponsors-script">Groomsmen &amp; Bridesmaids</h2>
-                  <ul class="sponsors-list sponsors-list--solo">
-                    <li>Mr. Nigeleivi Arugay</li>
-                    <li>Mr. John Luis Taganahan &amp; Ms. Glydel Nicole Cascayan</li>
-                    <li>Mr. Aisen Tablac &amp; Ms. Gianne Chloe Quijano</li>
-                    <li>Mr. Anthony Ariza &amp; Ms. Melody Taganahan</li>
-                    <li>Mr. Renzo Zuñiega &amp; Mrs. Angelica Villeña</li>
-                    <li>Mr. Kenneth Dugenio &amp; Elder Deborah Albason</li>
-                    <li>Mr. Vince Tablac &amp; Ms. Keen Claire Sardeña</li>
+                  <h2 id="party-heading" class="sponsors-script sponsors-script--names">Groomsmen &amp; Bridesmaids</h2>
+                  <ul class="sponsors-list sponsors-list--party">
+                    <li class="sponsors-party-row">
+                      <span class="sponsors-party-left">Mr. Nigeleivi Arugay</span>
+                      <span class="sponsors-party-right" aria-hidden="true"></span>
+                    </li>
+                    <li class="sponsors-party-row">
+                      <span class="sponsors-party-left">Mr. John Luis Taganahan</span>
+                      <span class="sponsors-party-right">Ms. Glydel Nicole Cascayan</span>
+                    </li>
+                    <li class="sponsors-party-row">
+                      <span class="sponsors-party-left">Mr. Aisen Tablac</span>
+                      <span class="sponsors-party-right">Ms. Gianne Chloe Quijano</span>
+                    </li>
+                    <li class="sponsors-party-row">
+                      <span class="sponsors-party-left">Mr. Anthony Ariza</span>
+                      <span class="sponsors-party-right">Ms. Melody Taganahan</span>
+                    </li>
+                    <li class="sponsors-party-row">
+                      <span class="sponsors-party-left">Mr. Renzo Zuñiega</span>
+                      <span class="sponsors-party-right">Mrs. Angelica Villeña</span>
+                    </li>
+                    <li class="sponsors-party-row">
+                      <span class="sponsors-party-left">Mr. Kenneth Dugenio</span>
+                      <span class="sponsors-party-right">Elder Deborah Albason</span>
+                    </li>
+                    <li class="sponsors-party-row">
+                      <span class="sponsors-party-left">Mr. Vince Tablac</span>
+                      <span class="sponsors-party-right">Ms. Keen Claire Sardeña</span>
+                    </li>
                   </ul>
                 </section>
               </div>

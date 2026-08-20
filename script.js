@@ -124,7 +124,7 @@ document.querySelectorAll('a[href^="#"]').forEach((link) => {
 });
 
 /* More page — HTML5 preview of Slower I Go (local copy of iTunes ~30s preview) */
-const MORE_PREVIEW_URL = `${import.meta.env.BASE_URL}assets/slower-i-go-preview.m4a`;
+const MORE_PREVIEW_URL = `${import.meta.env?.BASE_URL ?? ""}assets/slower-i-go-preview.m4a`;
 const MORE_FADE_MS = 1200;
 const MORE_TARGET_VOLUME = 0.65;
 
@@ -844,7 +844,7 @@ if (giftsQr) {
     giftsQr.src = fallback;
   });
   // Probe missing local asset quickly
-  fetch(`${import.meta.env.BASE_URL}assets/gifts-qr.png`, { method: "HEAD" })
+  fetch(`${import.meta.env?.BASE_URL ?? ""}assets/gifts-qr.png`, { method: "HEAD" })
     .then((res) => {
       if (!res.ok) giftsQr.src = fallback;
     })
@@ -864,6 +864,82 @@ document.querySelectorAll("img[data-photo-fallback]").forEach((img) => {
   img.addEventListener("error", markEmpty);
   if (img.complete && img.naturalWidth === 0) markEmpty();
 });
+
+/* Entourage overlay tint + name alignment */
+(function initEntourageControls() {
+  const panel = document.getElementById("entourage");
+  if (!panel) return;
+
+  const swatches = [...panel.querySelectorAll(".entourage-swatch")];
+  const alignButtons = [...panel.querySelectorAll(".entourage-align")];
+  const OVERLAY_KEY = "entourage-overlay";
+  const ALIGN_KEY = "entourage-align";
+  const LIGHT_OVERLAYS = new Set(["1"]);
+  const ALIGN_VALUES = new Set(["left", "center", "right"]);
+
+  const applyOverlay = (value) => {
+    const id = String(value);
+    if (!/^[1-5]$/.test(id)) return;
+
+    panel.dataset.overlay = id;
+    panel.classList.toggle("entourage-overlay-light", LIGHT_OVERLAYS.has(id));
+
+    swatches.forEach((btn) => {
+      const active = btn.dataset.overlay === id;
+      btn.classList.toggle("is-active", active);
+      btn.setAttribute("aria-checked", active ? "true" : "false");
+    });
+
+    try {
+      sessionStorage.setItem(OVERLAY_KEY, id);
+    } catch (_) {
+      /* ignore quota / private mode */
+    }
+  };
+
+  const applyAlign = (value) => {
+    const align = String(value);
+    if (!ALIGN_VALUES.has(align)) return;
+
+    panel.dataset.align = align;
+
+    alignButtons.forEach((btn) => {
+      const active = btn.dataset.align === align;
+      btn.classList.toggle("is-active", active);
+      btn.setAttribute("aria-checked", active ? "true" : "false");
+    });
+
+    try {
+      sessionStorage.setItem(ALIGN_KEY, align);
+    } catch (_) {
+      /* ignore quota / private mode */
+    }
+  };
+
+  let savedOverlay = "1";
+  let savedAlign = "center";
+  try {
+    savedOverlay = sessionStorage.getItem(OVERLAY_KEY) || "1";
+    savedAlign = sessionStorage.getItem(ALIGN_KEY) || "center";
+  } catch (_) {
+    savedOverlay = "1";
+    savedAlign = "center";
+  }
+
+  if (swatches.length) {
+    applyOverlay(savedOverlay);
+    swatches.forEach((btn) => {
+      btn.addEventListener("click", () => applyOverlay(btn.dataset.overlay));
+    });
+  }
+
+  if (alignButtons.length) {
+    applyAlign(savedAlign);
+    alignButtons.forEach((btn) => {
+      btn.addEventListener("click", () => applyAlign(btn.dataset.align));
+    });
+  }
+})();
 
 if (form && statusEl) {
   form.addEventListener("submit", async (event) => {
