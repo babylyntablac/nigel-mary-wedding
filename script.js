@@ -75,6 +75,7 @@ function scrollToSection(id) {
   const target = document.getElementById(id);
   if (!target) return;
 
+  /* Nav clicks may smooth-scroll; finger scroll stays CSS scroll-behavior:auto on mobile. */
   const scrollBehavior = prefersReducedMotion ? "auto" : "smooth";
   const { start: photoYStart, end: photoYEnd } = getScenePhotoYRange();
 
@@ -1345,9 +1346,10 @@ if (mobileRsvpCta) {
     const incomplete = firstIncompleteField();
     if (incomplete || !submitAreaInView()) {
       const focusTarget = incomplete || submitArea || form;
+      /* Mobile: avoid block:"center" latch feel; keep free native scroll positioning. */
       focusTarget.scrollIntoView({
         behavior: prefersReducedMotion ? "auto" : "smooth",
-        block: "center",
+        block: mqMobileNav.matches ? "nearest" : "center",
       });
       if (incomplete && typeof incomplete.focus === "function") {
         window.setTimeout(
