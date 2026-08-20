@@ -103,7 +103,7 @@ document.querySelectorAll('a[href^="#"]').forEach((link) => {
 });
 
 /* More page — HTML5 preview of Slower I Go (local copy of iTunes ~30s preview) */
-const MORE_PREVIEW_URL = "assets/slower-i-go-preview.m4a";
+const MORE_PREVIEW_URL = `${import.meta.env.BASE_URL}assets/slower-i-go-preview.m4a`;
 const MORE_FADE_MS = 1200;
 const MORE_TARGET_VOLUME = 0.65;
 
@@ -360,7 +360,7 @@ if (giftsQr) {
     giftsQr.src = fallback;
   });
   // Probe missing local asset quickly
-  fetch("assets/gifts-qr.png", { method: "HEAD" })
+  fetch(`${import.meta.env.BASE_URL}assets/gifts-qr.png`, { method: "HEAD" })
     .then((res) => {
       if (!res.ok) giftsQr.src = fallback;
     })

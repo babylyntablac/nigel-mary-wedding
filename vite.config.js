@@ -7,6 +7,7 @@ const noCache = {
 };
 
 export default defineConfig({
+  base: "/nigel-mary-wedding/",
   appType: "mpa",
   server: {
     host: "127.0.0.1",

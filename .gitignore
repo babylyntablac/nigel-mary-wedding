@@ -22,3 +22,7 @@ our story.jpg
 secondary sponsors.jpg
 wedding monogram.png
 "officiating minister, groom, bride, parent of the groom, parent of the bride, principal sponsors.jpg"
+
+# Build output
+dist/
+
