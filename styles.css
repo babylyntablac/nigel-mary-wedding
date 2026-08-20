@@ -677,6 +677,12 @@ body.is-sealed .mobile-rsvp-cta {
   pointer-events: none;
 }
 
+/* Fade floating CTA while RSVP section is active (≤1100; sealed already hides it) */
+body.is-rsvp-view .mobile-rsvp-cta {
+  opacity: 0;
+  pointer-events: none;
+}
+
 /* Mobile/tablet primary CTA — shown only at hamburger breakpoint (≤1100) */
 .mobile-rsvp-cta {
   display: none;
@@ -1806,7 +1812,7 @@ body.is-sealed .hero-meta {
 }
 
 .rsvp-form--compact {
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 0.35rem 0.55rem;
   margin-top: 0;
 }
@@ -4340,7 +4346,7 @@ body.is-sealed .hero-meta {
 
 .rsvp-form {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: clamp(0.65rem, 1.8vh, 1rem) 0.9rem;
   align-content: start;
 }
@@ -4484,49 +4490,26 @@ body.is-sealed .hero-meta {
   display: block;
 }
 
-.guests-note {
+.guests-summary {
   margin: 0;
-  padding: 0.65rem 0.75rem;
-  border: 1px solid color-mix(in srgb, var(--cherry) 28%, transparent);
-  border-left: 3px solid var(--cherry);
-  border-radius: 2px;
-  background: color-mix(in srgb, var(--cherry) 7%, var(--white));
   font-family: var(--font-body);
   font-size: 0.9rem;
-  color: color-mix(in srgb, var(--ink) 82%, transparent);
-  line-height: 1.45;
-}
-
-.guests-note strong {
-  color: var(--cherry-deep);
-  font-weight: 700;
-}
-
-.guests-note em {
-  font-style: italic;
-  color: var(--cherry);
-  font-weight: 600;
-}
-
-.guests-cost-note {
-  margin: 0;
-  padding: 0.45rem 0.55rem;
-  border-radius: 2px;
-  background: color-mix(in srgb, var(--gold) 12%, var(--white));
-  font-family: var(--font-body);
-  font-size: 0.84rem;
   line-height: 1.45;
   color: color-mix(in srgb, var(--ink) 78%, transparent);
 }
 
-.guests-cost-note strong {
+.guests-summary[hidden] {
+  display: none;
+}
+
+.guests-summary strong {
   color: var(--cherry-deep);
   font-weight: 700;
 }
 
 .guests-add-btn {
-  justify-self: start;
-  min-height: 2.5rem;
+  width: 100%;
+  min-height: 2.9rem;
   padding: 0.45rem 1rem;
   border: 1px dashed color-mix(in srgb, var(--cherry) 42%, transparent);
   border-radius: 2px;
@@ -4677,7 +4660,7 @@ body.is-sealed .hero-meta {
 .guests-modal-panel {
   position: relative;
   z-index: 1;
-  width: min(26rem, 100%);
+  width: min(28rem, 100%);
   padding: clamp(1.35rem, 4vw, 1.85rem);
   border: 1px solid color-mix(in srgb, var(--gold) 35%, var(--cherry));
   border-radius: 2px;
@@ -4715,6 +4698,48 @@ body.is-sealed .hero-meta {
 .guests-modal-body strong {
   color: var(--cherry-deep);
   font-weight: 700;
+}
+
+.guests-modal .guests-stepper {
+  margin-bottom: 1.15rem;
+  text-align: left;
+}
+
+.guests-modal-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem;
+}
+
+.guests-modal-cancel {
+  width: 100%;
+  min-height: 2.85rem;
+  margin: 0;
+  padding: 0.45rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--olive) 28%, transparent);
+  border-radius: 2px;
+  background: var(--white);
+  color: color-mix(in srgb, var(--ink) 78%, transparent);
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    border-color 0.18s var(--ease-out),
+    background 0.18s var(--ease-out),
+    color 0.18s var(--ease-out);
+}
+
+.guests-modal-cancel:hover {
+  border-color: color-mix(in srgb, var(--cherry) 35%, transparent);
+  color: var(--cherry);
+}
+
+.guests-modal-cancel:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cherry) 12%, transparent);
 }
 
 .guests-modal-cta {
@@ -5068,8 +5093,8 @@ body.is-sealed .hero-meta {
       0 10px 28px rgba(53, 20, 26, 0.38),
       0 0 0 1px color-mix(in srgb, var(--gold) 22%, transparent);
     transition:
-      opacity 0.35s var(--ease-out),
-      visibility 0.35s var(--ease-out),
+      opacity 0.35s ease,
+      visibility 0.35s ease,
       transform 0.22s var(--ease-out);
   }
 

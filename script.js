@@ -1116,7 +1116,7 @@ if (form && statusEl) {
   const COST_PER_EXTRA = 3000;
   const guestsTotalInput = document.getElementById("guests-total");
   const guestsAddBtn = document.getElementById("guests-add-btn");
-  const guestsStepper = document.getElementById("guests-stepper");
+  const guestsSummary = document.getElementById("guests-summary");
   const guestsExtraCount = document.getElementById("guests-extra-count");
   const guestsEstimate = document.getElementById("guests-estimate");
   const guestsMinus = document.getElementById("guests-minus");
@@ -1125,39 +1125,49 @@ if (form && statusEl) {
   const guestsUnderstand = document.getElementById("guests-understand");
   const contactInput = form.querySelector('input[name="email"]');
 
-  let extraGuests = 0;
-  let guestsAcknowledged = false;
+  let confirmedExtras = 0;
+  let draftExtras = 0;
   let modalLastFocus = null;
 
   const peso = (amount) =>
     `₱${amount.toLocaleString("en-PH", { maximumFractionDigits: 0 })}`;
 
-  function syncGuestsUi() {
-    if (guestsTotalInput) guestsTotalInput.value = String(1 + extraGuests);
-    if (guestsExtraCount) guestsExtraCount.textContent = String(extraGuests);
+  function syncStepperUi(count) {
+    if (guestsExtraCount) guestsExtraCount.textContent = String(count);
     if (guestsEstimate) {
       guestsEstimate.innerHTML = `Estimated contribution for extra guests: <strong>${peso(
-        extraGuests * COST_PER_EXTRA
-      )}</strong> <span class="guests-estimate-math">(${extraGuests} × ${peso(COST_PER_EXTRA)})</span>`;
+        count * COST_PER_EXTRA
+      )}</strong> <span class="guests-estimate-math">(${count} × ${peso(COST_PER_EXTRA)})</span>`;
     }
-    if (guestsMinus) guestsMinus.disabled = extraGuests <= 0;
-    if (guestsPlus) guestsPlus.disabled = extraGuests >= MAX_EXTRA_GUESTS;
+    if (guestsMinus) guestsMinus.disabled = count <= 0;
+    if (guestsPlus) guestsPlus.disabled = count >= MAX_EXTRA_GUESTS;
   }
 
-  function revealGuestsStepper() {
-    guestsAcknowledged = true;
-    if (guestsAddBtn) guestsAddBtn.hidden = true;
-    if (guestsStepper) guestsStepper.hidden = false;
-    if (extraGuests < 1) extraGuests = 1;
-    syncGuestsUi();
+  function syncFormGuests() {
+    if (guestsTotalInput) guestsTotalInput.value = String(1 + confirmedExtras);
+    if (guestsAddBtn) {
+      guestsAddBtn.textContent =
+        confirmedExtras > 0 ? "Edit guests" : "+ Add a guest";
+    }
+    if (guestsSummary) {
+      if (confirmedExtras > 0) {
+        const label = confirmedExtras === 1 ? "1 extra guest" : `${confirmedExtras} extra guests`;
+        guestsSummary.hidden = false;
+        guestsSummary.innerHTML = `${label} · <strong>${peso(
+          confirmedExtras * COST_PER_EXTRA
+        )}</strong>`;
+      } else {
+        guestsSummary.hidden = true;
+        guestsSummary.textContent = "";
+      }
+    }
   }
 
   function resetGuestsUi() {
-    extraGuests = 0;
-    guestsAcknowledged = false;
-    if (guestsAddBtn) guestsAddBtn.hidden = false;
-    if (guestsStepper) guestsStepper.hidden = true;
-    syncGuestsUi();
+    confirmedExtras = 0;
+    draftExtras = 0;
+    syncStepperUi(0);
+    syncFormGuests();
   }
 
   function getFocusable(root) {
@@ -1172,7 +1182,7 @@ if (form && statusEl) {
     if (!guestsNotice || guestsNotice.hidden) return;
     if (event.key === "Escape") {
       event.preventDefault();
-      closeGuestsNotice();
+      closeGuestsNotice({ apply: false });
       return;
     }
     if (event.key !== "Tab") return;
@@ -1192,49 +1202,52 @@ if (form && statusEl) {
   function openGuestsNotice() {
     if (!guestsNotice) return;
     modalLastFocus = document.activeElement;
+    draftExtras = confirmedExtras > 0 ? confirmedExtras : 1;
+    syncStepperUi(draftExtras);
     guestsNotice.hidden = false;
     document.body.style.overflow = "hidden";
     document.addEventListener("keydown", onGuestsNoticeKeydown);
     const focusables = getFocusable(guestsNotice);
-    (guestsUnderstand || focusables[0])?.focus();
+    (guestsPlus || guestsUnderstand || focusables[0])?.focus();
   }
 
-  function closeGuestsNotice({ acknowledge = false } = {}) {
+  function closeGuestsNotice({ apply = false } = {}) {
     if (!guestsNotice || guestsNotice.hidden) return;
+    if (apply) {
+      confirmedExtras = draftExtras;
+      syncFormGuests();
+    } else {
+      draftExtras = confirmedExtras;
+      syncStepperUi(draftExtras);
+    }
     guestsNotice.hidden = true;
     document.body.style.overflow = "";
     document.removeEventListener("keydown", onGuestsNoticeKeydown);
-    if (acknowledge) revealGuestsStepper();
-    const restore = acknowledge ? guestsPlus || guestsStepper : guestsAddBtn;
-    (restore || modalLastFocus)?.focus?.();
+    (guestsAddBtn || modalLastFocus)?.focus?.();
   }
 
   guestsAddBtn?.addEventListener("click", () => {
-    if (guestsAcknowledged) {
-      revealGuestsStepper();
-      return;
-    }
     openGuestsNotice();
   });
 
   guestsUnderstand?.addEventListener("click", () => {
-    closeGuestsNotice({ acknowledge: true });
+    closeGuestsNotice({ apply: true });
   });
 
   guestsNotice?.querySelectorAll("[data-guests-dismiss]").forEach((el) => {
-    el.addEventListener("click", () => closeGuestsNotice());
+    el.addEventListener("click", () => closeGuestsNotice({ apply: false }));
   });
 
   guestsMinus?.addEventListener("click", () => {
-    if (extraGuests <= 0) return;
-    extraGuests -= 1;
-    syncGuestsUi();
+    if (draftExtras <= 0) return;
+    draftExtras -= 1;
+    syncStepperUi(draftExtras);
   });
 
   guestsPlus?.addEventListener("click", () => {
-    if (extraGuests >= MAX_EXTRA_GUESTS) return;
-    extraGuests += 1;
-    syncGuestsUi();
+    if (draftExtras >= MAX_EXTRA_GUESTS) return;
+    draftExtras += 1;
+    syncStepperUi(draftExtras);
   });
 
   function isValidContact(value) {
@@ -1245,7 +1258,8 @@ if (form && statusEl) {
     return /^(?:\+?63|0)9\d{9}$/.test(digits);
   }
 
-  syncGuestsUi();
+  syncFormGuests();
+  syncStepperUi(0);
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -1266,7 +1280,7 @@ if (form && statusEl) {
       return;
     }
 
-    syncGuestsUi();
+    syncFormGuests();
     const data = Object.fromEntries(new FormData(form).entries());
     statusEl.textContent = "Sending your RSVP…";
 

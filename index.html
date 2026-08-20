@@ -408,12 +408,12 @@
               <figure class="join-shot">
                 <img
                   src="assets/estancia-pool.webp?v=1"
-                  alt="Luxxe Pavilion grounds at Estancia de Lorenzo"
+                  alt="Luxe Pavilion grounds at Estancia de Lorenzo"
                   loading="lazy"
                   decoding="async"
                 />
               </figure>
-              <p class="join-hour-meta">6:15 PM · Luxxe Pavilion</p>
+              <p class="join-hour-meta">6:15 PM · Luxe Pavilion</p>
             </article>
           </div>
 
@@ -836,11 +836,6 @@
               <div class="field field--wide guests-field" data-guests-root>
                 <span class="guests-label">Guests</span>
                 <input type="hidden" name="guests" id="guests-total" value="1" />
-                <p class="guests-note" id="guests-baseline" role="note">
-                  <strong>Please note:</strong> you are already counted.
-                  Add only <em>extra</em> guests —
-                  <strong>excluding yourself</strong>.
-                </p>
                 <button
                   type="button"
                   class="guests-add-btn"
@@ -850,24 +845,7 @@
                 >
                   + Add a guest
                 </button>
-                <div class="guests-stepper" id="guests-stepper" hidden>
-                  <div class="guests-stepper-row">
-                    <span class="guests-stepper-label" id="guests-extra-label">Extra guests (excluding yourself)</span>
-                    <div class="guests-stepper-controls" role="group" aria-labelledby="guests-extra-label">
-                      <button type="button" class="guests-step-btn" id="guests-minus" aria-label="Fewer extra guests">−</button>
-                      <span class="guests-step-count" id="guests-extra-count" aria-live="polite">0</span>
-                      <button type="button" class="guests-step-btn" id="guests-plus" aria-label="More extra guests">+</button>
-                    </div>
-                  </div>
-                  <p class="guests-estimate" id="guests-estimate" aria-live="polite">
-                    Estimated contribution for extra guests: <strong>₱0</strong>
-                  </p>
-                  <p class="guests-cost-note">
-                    Cost applies <strong>only</strong> to extra guests
-                    (<span aria-hidden="true">·</span>
-                    <strong>₱3,000</strong> each (excluding yourself).
-                  </p>
-                </div>
+                <p class="guests-summary" id="guests-summary" hidden aria-live="polite"></p>
               </div>
 
               <div class="field field--submit">
@@ -929,11 +907,10 @@
         <h3 class="guests-modal-title" id="guests-notice-title">You’re welcome to bring a guest</h3>
         <div class="guests-modal-body">
           <p>
-            We would be truly glad if extra guests celebrated with us.
-            With warm hearts, we share a gentle note:
+            We’d be so happy if your loved ones celebrated with us too!
           </p>
           <p>
-            <strong>You are already counted</strong> as our invited guest.
+            A joyful note: <strong>you’re already counted</strong> as our invited guest.
             Anyone you add is an <strong>extra</strong> guest —
             <strong>excluding yourself</strong>.
           </p>
@@ -943,13 +920,31 @@
             extra guests × ₱3,000 — kindly covered by those joining beyond your invitation.
           </p>
           <p>
-            Your presence is already our gift; this share simply helps us welcome
-            every +1 with love.
+            Your presence is already our greatest gift — this little share just helps us
+            welcome every +1 with open arms.
           </p>
         </div>
-        <button type="button" class="btn-primary guests-modal-cta" id="guests-understand">
-          I understand
-        </button>
+        <div class="guests-stepper" id="guests-stepper">
+          <div class="guests-stepper-row">
+            <span class="guests-stepper-label" id="guests-extra-label">Extra guests (excluding yourself)</span>
+            <div class="guests-stepper-controls" role="group" aria-labelledby="guests-extra-label">
+              <button type="button" class="guests-step-btn" id="guests-minus" aria-label="Fewer extra guests">−</button>
+              <span class="guests-step-count" id="guests-extra-count" aria-live="polite">0</span>
+              <button type="button" class="guests-step-btn" id="guests-plus" aria-label="More extra guests">+</button>
+            </div>
+          </div>
+          <p class="guests-estimate" id="guests-estimate" aria-live="polite">
+            Estimated contribution for extra guests: <strong>₱0</strong>
+          </p>
+        </div>
+        <div class="guests-modal-actions">
+          <button type="button" class="guests-modal-cancel" id="guests-cancel" data-guests-dismiss>
+            Cancel
+          </button>
+          <button type="button" class="btn-primary guests-modal-cta" id="guests-understand">
+            I understand
+          </button>
+        </div>
       </div>
     </div>
 
