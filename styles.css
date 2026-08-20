@@ -201,8 +201,8 @@ img {
 .stage-look-head,
 .more-frame {
   transition:
-    opacity 0.95s var(--ease-out),
-    transform 0.95s var(--ease-out);
+    opacity 0.72s var(--ease-out),
+    transform 0.72s var(--ease-out);
 }
 
 .panel:not(.is-inview) .day-beat:nth-child(odd) {
