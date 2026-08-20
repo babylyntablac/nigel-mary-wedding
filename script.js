@@ -118,6 +118,7 @@ function setActivePill(id) {
   pills.forEach((pill) => {
     pill.classList.toggle("is-active", pill.dataset.section === id);
   });
+  document.body.classList.toggle("is-rsvp-view", id === "rsvp");
 }
 
 function syncMobileNavA11y(isOpen) {
@@ -1111,9 +1112,152 @@ document.querySelectorAll("img[data-photo-fallback]").forEach((img) => {
 });
 
 if (form && statusEl) {
+  const MAX_EXTRA_GUESTS = 9;
+  const COST_PER_EXTRA = 3000;
+  const guestsTotalInput = document.getElementById("guests-total");
+  const guestsAddBtn = document.getElementById("guests-add-btn");
+  const guestsStepper = document.getElementById("guests-stepper");
+  const guestsExtraCount = document.getElementById("guests-extra-count");
+  const guestsEstimate = document.getElementById("guests-estimate");
+  const guestsMinus = document.getElementById("guests-minus");
+  const guestsPlus = document.getElementById("guests-plus");
+  const guestsNotice = document.getElementById("guests-notice");
+  const guestsUnderstand = document.getElementById("guests-understand");
+  const contactInput = form.querySelector('input[name="email"]');
+
+  let extraGuests = 0;
+  let guestsAcknowledged = false;
+  let modalLastFocus = null;
+
+  const peso = (amount) =>
+    `₱${amount.toLocaleString("en-PH", { maximumFractionDigits: 0 })}`;
+
+  function syncGuestsUi() {
+    if (guestsTotalInput) guestsTotalInput.value = String(1 + extraGuests);
+    if (guestsExtraCount) guestsExtraCount.textContent = String(extraGuests);
+    if (guestsEstimate) {
+      guestsEstimate.innerHTML = `Estimated contribution for extra guests: <strong>${peso(
+        extraGuests * COST_PER_EXTRA
+      )}</strong> <span class="guests-estimate-math">(${extraGuests} × ${peso(COST_PER_EXTRA)})</span>`;
+    }
+    if (guestsMinus) guestsMinus.disabled = extraGuests <= 0;
+    if (guestsPlus) guestsPlus.disabled = extraGuests >= MAX_EXTRA_GUESTS;
+  }
+
+  function revealGuestsStepper() {
+    guestsAcknowledged = true;
+    if (guestsAddBtn) guestsAddBtn.hidden = true;
+    if (guestsStepper) guestsStepper.hidden = false;
+    if (extraGuests < 1) extraGuests = 1;
+    syncGuestsUi();
+  }
+
+  function resetGuestsUi() {
+    extraGuests = 0;
+    guestsAcknowledged = false;
+    if (guestsAddBtn) guestsAddBtn.hidden = false;
+    if (guestsStepper) guestsStepper.hidden = true;
+    syncGuestsUi();
+  }
+
+  function getFocusable(root) {
+    return [
+      ...root.querySelectorAll(
+        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      ),
+    ].filter((el) => !el.hasAttribute("hidden") && el.getClientRects().length > 0);
+  }
+
+  function onGuestsNoticeKeydown(event) {
+    if (!guestsNotice || guestsNotice.hidden) return;
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeGuestsNotice();
+      return;
+    }
+    if (event.key !== "Tab") return;
+    const focusables = getFocusable(guestsNotice);
+    if (!focusables.length) return;
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
+
+  function openGuestsNotice() {
+    if (!guestsNotice) return;
+    modalLastFocus = document.activeElement;
+    guestsNotice.hidden = false;
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", onGuestsNoticeKeydown);
+    const focusables = getFocusable(guestsNotice);
+    (guestsUnderstand || focusables[0])?.focus();
+  }
+
+  function closeGuestsNotice({ acknowledge = false } = {}) {
+    if (!guestsNotice || guestsNotice.hidden) return;
+    guestsNotice.hidden = true;
+    document.body.style.overflow = "";
+    document.removeEventListener("keydown", onGuestsNoticeKeydown);
+    if (acknowledge) revealGuestsStepper();
+    const restore = acknowledge ? guestsPlus || guestsStepper : guestsAddBtn;
+    (restore || modalLastFocus)?.focus?.();
+  }
+
+  guestsAddBtn?.addEventListener("click", () => {
+    if (guestsAcknowledged) {
+      revealGuestsStepper();
+      return;
+    }
+    openGuestsNotice();
+  });
+
+  guestsUnderstand?.addEventListener("click", () => {
+    closeGuestsNotice({ acknowledge: true });
+  });
+
+  guestsNotice?.querySelectorAll("[data-guests-dismiss]").forEach((el) => {
+    el.addEventListener("click", () => closeGuestsNotice());
+  });
+
+  guestsMinus?.addEventListener("click", () => {
+    if (extraGuests <= 0) return;
+    extraGuests -= 1;
+    syncGuestsUi();
+  });
+
+  guestsPlus?.addEventListener("click", () => {
+    if (extraGuests >= MAX_EXTRA_GUESTS) return;
+    extraGuests += 1;
+    syncGuestsUi();
+  });
+
+  function isValidContact(value) {
+    const raw = value.trim();
+    if (!raw) return false;
+    if (/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i.test(raw)) return true;
+    const digits = raw.replace(/[\s\-().]/g, "");
+    return /^(?:\+?63|0)9\d{9}$/.test(digits);
+  }
+
+  syncGuestsUi();
+
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     statusEl.classList.remove("is-error");
+
+    if (contactInput && !isValidContact(contactInput.value)) {
+      statusEl.classList.add("is-error");
+      statusEl.textContent =
+        "Please enter a valid email or Philippine mobile number (e.g. 09XXXXXXXXX).";
+      contactInput.focus();
+      return;
+    }
 
     if (!GOOGLE_SCRIPT_URL) {
       statusEl.classList.add("is-error");
@@ -1122,6 +1266,7 @@ if (form && statusEl) {
       return;
     }
 
+    syncGuestsUi();
     const data = Object.fromEntries(new FormData(form).entries());
     statusEl.textContent = "Sending your RSVP…";
 
@@ -1134,10 +1279,75 @@ if (form && statusEl) {
       });
 
       form.reset();
+      resetGuestsUi();
       statusEl.textContent = "Thank you — your RSVP was sent. We can’t wait to celebrate with you.";
     } catch (error) {
       statusEl.classList.add("is-error");
       statusEl.textContent = "Something went wrong. Please try again in a moment.";
+    }
+  });
+}
+
+/* Mobile ≤1100: persistent bottom RSVP NOW — navigate, or help finish the form */
+const mobileRsvpCta = document.querySelector(".mobile-rsvp-cta");
+if (mobileRsvpCta) {
+  const submitArea = form?.querySelector(".field--submit");
+
+  function firstIncompleteField() {
+    if (!form) return null;
+    const nameInput = form.querySelector('input[name="name"]');
+    const contact = form.querySelector('input[name="email"]');
+    const attendance = form.querySelector('input[name="attendance"]:checked');
+    if (nameInput && !nameInput.value.trim()) return nameInput;
+    if (contact && !contact.value.trim()) return contact;
+    if (!attendance) {
+      return form.querySelector('input[name="attendance"]') || submitArea;
+    }
+    return null;
+  }
+
+  function submitAreaInView() {
+    if (!form) return false;
+    const target = submitArea || form;
+    const rect = target.getBoundingClientRect();
+    const vh = window.innerHeight || 1;
+    return rect.top < vh * 0.82 && rect.bottom > vh * 0.22;
+  }
+
+  mobileRsvpCta.addEventListener("click", (event) => {
+    event.preventDefault();
+    setMobileNavOpen(false, { restoreFocus: false });
+
+    if (!document.body.classList.contains("is-rsvp-view")) {
+      scrollToSection("rsvp");
+      return;
+    }
+
+    if (!form) {
+      scrollToSection("rsvp");
+      return;
+    }
+
+    const incomplete = firstIncompleteField();
+    if (incomplete || !submitAreaInView()) {
+      const focusTarget = incomplete || submitArea || form;
+      focusTarget.scrollIntoView({
+        behavior: prefersReducedMotion ? "auto" : "smooth",
+        block: "center",
+      });
+      if (incomplete && typeof incomplete.focus === "function") {
+        window.setTimeout(
+          () => incomplete.focus({ preventScroll: true }),
+          prefersReducedMotion ? 0 : 320
+        );
+      }
+      return;
+    }
+
+    if (typeof form.requestSubmit === "function") {
+      form.requestSubmit();
+    } else {
+      form.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
     }
   });
 }

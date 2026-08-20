@@ -671,9 +671,15 @@ img {
 }
 
 body.is-sealed .pill-nav,
-body.is-sealed .nav-toggle {
+body.is-sealed .nav-toggle,
+body.is-sealed .mobile-rsvp-cta {
   opacity: 0;
   pointer-events: none;
+}
+
+/* Mobile/tablet primary CTA — shown only at hamburger breakpoint (≤1100) */
+.mobile-rsvp-cta {
+  display: none;
 }
 
 body.is-sealed .hero-monogram {
@@ -4470,6 +4476,254 @@ body.is-sealed .hero-meta {
   border-radius: 2px;
 }
 
+.guests-field {
+  gap: 0.55rem;
+}
+
+.guests-label {
+  display: block;
+}
+
+.guests-note {
+  margin: 0;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--cherry) 28%, transparent);
+  border-left: 3px solid var(--cherry);
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--cherry) 7%, var(--white));
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: color-mix(in srgb, var(--ink) 82%, transparent);
+  line-height: 1.45;
+}
+
+.guests-note strong {
+  color: var(--cherry-deep);
+  font-weight: 700;
+}
+
+.guests-note em {
+  font-style: italic;
+  color: var(--cherry);
+  font-weight: 600;
+}
+
+.guests-cost-note {
+  margin: 0;
+  padding: 0.45rem 0.55rem;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--gold) 12%, var(--white));
+  font-family: var(--font-body);
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: color-mix(in srgb, var(--ink) 78%, transparent);
+}
+
+.guests-cost-note strong {
+  color: var(--cherry-deep);
+  font-weight: 700;
+}
+
+.guests-add-btn {
+  justify-self: start;
+  min-height: 2.5rem;
+  padding: 0.45rem 1rem;
+  border: 1px dashed color-mix(in srgb, var(--cherry) 42%, transparent);
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--cherry) 5%, var(--white));
+  color: var(--cherry);
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    border-color 0.18s var(--ease-out),
+    background 0.18s var(--ease-out),
+    color 0.18s var(--ease-out);
+}
+
+.guests-add-btn:hover {
+  border-style: solid;
+  background: color-mix(in srgb, var(--cherry) 10%, var(--white));
+}
+
+.guests-add-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cherry) 12%, transparent);
+}
+
+.guests-add-btn[hidden] {
+  display: none;
+}
+
+.guests-stepper {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid color-mix(in srgb, var(--olive) 18%, transparent);
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--ivory) 55%, var(--white));
+}
+
+.guests-stepper[hidden] {
+  display: none;
+}
+
+.guests-stepper-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.guests-stepper-label {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--ink) 68%, transparent);
+}
+
+.guests-stepper-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.guests-step-btn {
+  width: 2.35rem;
+  height: 2.35rem;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--olive) 22%, transparent);
+  border-radius: 2px;
+  background: var(--white);
+  color: var(--cherry);
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    border-color 0.18s var(--ease-out),
+    background 0.18s var(--ease-out);
+}
+
+.guests-step-btn:hover:not(:disabled) {
+  border-color: var(--cherry);
+  background: color-mix(in srgb, var(--cherry) 6%, var(--white));
+}
+
+.guests-step-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cherry) 12%, transparent);
+}
+
+.guests-step-btn:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+
+.guests-step-count {
+  min-width: 2rem;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.guests-estimate {
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  color: color-mix(in srgb, var(--ink) 78%, transparent);
+  line-height: 1.4;
+}
+
+.guests-estimate strong {
+  color: var(--cherry);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.guests-estimate-math {
+  font-size: 0.82em;
+  color: color-mix(in srgb, var(--ink) 58%, transparent);
+}
+
+.guests-modal[hidden] {
+  display: none;
+}
+
+.guests-modal:not([hidden]) {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+}
+
+.guests-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--forest) 48%, transparent);
+  backdrop-filter: blur(2px);
+}
+
+.guests-modal-panel {
+  position: relative;
+  z-index: 1;
+  width: min(26rem, 100%);
+  padding: clamp(1.35rem, 4vw, 1.85rem);
+  border: 1px solid color-mix(in srgb, var(--gold) 35%, var(--cherry));
+  border-radius: 2px;
+  background:
+    radial-gradient(ellipse at 12% 0%, rgba(75, 29, 36, 0.05) 0%, transparent 50%),
+    linear-gradient(180deg, #faf7f1 0%, var(--paper-bg) 100%);
+  box-shadow: 0 22px 48px color-mix(in srgb, var(--ink) 22%, transparent);
+  text-align: center;
+}
+
+.guests-modal-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 3.5vw, 1.65rem);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--cherry);
+  line-height: 1.25;
+  margin-bottom: 0.85rem;
+}
+
+.guests-modal-body {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  text-align: left;
+}
+
+.guests-modal-body p {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: color-mix(in srgb, var(--ink) 82%, transparent);
+}
+
+.guests-modal-body strong {
+  color: var(--cherry-deep);
+  font-weight: 700;
+}
+
+.guests-modal-cta {
+  width: 100%;
+  margin-top: 0;
+  min-height: 2.85rem;
+  border-radius: 2px;
+}
+
 .form-status {
   min-height: 1.1rem;
   font-family: var(--font-body);
@@ -4771,6 +5025,11 @@ body.is-sealed .hero-meta {
 }
 
 @media (max-width: 1100px) {
+  /* Clearance for fixed bottom RSVP CTA + iOS home indicator */
+  :root {
+    --mobile-rsvp-cta-space: calc(4.35rem + env(safe-area-inset-bottom, 0px));
+  }
+
   /* Tablet + narrow: desktop 50svh lift crops heads. Zero lift and face-bias
      object-position (phone keeps a tighter override at ≤560px). */
   .scene-run {
@@ -4778,6 +5037,107 @@ body.is-sealed .hero-meta {
     --scene-photo-y-start: 28%;
     --scene-photo-y-end: 44%;
     --scene-photo-y: var(--scene-photo-y-start);
+  }
+
+  /* Persistent bottom CTA — primary; menu RSVP stays as secondary */
+  .mobile-rsvp-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    left: 50%;
+    bottom: max(0.85rem, calc(env(safe-area-inset-bottom, 0px) + 0.65rem));
+    z-index: 55;
+    min-width: min(16.5rem, calc(100vw - 2.5rem));
+    min-height: 3rem;
+    padding: 0.7rem 1.65rem;
+    transform: translateX(-50%);
+    isolation: isolate;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--gold) 62%, var(--cherry));
+    border-radius: 0;
+    color: #f7f1e8;
+    font-family: var(--font-sans);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+    text-align: center;
+    box-shadow:
+      0 10px 28px rgba(53, 20, 26, 0.38),
+      0 0 0 1px color-mix(in srgb, var(--gold) 22%, transparent);
+    transition:
+      opacity 0.35s var(--ease-out),
+      visibility 0.35s var(--ease-out),
+      transform 0.22s var(--ease-out);
+  }
+
+  .mobile-rsvp-cta::before {
+    content: "";
+    position: absolute;
+    inset: -120%;
+    background: conic-gradient(
+      from 0deg,
+      #35141a 0deg,
+      #6a2a34 70deg,
+      #d2b882 140deg,
+      #3d5c48 210deg,
+      #4b1d24 280deg,
+      #d2b882 330deg,
+      #35141a 360deg
+    );
+    animation: rsvp-orbit 6.5s linear infinite;
+    z-index: -2;
+  }
+
+  .mobile-rsvp-cta::after {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    background: linear-gradient(
+      115deg,
+      #4b1d24 0%,
+      #6a2a34 28%,
+      #b89a62 50%,
+      #2f4638 74%,
+      #4b1d24 100%
+    );
+    background-size: 260% 260%;
+    animation: rsvp-wash 3.8s ease-in-out infinite;
+    z-index: -1;
+  }
+
+  .mobile-rsvp-cta:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--gold-soft) 80%, var(--cream));
+    outline-offset: 3px;
+  }
+
+  .mobile-rsvp-cta:active {
+    transform: translateX(-50%) scale(0.98);
+  }
+
+  /* Hide while the full-screen hamburger menu is open */
+  body.is-nav-open .mobile-rsvp-cta {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mobile-rsvp-cta::before,
+    .mobile-rsvp-cta::after {
+      animation: none;
+    }
+  }
+
+  /* Keep section content clear of the floating CTA */
+  .panel:not(.home-panel) > .stage,
+  .panel:not(.home-panel) > .join-stage,
+  .panel:not(.home-panel) > .invite-compose,
+  .panel:not(.home-panel) > .sponsors-compose,
+  .rsvp-panel .rsvp-stage {
+    padding-bottom: max(1.5rem, var(--mobile-rsvp-cta-space));
   }
 
   .scene-run-photo {
@@ -4789,7 +5149,7 @@ body.is-sealed .hero-meta {
 
   .day-stage {
     padding-top: clamp(1.1rem, 3vh, 1.75rem);
-    padding-bottom: clamp(1.1rem, 3vh, 1.75rem);
+    padding-bottom: max(clamp(1.1rem, 3vh, 1.75rem), var(--mobile-rsvp-cta-space));
   }
 
   .day-intro .section-title {
@@ -4843,6 +5203,7 @@ body.is-sealed .hero-meta {
   }
 
   .pill-nav.is-open {
+    z-index: 58; /* above FAB (55), below hamburger toggle (60) */
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
@@ -4895,9 +5256,11 @@ body.is-sealed .hero-meta {
     position: absolute;
     left: 0;
     right: 0;
-    bottom: clamp(1.35rem, 4vh, 2.65rem);
+    /* Sit above floating RSVP CTA + home indicator */
+    bottom: calc(var(--mobile-rsvp-cta-space) + 0.35rem);
     z-index: 2;
-    width: min(22rem, calc(100vw - 2rem));
+    /* 100% = hero/layout width (not 100vw) so scrollbar never skews centering */
+    width: min(22rem, calc(100% - 2rem));
     max-width: none;
     margin-inline: auto;
     padding-inline: 0;
@@ -4936,6 +5299,44 @@ body.is-sealed .hero-meta {
   .stage-layout,
   .stage-layout--flip {
     grid-template-columns: 1fr;
+  }
+
+  /*
+   * RSVP: desktop .stage keeps right-only padding for the pill rail.
+   * With the hamburger (≤1100), center the column with equal inset.
+   * Higher specificity beats later .stage { padding-right } overrides.
+   */
+  .stage.rsvp-stage {
+    width: min(40rem, calc(100% - 2.5rem));
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+    box-sizing: border-box;
+  }
+
+  .rsvp-body {
+    width: 100%;
+    margin-inline: auto;
+    align-items: center;
+    text-align: center;
+  }
+
+  .rsvp-title-col {
+    align-self: center;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .rsvp-deck {
+    text-align: center;
+  }
+
+  .rsvp-layout {
+    width: 100%;
+  }
+
+  .rsvp-form {
+    text-align: start;
+    width: 100%;
   }
 }
 
@@ -5196,8 +5597,8 @@ body.is-sealed .hero-meta {
   }
 
   .home-panel .hero-meta {
-    width: min(22rem, calc(100vw - 1.5rem));
-    bottom: clamp(1.15rem, 3.5vh, 2rem);
+    width: min(22rem, calc(100% - 1.5rem));
+    bottom: calc(var(--mobile-rsvp-cta-space) + 0.2rem);
   }
 
   .invite-card > .hero-meta {
