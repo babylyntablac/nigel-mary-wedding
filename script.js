@@ -39,7 +39,14 @@ function updateScenePan() {
 
   const progress = getScenePanProgress();
   const storyTop = getStoryScrollTop();
-  const anchored = window.scrollY >= storyTop - 2;
+  /* Wider hysteresis + only anchor once Invite wash nearly covers the photo,
+     so fixed→absolute doesn't fire while brand morph is still settling. */
+  const wasAnchored = sceneRun.classList.contains("is-photo-anchored");
+  const anchorEnter = storyTop + 12;
+  const anchorLeave = storyTop - 28;
+  const anchored = wasAnchored
+    ? window.scrollY >= anchorLeave
+    : window.scrollY >= anchorEnter && progress >= 0.97;
   const pan = Math.min(1, progress);
   const photoY = progress * SCENE_PHOTO_Y_END;
 
@@ -47,12 +54,15 @@ function updateScenePan() {
   sceneRun.style.setProperty("--scene-photo-y", `${photoY.toFixed(2)}%`);
 
   sceneRun.classList.toggle("is-photo-anchored", anchored);
+  /* Keep inline object-position continuous — never let the anchored CSS rule snap crop. */
   scenePhoto.style.objectPosition = `center ${photoY.toFixed(2)}%`;
 }
 
 function scrollToSection(id) {
   const target = document.getElementById(id);
   if (!target) return;
+
+  const scrollBehavior = prefersReducedMotion ? "auto" : "smooth";
 
   if (id === "story" && scenePhoto && !prefersReducedMotion) {
     sceneRun?.classList.add("is-photo-anchored");
@@ -61,15 +71,27 @@ function scrollToSection(id) {
     scenePhoto.style.objectPosition = `center ${SCENE_PHOTO_Y_END}%`;
   }
 
-  if (id === "home" && scenePhoto && !prefersReducedMotion) {
-    sceneRun?.classList.remove("is-photo-anchored");
-    sceneRun?.style.setProperty("--scene-pan", "0");
-    sceneRun?.style.setProperty("--scene-photo-y", "0%");
-    scenePhoto.style.objectPosition = "center top";
+  /* Sticky #home already sits at top≈0 while Invite covers it, so
+     scrollIntoView({ block: "start" }) no-ops. Jump to document top. */
+  if (id === "home") {
+    if (scenePhoto && !prefersReducedMotion) {
+      sceneRun?.classList.remove("is-photo-anchored");
+      sceneRun?.style.setProperty("--scene-pan", "0");
+      sceneRun?.style.setProperty("--scene-photo-y", "0%");
+      scenePhoto.style.objectPosition = "center top";
+    }
+
+    window.scrollTo({ top: 0, behavior: scrollBehavior });
+    setActivePill("home");
+    requestAnimationFrame(() => {
+      updateScenePan();
+      updateBrandMorph();
+    });
+    return;
   }
 
   target.scrollIntoView({
-    behavior: prefersReducedMotion ? "auto" : "smooth",
+    behavior: scrollBehavior,
     block: "start",
   });
   requestAnimationFrame(() => {
@@ -247,7 +269,19 @@ function ensureBrandMorphLayer() {
   return brandMorphLayer;
 }
 
-function paintBrandGhost(entry, t, forceMeasure) {
+/* Settle window: ghosts fade out while real Invite targets fade in (overlap, never both 0). */
+const BRAND_CROSSFADE_START = 0.86;
+const BRAND_SETTLE_END = 0.995;
+
+function brandCrossfadeAmount(progress) {
+  if (progress <= BRAND_CROSSFADE_START) return 0;
+  if (progress >= BRAND_SETTLE_END) return 1;
+  return smoothstep(
+    (progress - BRAND_CROSSFADE_START) / (BRAND_SETTLE_END - BRAND_CROSSFADE_START)
+  );
+}
+
+function paintBrandGhost(entry, t, ghostOpacity, forceMeasure) {
   const { ghost, kind, from, to } = entry;
   if (!to) {
     ghost.style.opacity = "0";
@@ -283,6 +317,7 @@ function paintBrandGhost(entry, t, forceMeasure) {
   const top = lerp(fromRect.top, toRect.top, t);
   const width = lerp(fromRect.width, toRect.width, t);
   const height = lerp(fromRect.height, toRect.height, t);
+  const gOp = Math.max(0, Math.min(1, ghostOpacity));
 
   if (kind === "img") {
     ghost.style.left = `${left}px`;
@@ -290,7 +325,7 @@ function paintBrandGhost(entry, t, forceMeasure) {
     ghost.style.width = `${width}px`;
     ghost.style.height = `${height}px`;
     ghost.style.transform = "";
-    ghost.style.opacity = "1";
+    ghost.style.opacity = String(gOp);
     ghost.style.filter = `drop-shadow(0 4px 14px rgba(0, 0, 0, ${lerp(0.35, 0.12, t)}))`;
     return;
   }
@@ -306,7 +341,7 @@ function paintBrandGhost(entry, t, forceMeasure) {
     ghost.style.transform = "translate(-50%, -50%)";
     ghost.style.fontSize = toStyle.fontSize;
     ghost.style.color = toStyle.color;
-    ghost.style.opacity = String(smoothstep((t - 0.28) / 0.55));
+    ghost.style.opacity = String(smoothstep((t - 0.28) / 0.55) * gOp);
     return;
   }
 
@@ -346,7 +381,7 @@ function paintBrandGhost(entry, t, forceMeasure) {
       t < 0.65
         ? `0 2px 14px rgba(0, 0, 0, ${lerp(0.35, 0, t / 0.65)})`
         : "none";
-    ghost.style.opacity = "1";
+    ghost.style.opacity = String(gOp);
     return;
   }
 
@@ -359,7 +394,7 @@ function paintBrandGhost(entry, t, forceMeasure) {
     ghost.style.height = `${fromRect.height}px`;
     ghost.style.transform = `scale(${sx}, ${sy})`;
     ghost.style.transformOrigin = "top left";
-    ghost.style.opacity = "1";
+    ghost.style.opacity = String(gOp);
 
     const ink = lerp(255, 42, t);
     const inkG = lerp(255, 61, t);
@@ -382,44 +417,72 @@ function paintBrandGhost(entry, t, forceMeasure) {
   }
 }
 
+function setBrandMorphVars(ghostOpacity, realOpacity) {
+  sceneRun.style.setProperty("--brand-ghost-opacity", ghostOpacity.toFixed(4));
+  sceneRun.style.setProperty("--brand-real-opacity", realOpacity.toFixed(4));
+}
+
 function updateBrandMorph(forceMeasure = false) {
   if (prefersReducedMotion || !sceneRun || !homePanel || !storyPanel) return;
 
   const progress = getScenePanProgress();
-  const t = smoothstep(progress);
+  const t = smoothstep(Math.min(1, progress / BRAND_SETTLE_END));
+  const cross = brandCrossfadeAmount(progress);
+  /* Overlap: real rises ahead of ghost fall so coverage stays ≥ ~1 through the blend */
+  const realOpacity = Math.min(1, cross * 1.2);
+  const ghostOpacity = Math.max(0, 1 - cross);
 
   if (progress <= 0.02) {
     if (brandMorphState !== "idle") {
-      sceneRun.classList.remove("is-brand-morphing", "is-brand-settled");
+      sceneRun.classList.remove(
+        "is-brand-morphing",
+        "is-brand-settled",
+        "is-brand-handing-off"
+      );
       homePanel.classList.add("is-inview");
       brandMorphState = "idle";
+      setBrandMorphVars(0, 0);
       if (brandMorphLayer) brandMorphLayer.classList.remove("is-active");
     }
     return;
   }
 
-  if (progress >= 0.985) {
+  if (progress >= BRAND_SETTLE_END) {
+    ensureBrandMorphLayer();
+    /* Final paint at t=1 while layer still up — then settle (no empty frame). */
     if (brandMorphState !== "settled") {
-      ensureBrandMorphLayer();
-      sceneRun.classList.remove("is-brand-morphing");
+      Object.values(brandMorphGhosts || {}).forEach((entry) => {
+        paintBrandGhost(entry, 1, 0, forceMeasure);
+      });
+      sceneRun.classList.remove("is-brand-morphing", "is-brand-handing-off");
       sceneRun.classList.add("is-brand-settled");
       storyPanel.classList.add("is-inview");
       brandMorphState = "settled";
+      setBrandMorphVars(0, 1);
       if (brandMorphLayer) brandMorphLayer.classList.remove("is-active");
+    } else {
+      setBrandMorphVars(0, 1);
     }
     return;
   }
 
   ensureBrandMorphLayer();
+  const handingOff = cross > 0.02;
   if (brandMorphState !== "morphing") {
     sceneRun.classList.add("is-brand-morphing");
     sceneRun.classList.remove("is-brand-settled");
     brandMorphState = "morphing";
   }
+  sceneRun.classList.toggle("is-brand-handing-off", handingOff);
+  if (handingOff) {
+    /* Unlock real targets for the blend; keep Invite entrance delays from replaying. */
+    storyPanel.classList.add("is-inview");
+  }
+  setBrandMorphVars(ghostOpacity, realOpacity);
   if (brandMorphLayer) brandMorphLayer.classList.add("is-active");
 
   Object.values(brandMorphGhosts || {}).forEach((entry) => {
-    paintBrandGhost(entry, t, forceMeasure);
+    paintBrandGhost(entry, t, ghostOpacity, forceMeasure);
   });
 }
 
