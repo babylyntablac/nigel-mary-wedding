@@ -119,7 +119,7 @@ img {
 .panel:not(.is-inview) > .panel-fade,
 .panel:not(.is-inview) > .stage,
 .panel:not(.is-inview) > .join-stage,
-.panel:not(.is-inview) > .invite-card {
+.panel:not(.is-inview) > .invite-compose {
   opacity: 0;
   transform: translate3d(0, 28px, 0);
 }
@@ -127,14 +127,14 @@ img {
 .panel.is-inview > .panel-fade,
 .panel.is-inview > .stage,
 .panel.is-inview > .join-stage,
-.panel.is-inview > .invite-card {
+.panel.is-inview > .invite-compose {
   opacity: 1;
   transform: none;
 }
 
 .stage,
 .join-stage,
-.invite-card {
+.invite-compose {
   transition:
     opacity 0.9s var(--ease-out),
     transform 0.9s var(--ease-out);
@@ -142,7 +142,7 @@ img {
 
 .panel.is-inview > .stage,
 .panel.is-inview > .join-stage,
-.panel.is-inview > .invite-card {
+.panel.is-inview > .invite-compose {
   transition-delay: 70ms;
 }
 
@@ -151,7 +151,7 @@ img {
   transform: translate3d(-36px, 0, 0);
 }
 
-.panel:not(.is-inview) > .invite-card {
+.panel:not(.is-inview) > .invite-compose {
   transform: translate3d(0, 42px, 0) scale(0.97);
 }
 
@@ -807,20 +807,15 @@ body.is-sealed .hero-monogram {
   outline-offset: 2px;
 }
 
-/* One tall park photo spanning Home → Invite (50% image per page) */
+/* One tall park photo spanning Home → Invite (50% image per page).
+   Invite follows sticky Home directly so its rise shares the same scroll as --scene-pan. */
 .scene-run {
   position: relative;
-  --scene-pan-distance: 100svh;
   --scene-photo-lift: 50svh;
   --scene-photo-y-end: 50%;
   --scene-photo-y: 0%;
   --scene-pan: 0;
   --scene-title-travel: 36svh;
-}
-
-.scene-pan-track {
-  height: var(--scene-pan-distance);
-  pointer-events: none;
 }
 
 .scene-run-photo {
@@ -850,7 +845,6 @@ body.is-sealed .hero-monogram {
 .home-panel,
 .story-panel {
   position: relative;
-  z-index: 1;
   background: transparent;
 }
 
@@ -858,6 +852,7 @@ body.is-sealed .hero-monogram {
 .home-panel {
   position: sticky;
   top: 0;
+  z-index: 1;
   min-height: 100svh;
   height: 100svh;
   background-color: transparent;
@@ -962,6 +957,118 @@ body.is-sealed .hero-monogram {
   transform: translate3d(0, calc(var(--scene-pan) * 14px), 0);
 }
 
+/* Shared-element brand morph (HOME → INVITE) — scroll-driven FLIP ghosts */
+.brand-morph-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 35;
+  pointer-events: none;
+  overflow: visible;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.brand-morph-layer.is-active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.brand-morph-ghost {
+  position: fixed;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  transform-origin: top left;
+  will-change: left, top, width, height, font-size, color, opacity, filter;
+  white-space: nowrap;
+  pointer-events: none;
+  box-sizing: border-box;
+}
+
+.brand-morph-ghost.is-text {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  text-transform: uppercase;
+  line-height: 1.2;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.35);
+}
+
+.brand-morph-ghost.is-amp {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+  line-height: 1.2;
+  text-shadow: none;
+}
+
+.brand-morph-ghost.is-img {
+  display: block;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.35));
+}
+
+.brand-morph-ghost.is-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  text-align: center;
+  color: var(--white);
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.3);
+}
+
+.brand-morph-ghost.is-meta .hero-meta-time,
+.brand-morph-ghost.is-meta .hero-meta-year,
+.brand-morph-ghost.is-meta .hero-meta-place,
+.brand-morph-ghost.is-meta .hero-date-side,
+.brand-morph-ghost.is-meta .hero-date-day {
+  transition: none;
+}
+
+.scene-run.is-brand-morphing .hero-brand,
+.scene-run.is-brand-morphing .home-panel > .hero .hero-meta,
+.scene-run.is-brand-morphing [data-morph],
+.scene-run.is-brand-morphing [data-morph-target],
+.scene-run.is-brand-morphing .invite-seal,
+.scene-run.is-brand-morphing .invite-names,
+.scene-run.is-brand-morphing .invite-card > .hero-meta {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  transition: none !important;
+  animation: none !important;
+  transform: none !important;
+}
+
+.scene-run.is-brand-morphing .invite-compose {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+.scene-run.is-brand-morphing .invite-kicker,
+.scene-run.is-brand-morphing .invite-title {
+  /* Keep staggered reveal of non-morphing copy */
+  visibility: visible;
+}
+
+.scene-run.is-brand-settled .home-panel .hero-brand,
+.scene-run.is-brand-settled .home-panel .hero-meta[data-morph] {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none;
+}
+
+.scene-run.is-brand-settled .invite-seal,
+.scene-run.is-brand-settled .invite-names,
+.scene-run.is-brand-settled .invite-card > .hero-meta,
+.scene-run.is-brand-settled [data-morph-target] {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+}
+
 .hero-title {
   display: grid;
   justify-items: start;
@@ -1018,10 +1125,11 @@ body.is-sealed .hero-meta {
 
 .story-panel .hero-meta {
   position: relative;
-  z-index: 2;
+  z-index: 1;
   width: 100%;
-  justify-self: center;
-  padding-bottom: clamp(1.75rem, 4.5vh, 3rem);
+  max-width: 100%;
+  margin-top: clamp(0.65rem, 1.8vh, 1.15rem);
+  padding-bottom: 0;
   opacity: 0;
   transform: translate3d(0, 12px, 0);
 }
@@ -1029,7 +1137,7 @@ body.is-sealed .hero-meta {
 .story-panel.is-inview .hero-meta {
   opacity: 1;
   transform: none;
-  transition-delay: 620ms;
+  transition-delay: 520ms;
 }
 
 .story-panel .hero-meta-time,
@@ -1043,6 +1151,20 @@ body.is-sealed .hero-meta {
 .story-panel .hero-date-day {
   color: #2a3d55;
   text-shadow: none;
+}
+
+.story-panel .hero-date-block {
+  min-width: 0;
+  width: 100%;
+  gap: clamp(0.4rem, 1.6vw, 0.9rem);
+}
+
+.story-panel .hero-date-day {
+  font-size: clamp(2.55rem, 6.5vw, 3.85rem);
+}
+
+.story-panel .hero-meta-place {
+  max-width: 16rem;
 }
 
 .hero-meta-time {
@@ -1184,26 +1306,34 @@ body.is-sealed .hero-meta {
 .story-panel {
   --invite-wash: 0;
   --invite-pattern: 0;
+  /* Above sticky Home so toile/wash fully cover the shared park photo */
+  z-index: 2;
   display: grid;
-  grid-template-rows: 1fr auto;
+  grid-template-rows: 1fr;
   place-items: center;
   align-content: stretch;
+  /* Lock to viewport like Home / Day — svh fallback, dvh for mobile chrome */
   min-height: 100svh;
-  overflow: hidden;
+  min-height: 100dvh;
+  height: 100svh;
+  height: 100dvh;
+  overflow: visible;
   color: var(--ink);
   padding:
-    clamp(1.4rem, 4vh, 2.8rem)
+    0
     clamp(1rem, 4vw, 2rem)
     0;
+  box-sizing: border-box;
 }
 
 .invite-pattern {
   position: absolute;
-  inset: 0;
+  /* Bleed 1px past edges to hide subpixel seams against Home / next panel */
+  inset: -1px 0;
   z-index: 0;
   pointer-events: none;
   opacity: var(--invite-pattern);
-  background-color: #f4f1ea;
+  background-color: #f3eee4;
   background-image: url("assets/invite-toile-botanical.png");
   background-repeat: repeat;
   background-position: center center;
@@ -1214,24 +1344,153 @@ body.is-sealed .hero-meta {
 
 .invite-wash {
   position: absolute;
-  inset: 0;
-  z-index: 0;
+  inset: -1px 0;
+  z-index: 1;
   pointer-events: none;
   background:
     radial-gradient(
-      ellipse 52% 58% at 50% 44%,
-      rgba(255, 252, 247, 0.55) 0%,
-      rgba(255, 252, 247, 0.18) 48%,
-      transparent 72%
+      ellipse 52% 48% at 50% 58%,
+      rgba(255, 252, 247, 0.5) 0%,
+      rgba(255, 252, 247, 0.14) 52%,
+      transparent 74%
     );
   opacity: var(--invite-wash);
 }
 
-.invite-card {
+.invite-compose {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   width: min(26rem, calc(100% - 2.5rem));
-  min-height: min(68svh, 36rem);
+  margin-top: clamp(1.5rem, 4vh, 3rem);
+  padding-top: clamp(2.75rem, 7vh, 4.5rem);
+  justify-self: center;
+  align-self: center;
+}
+
+.invite-ark {
+  position: absolute;
+  left: 50%;
+  top: clamp(-0.35rem, -1.2vw, 0.15rem);
+  z-index: 3;
+  width: min(138%, 34rem);
+  max-width: none;
+  pointer-events: none;
+  transform: translateX(-50%);
+  overflow: visible;
+  opacity: var(--invite-pattern);
+}
+
+.invite-ark-flora {
+  width: 100%;
+  max-width: none;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 8px 18px rgba(26, 31, 28, 0.16));
+}
+
+/* Invite blue butterfly — flies between floral-ark perch points */
+.invite-butterfly {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 4;
+  width: clamp(1.55rem, 5.2vw, 2.25rem);
+  height: auto;
+  margin: 0;
+  padding: 0;
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform;
+  transform: translate3d(0, 0, 0) translate(-50%, -50%) rotate(0deg);
+  filter: drop-shadow(0 2px 4px rgba(26, 31, 28, 0.22));
+  transition: opacity 0.7s var(--ease-out);
+}
+
+.story-panel.is-inview .invite-butterfly {
+  opacity: 0.92;
+}
+
+.invite-butterfly-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  transform-origin: 50% 55%;
+}
+
+.bfly-wing {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.bfly-wing-l {
+  transform-origin: right center;
+}
+
+.bfly-wing-r {
+  transform-origin: left center;
+}
+
+.invite-butterfly.is-flying .bfly-wing-l {
+  animation: bfly-flap-l 0.16s ease-in-out infinite alternate;
+}
+
+.invite-butterfly.is-flying .bfly-wing-r {
+  animation: bfly-flap-r 0.16s ease-in-out infinite alternate;
+}
+
+.invite-butterfly.is-perched .bfly-wing-l {
+  animation: bfly-rest-l 2.8s var(--ease-in-out) infinite alternate;
+}
+
+.invite-butterfly.is-perched .bfly-wing-r {
+  animation: bfly-rest-r 2.8s var(--ease-in-out) infinite alternate;
+}
+
+@keyframes bfly-flap-l {
+  from {
+    transform: scaleX(1) rotate(-2deg);
+  }
+  to {
+    transform: scaleX(0.28) rotate(4deg);
+  }
+}
+
+@keyframes bfly-flap-r {
+  from {
+    transform: scaleX(1) rotate(2deg);
+  }
+  to {
+    transform: scaleX(0.28) rotate(-4deg);
+  }
+}
+
+@keyframes bfly-rest-l {
+  from {
+    transform: scaleX(0.92) rotate(-1deg);
+  }
+  to {
+    transform: scaleX(0.78) rotate(2deg);
+  }
+}
+
+@keyframes bfly-rest-r {
+  from {
+    transform: scaleX(0.92) rotate(1deg);
+  }
+  to {
+    transform: scaleX(0.78) rotate(-2deg);
+  }
+}
+
+.invite-card {
+  --invite-stroke: #2a3d55;
+  --invite-fill: #fffcf7;
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  min-height: min(72svh, 40rem);
+  margin-top: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1239,16 +1498,30 @@ body.is-sealed .hero-meta {
   text-align: center;
   gap: 0.35rem;
   padding:
-    clamp(3.2rem, 8vh, 4.6rem)
-    clamp(1.8rem, 5vw, 2.85rem)
-    clamp(2.8rem, 7vh, 4rem);
-  background: #fffcf7;
-  border: 2px solid #2a3d55;
+    clamp(3.4rem, 8.5vh, 5rem)
+    clamp(1.9rem, 5.2vw, 3rem)
+    clamp(3rem, 7.5vh, 4.4rem);
+  background: var(--invite-fill);
+  /* Thick outer navy stroke; thin inner via ::after */
+  border: 3.5px solid var(--invite-stroke);
   border-radius: 999px;
-  box-shadow:
-    inset 0 0 0 5px #fffcf7,
-    inset 0 0 0 7px #2a3d55,
-    0 16px 36px color-mix(in srgb, var(--ink) 10%, transparent);
+  box-shadow: 0 16px 36px color-mix(in srgb, var(--ink) 10%, transparent);
+  isolation: isolate;
+}
+
+.invite-card::after {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  z-index: 0;
+  border: 1px solid var(--invite-stroke);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.invite-card > * {
+  position: relative;
+  z-index: 1;
 }
 
 .invite-kicker {
@@ -1285,6 +1558,12 @@ body.is-sealed .hero-meta {
   letter-spacing: 0.32em;
   text-transform: uppercase;
   color: color-mix(in srgb, #2a3d55 78%, transparent);
+}
+
+.invite-names-amp {
+  letter-spacing: 0;
+  font-weight: 500;
+  transform: translateY(-0.02em);
 }
 
 .invite-seal {
@@ -1326,6 +1605,10 @@ body.is-sealed .hero-meta {
 
 .story-panel.is-inview .invite-names {
   transition-delay: 420ms;
+}
+
+.story-panel.is-inview .invite-card > .hero-meta {
+  transition-delay: 520ms;
 }
 
 /* Love Story — full page */
@@ -2319,8 +2602,8 @@ body.is-sealed .hero-meta {
 
 .join-hours {
   display: grid;
-  gap: 1.85rem;
-  margin: 0.75rem 0 0.55rem;
+  gap: 1.15rem;
+  margin: 0.55rem 0 0.35rem;
 }
 
 .join-hour-label {
@@ -2341,16 +2624,167 @@ body.is-sealed .hero-meta {
   color: var(--ink-soft);
 }
 
-.join-place {
-  margin-top: 0.35rem;
-  padding-top: 0.7rem;
+/* When & where — calendar + venue as one composition */
+.join-whenwhere {
+  display: grid;
+  grid-template-columns: minmax(9.5rem, 11.5rem) minmax(0, 1fr);
+  gap: clamp(0.85rem, 1.8vw, 1.35rem);
+  align-items: start;
+  margin-top: 0.45rem;
+  padding-top: 0.75rem;
   border-top: 1px solid color-mix(in srgb, var(--olive) 16%, transparent);
 }
 
+.join-cal {
+  --join-cal-cream: #fdfbf7;
+  --join-cal-ink: var(--ink);
+  width: 100%;
+  max-width: 11.5rem;
+  padding: 0.7rem 0.65rem 0.55rem;
+  background: var(--join-cal-cream);
+  color: var(--join-cal-ink);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--ink) 6%, transparent);
+}
+
+.join-cal-month {
+  margin: 0 0 0.45rem;
+  text-align: center;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--join-cal-ink);
+}
+
+.join-cal-weekdays,
+.join-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.05rem 0.1rem;
+}
+
+.join-cal-weekdays {
+  margin-bottom: 0.28rem;
+}
+
+.join-cal-weekdays span {
+  text-align: center;
+  font-family: var(--font-sans);
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--join-cal-ink) 55%, transparent);
+  line-height: 1.2;
+}
+
+.join-cal-day,
+.join-cal-empty {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  min-height: 1.15rem;
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--join-cal-ink);
+}
+
+.join-cal-day--heart {
+  color: var(--join-cal-cream);
+  z-index: 1;
+}
+
+.join-cal-heart {
+  position: absolute;
+  width: 138%;
+  height: 138%;
+  left: 50%;
+  top: 48%;
+  transform: translate(-50%, -50%) rotate(-8deg);
+  color: var(--join-cal-ink);
+  pointer-events: none;
+}
+
+.join-cal-num {
+  position: relative;
+  z-index: 1;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.join-place {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.join-place-label {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--ink) 48%, transparent);
+}
+
+.join-place-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 2.6vh, 1.55rem);
+  font-style: italic;
+  font-weight: 500;
+  line-height: 1.15;
+  color: var(--olive);
+}
+
+.join-place-address {
+  margin: 0.1rem 0 0.15rem;
+  font-family: var(--font-body);
+  font-size: clamp(0.78rem, 1.5vh, 0.88rem);
+  line-height: 1.35;
+  color: color-mix(in srgb, var(--ink) 72%, transparent);
+}
+
+.join-directions {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  margin: 0.15rem 0 0.35rem;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--cherry);
+  border-bottom: 1px solid color-mix(in srgb, var(--cherry) 35%, transparent);
+  padding-bottom: 0.08rem;
+  transition:
+    color 0.18s var(--ease-out),
+    border-color 0.18s var(--ease-out);
+}
+
+.join-directions:hover {
+  color: var(--cherry-deep);
+  border-bottom-color: color-mix(in srgb, var(--cherry-deep) 55%, transparent);
+}
+
+.join-directions:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--cherry) 55%, transparent);
+  outline-offset: 3px;
+}
+
 .join-map-slot {
-  margin-top: 0.55rem;
-  height: min(22vh, 11.5rem);
-  min-height: 8.5rem;
+  margin-top: 0.15rem;
+  height: min(14vh, 7.5rem);
+  min-height: 5.75rem;
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--olive) 16%, transparent);
   background: color-mix(in srgb, var(--paper-deep) 40%, #d5ddd6);
@@ -2365,7 +2799,7 @@ body.is-sealed .hero-meta {
 }
 
 .join-place .day-meta {
-  margin-top: 0.45rem;
+  margin-top: 0.35rem;
 }
 
 /* Order heading accents */
@@ -3039,7 +3473,7 @@ body.is-sealed .hero-meta {
 }
 
 .day-beat-icon {
-  width: clamp(1.85rem, 3.6vh, 2.35rem);
+  width: clamp(3.15rem, 6.4vh, 4.15rem);
   color: var(--ink);
 }
 
@@ -3047,6 +3481,102 @@ body.is-sealed .hero-meta {
   width: 100%;
   height: auto;
   display: block;
+  overflow: visible;
+}
+
+.day-icon-stroke {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+
+.day-panel.is-inview .day-icon-stroke {
+  animation: dayIconForm 3.8s ease-in-out infinite;
+}
+
+.day-panel.is-inview .day-beat:nth-child(1) .day-icon-stroke {
+  animation-duration: 3.55s;
+}
+
+.day-panel.is-inview .day-beat:nth-child(2) .day-icon-stroke {
+  animation-duration: 3.9s;
+  animation-delay: 0.18s;
+}
+
+.day-panel.is-inview .day-beat:nth-child(3) .day-icon-stroke {
+  animation-duration: 3.7s;
+  animation-delay: 0.32s;
+}
+
+.day-panel.is-inview .day-beat:nth-child(4) .day-icon-stroke {
+  animation-duration: 4s;
+  animation-delay: 0.1s;
+}
+
+.day-panel.is-inview .day-beat:nth-child(5) .day-icon-stroke {
+  animation-duration: 3.65s;
+  animation-delay: 0.24s;
+}
+
+.day-panel.is-inview .day-beat-icon .day-icon-stroke:nth-child(2) {
+  animation-delay: calc(var(--day-icon-base-delay, 0s) + 0.14s);
+}
+
+.day-panel.is-inview .day-beat-icon .day-icon-stroke:nth-child(3) {
+  animation-delay: calc(var(--day-icon-base-delay, 0s) + 0.26s);
+}
+
+.day-panel.is-inview .day-beat-icon .day-icon-stroke:nth-child(4) {
+  animation-delay: calc(var(--day-icon-base-delay, 0s) + 0.36s);
+}
+
+.day-panel.is-inview .day-beat-icon .day-icon-stroke:nth-child(5) {
+  animation-delay: calc(var(--day-icon-base-delay, 0s) + 0.44s);
+}
+
+.day-panel.is-inview .day-beat-icon .day-icon-stroke:nth-child(6) {
+  animation-delay: calc(var(--day-icon-base-delay, 0s) + 0.52s);
+}
+
+.day-panel.is-inview .day-beat:nth-child(1) {
+  --day-icon-base-delay: 0s;
+}
+
+.day-panel.is-inview .day-beat:nth-child(2) {
+  --day-icon-base-delay: 0.18s;
+}
+
+.day-panel.is-inview .day-beat:nth-child(3) {
+  --day-icon-base-delay: 0.32s;
+}
+
+.day-panel.is-inview .day-beat:nth-child(4) {
+  --day-icon-base-delay: 0.1s;
+}
+
+.day-panel.is-inview .day-beat:nth-child(5) {
+  --day-icon-base-delay: 0.24s;
+}
+
+@keyframes dayIconForm {
+  0% {
+    stroke-dashoffset: 1;
+    opacity: 0.35;
+  }
+
+  48% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+
+  72% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+
+  100% {
+    stroke-dashoffset: 1;
+    opacity: 0.4;
+  }
 }
 
 .day-beat--right .day-beat-icon {
@@ -3865,6 +4395,11 @@ body.is-sealed .hero-meta {
     top: 12%;
   }
 
+  .join-whenwhere {
+    grid-template-columns: minmax(9rem, 10.5rem) minmax(0, 1fr);
+    gap: 1rem;
+  }
+
   .pill-nav {
     right: 0.65rem;
   }
@@ -3929,7 +4464,7 @@ body.is-sealed .hero-meta {
   .panel:not(.is-inview) > .panel-fade,
   .panel:not(.is-inview) > .stage,
   .panel:not(.is-inview) > .join-stage,
-  .panel:not(.is-inview) > .invite-card,
+  .panel:not(.is-inview) > .invite-compose,
   .home-panel:not(.is-inview) .hero-brand,
   .home-panel:not(.is-inview) .hero-center,
   .home-panel:not(.is-inview) .hero-meta,
@@ -3986,13 +4521,49 @@ body.is-sealed .hero-meta {
   .story-panel:not(.is-inview) .invite-kicker,
   .story-panel:not(.is-inview) .invite-title,
   .story-panel:not(.is-inview) .invite-names,
-  .story-panel:not(.is-inview) .invite-seal {
+  .story-panel:not(.is-inview) .invite-seal,
+  .story-panel:not(.is-inview) .invite-card > .hero-meta {
     opacity: 1;
     transform: none;
   }
 
+  .invite-butterfly {
+    opacity: 0.88;
+    left: 49%;
+    top: 9%;
+    /* Static perch on the center cream rose */
+    transform: translate(-50%, -50%) rotate(-8deg) !important;
+  }
+
+  .invite-butterfly .bfly-wing-l,
+  .invite-butterfly .bfly-wing-r {
+    transform: scaleX(0.85);
+  }
+
+  .brand-morph-layer {
+    display: none !important;
+  }
+
+  .scene-run.is-brand-morphing .hero-brand,
+  .scene-run.is-brand-morphing .home-panel > .hero .hero-meta,
+  .scene-run.is-brand-morphing [data-morph],
+  .scene-run.is-brand-morphing [data-morph-target],
+  .scene-run.is-brand-morphing .invite-seal,
+  .scene-run.is-brand-morphing .invite-names,
+  .scene-run.is-brand-morphing .invite-card > .hero-meta,
+  .scene-run.is-brand-settled .home-panel .hero-brand,
+  .scene-run.is-brand-settled .home-panel .hero-meta[data-morph] {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
   .flora-draw {
     stroke-dashoffset: 0;
+  }
+
+  .day-icon-stroke {
+    stroke-dashoffset: 0;
+    opacity: 1;
   }
 
   .flora-bloom {
@@ -4035,7 +4606,7 @@ body.is-sealed .hero-meta {
   }
 
   .day-beat-icon {
-    width: 1.7rem;
+    width: 2.95rem;
   }
 
   .day-colors {
@@ -4080,8 +4651,16 @@ body.is-sealed .hero-meta {
     gap: 0.55rem;
   }
 
+  .story-panel .hero-date-block {
+    min-width: 0;
+  }
+
   .hero-date-day {
     font-size: clamp(2.8rem, 14vw, 4rem);
+  }
+
+  .story-panel .hero-date-day {
+    font-size: clamp(2.35rem, 11vw, 3.25rem);
   }
 
   .hero-center {
@@ -4136,10 +4715,29 @@ body.is-sealed .hero-meta {
     gap: 0.85rem;
   }
 
-  .invite-card {
+  .invite-compose {
     width: min(22rem, calc(100% - 1.4rem));
-    min-height: min(62svh, 30rem);
-    padding: 2.6rem 1.45rem 2.2rem;
+    margin-top: clamp(1.25rem, 3.5vh, 2.5rem);
+    padding-top: clamp(2.25rem, 6vh, 3.5rem);
+  }
+
+  .invite-ark {
+    width: min(142%, 27rem);
+  }
+
+  .invite-butterfly {
+    width: clamp(1.35rem, 7.5vw, 1.85rem);
+  }
+
+  .invite-card {
+    width: 100%;
+    min-height: min(68svh, 36rem);
+    margin-top: 0;
+    padding: 2.85rem 1.55rem 2.6rem;
+  }
+
+  .invite-card::after {
+    inset: 5px;
   }
 
   .invite-names {
@@ -4267,8 +4865,51 @@ body.is-sealed .hero-meta {
     min-height: min(32vh, 16rem);
   }
 
+  .join-whenwhere {
+    grid-template-columns: 1fr;
+    justify-items: stretch;
+    gap: 1.1rem;
+  }
+
+  .join-cal {
+    max-width: 12.5rem;
+    margin-inline: auto;
+    padding: 0.85rem 0.75rem 0.65rem;
+  }
+
+  .join-cal-month {
+    font-size: 0.78rem;
+  }
+
+  .join-cal-weekdays span {
+    font-size: 0.62rem;
+  }
+
+  .join-cal-day,
+  .join-cal-empty {
+    min-height: 1.35rem;
+    font-size: 0.74rem;
+  }
+
+  .join-cal-num {
+    font-size: 0.76rem;
+  }
+
+  .join-place-name {
+    text-align: center;
+  }
+
+  .join-place-label,
+  .join-place-address {
+    text-align: center;
+  }
+
+  .join-directions {
+    margin-inline: auto;
+  }
+
   .join-map-slot {
-    height: 10rem;
+    height: 9.5rem;
   }
 
   .join-flora-art {
@@ -4313,8 +4954,8 @@ body.is-sealed .hero-meta {
   }
 
   .invite-card {
-    min-height: min(58svh, 28rem);
-    padding: 2.35rem 1.25rem 2rem;
+    min-height: min(70svh, 34rem);
+    padding: 2.55rem 1.35rem 2.35rem;
   }
 
   .day-notes,
@@ -4365,5 +5006,9 @@ body.is-sealed .hero-meta {
   .hero-meta {
     padding-inline: 2.5rem;
     text-align: center;
+  }
+
+  .invite-card > .hero-meta {
+    padding-inline: 0.15rem;
   }
 }

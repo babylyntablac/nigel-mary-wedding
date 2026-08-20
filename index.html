@@ -71,10 +71,6 @@
         <span class="pill-dot" aria-hidden="true"></span>
         <span class="pill-label">Join Us</span>
       </a>
-      <a class="pill" href="#share" data-section="share" aria-label="Share">
-        <span class="pill-dot" aria-hidden="true"></span>
-        <span class="pill-label">Share</span>
-      </a>
       <a class="pill" href="#day" data-section="day" aria-label="The Day">
         <span class="pill-dot" aria-hidden="true"></span>
         <span class="pill-label">The Day</span>
@@ -107,13 +103,14 @@
           <div class="hero-veil" aria-hidden="true"></div>
 
           <header class="hero-brand">
-            <span class="hero-brand-name">Nigel</span>
+            <span class="hero-brand-name" data-morph="name-nigel">Nigel</span>
             <img
               class="hero-monogram"
+              data-morph="seal"
               src="assets/monogram-cut.png"
               alt="Nigel and Mary monogram"
             />
-            <span class="hero-brand-name">Mary</span>
+            <span class="hero-brand-name" data-morph="name-mary">Mary</span>
           </header>
 
           <div class="hero-center">
@@ -123,7 +120,7 @@
             </h1>
           </div>
 
-          <footer class="hero-meta">
+          <footer class="hero-meta" data-morph="meta">
             <p class="hero-meta-time">4:00 PM</p>
             <div class="hero-date-block" aria-label="Saturday, September 19, 2026">
               <span class="hero-date-side">Saturday</span>
@@ -136,35 +133,114 @@
         </div>
       </section>
 
-      <div class="scene-pan-track" aria-hidden="true"></div>
-
       <section id="story" class="panel story-panel" data-panel="story">
         <div class="invite-pattern" aria-hidden="true"></div>
         <div class="invite-wash" aria-hidden="true"></div>
-        <article class="invite-card" aria-label="You are invited to the wedding of Nigel and Mary">
-          <p class="invite-kicker">The wedding of</p>
-          <h2 class="invite-title">You’re invited</h2>
-          <img
-            class="invite-seal"
-            src="assets/monogram-cut.png"
-            alt="Nigel and Mary monogram"
-          />
-          <p class="invite-names" aria-label="Nigel and Mary">
-            <span>Nigel</span>
-            <span>Mary</span>
-          </p>
-        </article>
-
-        <footer class="hero-meta">
-          <p class="hero-meta-time">4:00 PM</p>
-          <div class="hero-date-block" aria-label="Saturday, September 19, 2026">
-            <span class="hero-date-side">Saturday</span>
-            <span class="hero-date-day">19</span>
-            <span class="hero-date-side">September</span>
+        <div class="invite-compose">
+          <div class="invite-ark" aria-hidden="true">
+            <img
+              class="invite-ark-flora"
+              src="assets/invite-floral-ark.png"
+              alt=""
+              width="1499"
+              height="650"
+            />
+            <div class="invite-butterfly is-perched" data-invite-butterfly>
+              <svg
+                class="invite-butterfly-svg"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 120 100"
+                fill="none"
+                focusable="false"
+              >
+                <defs>
+                  <linearGradient id="bfWingBlue" x1="20" y1="20" x2="55" y2="75" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#6ec8f0" />
+                    <stop offset="45%" stop-color="#2f9fd4" />
+                    <stop offset="100%" stop-color="#1a7eb8" />
+                  </linearGradient>
+                  <linearGradient id="bfWingBlueR" x1="100" y1="20" x2="65" y2="75" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#6ec8f0" />
+                    <stop offset="45%" stop-color="#2f9fd4" />
+                    <stop offset="100%" stop-color="#1a7eb8" />
+                  </linearGradient>
+                  <radialGradient id="bfSheen" cx="42" cy="42" r="28" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#a8e4ff" stop-opacity="0.55" />
+                    <stop offset="70%" stop-color="#2f9fd4" stop-opacity="0" />
+                  </radialGradient>
+                </defs>
+                <g class="bfly-wing bfly-wing-l">
+                  <path fill="url(#bfWingBlue)" d="M58 48C48 28 34 14 22 10C12 7 6 14 8 24C10 36 18 46 28 54C36 60 48 56 58 48Z" />
+                  <path fill="url(#bfWingBlue)" d="M58 52C46 58 32 68 24 78C18 86 22 92 30 90C42 86 52 72 58 58Z" />
+                  <path fill="url(#bfSheen)" opacity="0.85" d="M58 48C48 28 34 14 22 10C12 7 6 14 8 24C10 36 18 46 28 54C36 60 48 56 58 48Z" />
+                  <path stroke="#1a1f1c" stroke-width="2.2" stroke-linejoin="round" d="M58 48C48 28 34 14 22 10C12 7 6 14 8 24C10 36 18 46 28 54C36 60 48 56 58 48Z" />
+                  <path stroke="#1a1f1c" stroke-width="2" stroke-linejoin="round" d="M58 52C46 58 32 68 24 78C18 86 22 92 30 90C42 86 52 72 58 58Z" />
+                  <path stroke="#145a82" stroke-width="0.7" stroke-opacity="0.55" d="M56 48C42 36 28 28 16 20" />
+                  <path stroke="#145a82" stroke-width="0.6" stroke-opacity="0.45" d="M56 50C40 52 28 62 22 74" />
+                  <circle cx="12" cy="16" r="1.35" fill="#f7fbff" />
+                  <circle cx="9" cy="22" r="1.05" fill="#e8f6ff" />
+                  <circle cx="11" cy="28" r="0.9" fill="#f7fbff" />
+                  <circle cx="15" cy="12" r="1.1" fill="#dceef8" />
+                  <circle cx="22" cy="84" r="1.1" fill="#f7fbff" />
+                  <circle cx="26" cy="88" r="0.85" fill="#e8f6ff" />
+                  <circle cx="36" cy="68" r="2.4" fill="#122028" opacity="0.55" />
+                  <circle cx="36" cy="68" r="1.1" fill="#0a1218" opacity="0.7" />
+                </g>
+                <g class="bfly-wing bfly-wing-r">
+                  <path fill="url(#bfWingBlueR)" d="M62 48C72 28 86 14 98 10C108 7 114 14 112 24C110 36 102 46 92 54C84 60 72 56 62 48Z" />
+                  <path fill="url(#bfWingBlueR)" d="M62 52C74 58 88 68 96 78C102 86 98 92 90 90C78 86 68 72 62 58Z" />
+                  <path fill="#a8e4ff" opacity="0.28" d="M62 48C72 28 86 14 98 10C108 7 114 14 112 24C110 36 102 46 92 54C84 60 72 56 62 48Z" />
+                  <path stroke="#1a1f1c" stroke-width="2.2" stroke-linejoin="round" d="M62 48C72 28 86 14 98 10C108 7 114 14 112 24C110 36 102 46 92 54C84 60 72 56 62 48Z" />
+                  <path stroke="#1a1f1c" stroke-width="2" stroke-linejoin="round" d="M62 52C74 58 88 68 96 78C102 86 98 92 90 90C78 86 68 72 62 58Z" />
+                  <path stroke="#145a82" stroke-width="0.7" stroke-opacity="0.55" d="M64 48C78 36 92 28 104 20" />
+                  <path stroke="#145a82" stroke-width="0.6" stroke-opacity="0.45" d="M64 50C80 52 92 62 98 74" />
+                  <circle cx="108" cy="16" r="1.35" fill="#f7fbff" />
+                  <circle cx="111" cy="22" r="1.05" fill="#e8f6ff" />
+                  <circle cx="109" cy="28" r="0.9" fill="#f7fbff" />
+                  <circle cx="105" cy="12" r="1.1" fill="#dceef8" />
+                  <circle cx="98" cy="84" r="1.1" fill="#f7fbff" />
+                  <circle cx="94" cy="88" r="0.85" fill="#e8f6ff" />
+                  <circle cx="84" cy="68" r="2.4" fill="#122028" opacity="0.55" />
+                  <circle cx="84" cy="68" r="1.1" fill="#0a1218" opacity="0.7" />
+                </g>
+                <g class="bfly-body">
+                  <path stroke="#1a1f1c" stroke-width="1.15" stroke-linecap="round" d="M56 22C52 14 48 10 46 8" />
+                  <path stroke="#1a1f1c" stroke-width="1.15" stroke-linecap="round" d="M64 22C68 14 72 10 74 8" />
+                  <circle cx="46" cy="7.5" r="1.15" fill="#1a1f1c" />
+                  <circle cx="74" cy="7.5" r="1.15" fill="#1a1f1c" />
+                  <ellipse cx="60" cy="42" rx="3.2" ry="5.2" fill="#1a1f1c" />
+                  <ellipse cx="60" cy="54" rx="2.6" ry="8.5" fill="#252a28" />
+                  <ellipse cx="60" cy="36" rx="2.4" ry="3" fill="#0f1210" />
+                </g>
+              </svg>
+            </div>
           </div>
-          <p class="hero-meta-year">2026</p>
-          <p class="hero-meta-place">Estancia de Lorenzo · San Mateo, Rizal</p>
-        </footer>
+          <article class="invite-card" aria-label="You are invited to the wedding of Nigel and Mary">
+            <p class="invite-kicker">The wedding of</p>
+            <h2 class="invite-title">You’re invited</h2>
+            <img
+              class="invite-seal"
+              data-morph-target="seal"
+              src="assets/monogram-cut.png"
+              alt="Nigel and Mary monogram"
+            />
+            <p class="invite-names" aria-label="Nigel and Mary">
+              <span data-morph-target="name-nigel">Nigel</span>
+              <span class="invite-names-amp" data-morph-target="amp" aria-hidden="true">&amp;</span>
+              <span data-morph-target="name-mary">Mary</span>
+            </p>
+            <footer class="hero-meta" data-morph-target="meta">
+              <p class="hero-meta-time">4:00 PM</p>
+              <div class="hero-date-block" aria-label="Saturday, September 19, 2026">
+                <span class="hero-date-side">Saturday</span>
+                <span class="hero-date-day">19</span>
+                <span class="hero-date-side">September</span>
+              </div>
+              <p class="hero-meta-year">2026</p>
+              <p class="hero-meta-place">Estancia de Lorenzo · San Mateo, Rizal</p>
+            </footer>
+          </article>
+        </div>
       </section>
       </div>
 
@@ -535,109 +611,96 @@
               </article>
             </div>
 
-            <div class="join-place">
-              <h3 class="day-heading">Estancia de Lorenzo</h3>
-              <div class="join-map-slot">
-                <iframe
-                  class="join-map"
-                  title="Estancia de Lorenzo on Google Maps"
-                  src="https://maps.google.com/maps?q=Estancia%20de%20Lorenzo%20San%20Mateo%20Rizal&z=16&output=embed"
-                  loading="lazy"
-                  referrerpolicy="no-referrer-when-downgrade"
-                ></iframe>
+            <div class="join-whenwhere">
+              <div
+                class="join-cal"
+                role="img"
+                aria-label="Calendar: Saturday, September 19, 2026"
+              >
+                <p class="join-cal-month">September</p>
+                <div class="join-cal-weekdays" aria-hidden="true">
+                  <span>Mo</span>
+                  <span>Tu</span>
+                  <span>We</span>
+                  <span>Th</span>
+                  <span>Fr</span>
+                  <span>Sa</span>
+                  <span>Su</span>
+                </div>
+                <div class="join-cal-grid" aria-hidden="true">
+                  <span class="join-cal-empty"></span>
+                  <span class="join-cal-day">1</span>
+                  <span class="join-cal-day">2</span>
+                  <span class="join-cal-day">3</span>
+                  <span class="join-cal-day">4</span>
+                  <span class="join-cal-day">5</span>
+                  <span class="join-cal-day">6</span>
+                  <span class="join-cal-day">7</span>
+                  <span class="join-cal-day">8</span>
+                  <span class="join-cal-day">9</span>
+                  <span class="join-cal-day">10</span>
+                  <span class="join-cal-day">11</span>
+                  <span class="join-cal-day">12</span>
+                  <span class="join-cal-day">13</span>
+                  <span class="join-cal-day">14</span>
+                  <span class="join-cal-day">15</span>
+                  <span class="join-cal-day">16</span>
+                  <span class="join-cal-day">17</span>
+                  <span class="join-cal-day">18</span>
+                  <span class="join-cal-day join-cal-day--heart">
+                    <svg
+                      class="join-cal-heart"
+                      viewBox="0 0 48 44"
+                      fill="currentColor"
+                      xmlns="http://www.w3.org/2000/svg"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M24.1 41.2c-.9-.8-4.6-3.9-8.8-8.2-5.8-5.9-12.2-13.6-12.6-20.4C2.3 6.8 7.1 2.2 13.2 2.8c3.2.3 5.5 2.1 7.2 4.6 1.1-1.8 2.7-3.5 5.1-4.5 4.6-1.9 10.2-.2 12.6 4.3 2.8 5.2 1.1 11.6-3.6 18.2-4.2 5.9-9.3 11.6-10.4 15.8z"
+                      />
+                    </svg>
+                    <span class="join-cal-num">19</span>
+                  </span>
+                  <span class="join-cal-day">20</span>
+                  <span class="join-cal-day">21</span>
+                  <span class="join-cal-day">22</span>
+                  <span class="join-cal-day">23</span>
+                  <span class="join-cal-day">24</span>
+                  <span class="join-cal-day">25</span>
+                  <span class="join-cal-day">26</span>
+                  <span class="join-cal-day">27</span>
+                  <span class="join-cal-day">28</span>
+                  <span class="join-cal-day">29</span>
+                  <span class="join-cal-day">30</span>
+                </div>
               </div>
-              <ul class="day-meta">
-                <li>Parking available on site</li>
-                <li>Please arrive by 03:30 PM</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      <section id="share" class="panel share-panel" data-panel="share">
-        <div class="stage share-stage">
-          <header class="stage-intro share-intro">
-            <p class="stage-kicker">Condividi</p>
-            <h2 class="section-title">Share</h2>
-            <p class="section-deck">Snap · scan · send your favorite frames</p>
-          </header>
-
-          <div class="share-board">
-            <div class="share-capture">
-              <p class="share-capture-label">Guest album</p>
-              <div class="share-qr-col">
-                <img
-                  class="share-qr"
-                  id="share-qr"
-                  src=""
-                  alt="QR code to upload and view wedding photos"
-                  width="220"
-                  height="220"
-                />
-                <a class="share-upload" id="share-upload" href="#share">Upload wedding pics</a>
+              <div class="join-place">
+                <p class="join-place-label">The venue</p>
+                <h3 class="join-place-name">Estancia de Lorenzo</h3>
+                <p class="join-place-address">San Mateo, Rizal, Philippines</p>
+                <a
+                  class="join-directions"
+                  href="https://www.google.com/maps/dir/?api=1&destination=Estancia%20de%20Lorenzo%2C%20San%20Mateo%2C%20Rizal"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Get directions
+                </a>
+                <div class="join-map-slot">
+                  <iframe
+                    class="join-map"
+                    title="Estancia de Lorenzo on Google Maps"
+                    src="https://maps.google.com/maps?q=Estancia%20de%20Lorenzo%20San%20Mateo%20Rizal&z=16&output=embed"
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"
+                  ></iframe>
+                </div>
+                <ul class="day-meta">
+                  <li>Parking available on site</li>
+                  <li>Please arrive by 03:30 PM</li>
+                </ul>
               </div>
-              <p class="share-hashtag">#HeavensAgreedtoNigel&amp;Mary</p>
-            </div>
-
-            <div class="share-guide" aria-label="How to share">
-              <article class="share-step">
-                <span class="share-step-num" aria-hidden="true">01</span>
-                <div class="share-step-body">
-                  <h3 class="share-step-title">Snap it</h3>
-                  <p class="share-step-copy">
-                    Capture the beautiful moments of our special day.
-                  </p>
-                </div>
-              </article>
-              <article class="share-step">
-                <span class="share-step-num" aria-hidden="true">02</span>
-                <div class="share-step-body">
-                  <h3 class="share-step-title">Scan it</h3>
-                  <p class="share-step-copy">
-                    Scan the QR code to open our shared photo album.
-                  </p>
-                </div>
-              </article>
-              <article class="share-step">
-                <span class="share-step-num" aria-hidden="true">03</span>
-                <div class="share-step-body">
-                  <h3 class="share-step-title">Send it</h3>
-                  <p class="share-step-copy">
-                    Upload your favorites and tag us so we can relive every frame.
-                  </p>
-                </div>
-              </article>
-            </div>
-          </div>
-
-          <div class="share-vendors" aria-label="Wedding partners">
-            <p class="share-vendors-kicker">With gratitude</p>
-            <div class="share-vendors-row">
-              <article class="share-vendor">
-                <span class="share-vendor-icon" aria-hidden="true">
-                  <svg viewBox="0 0 48 48"><path fill="currentColor" d="M24 8c-2 6-8 10-8 16a8 8 0 0 0 16 0c0-6-6-10-8-16zm0 28c-7 0-12-4-12-9 0-2 1-4 2-5-1 5 3 10 10 10s11-5 10-10c1 1 2 3 2 5 0 5-5 9-12 9z"/></svg>
-                </span>
-                <p class="share-vendor-name">Flowers</p>
-              </article>
-              <article class="share-vendor">
-                <span class="share-vendor-icon" aria-hidden="true">
-                  <svg viewBox="0 0 48 48"><path fill="currentColor" d="M14 18h20v14H14zm8-6h4v4h-4zm-6 22h16v2H16zM10 16h4v18h-2a2 2 0 0 1-2-2V16zm26 0h4v14a2 2 0 0 1-2 2h-2z"/></svg>
-                </span>
-                <p class="share-vendor-name">Photo &amp; Video</p>
-              </article>
-              <article class="share-vendor">
-                <span class="share-vendor-icon" aria-hidden="true">
-                  <svg viewBox="0 0 48 48"><path fill="currentColor" d="M24 6c-4 8-12 12-12 20a12 12 0 0 0 24 0c0-8-8-12-12-20zm-8 34h16v2H16z"/></svg>
-                </span>
-                <p class="share-vendor-name">Attire</p>
-              </article>
-              <article class="share-vendor">
-                <span class="share-vendor-icon" aria-hidden="true">
-                  <svg viewBox="0 0 48 48"><path fill="currentColor" d="M10 16h28v4H10zm4 6h20l2 16H12zm8 4v8h2v-8zm6 0v8h2v-8z"/></svg>
-                </span>
-                <p class="share-vendor-name">Catering</p>
-              </article>
             </div>
           </div>
         </div>
@@ -654,9 +717,9 @@
             <div class="day-rail-track">
             <article class="day-beat day-beat--right">
               <span class="day-beat-icon" aria-hidden="true">
-                <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="24" cy="24" r="14.5" />
-                  <path d="M24 16.5v8l5.5 3.2" />
+                <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                  <circle class="day-icon-stroke" pathLength="1" cx="24" cy="24" r="14.5" />
+                  <path class="day-icon-stroke" pathLength="1" d="M24 16.5v8l5.5 3.2" />
                 </svg>
               </span>
               <span class="day-beat-dot"></span>
@@ -673,20 +736,20 @@
               </div>
               <span class="day-beat-dot"></span>
               <span class="day-beat-icon" aria-hidden="true">
-                <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round">
-                  <circle cx="19" cy="24" r="7.5" />
-                  <circle cx="29" cy="24" r="7.5" />
-                  <path d="M29 17.2c.4-2.2 2.2-3.7 4.4-3.4" />
+                <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+                  <circle class="day-icon-stroke" pathLength="1" cx="19" cy="24" r="7.5" />
+                  <circle class="day-icon-stroke" pathLength="1" cx="29" cy="24" r="7.5" />
+                  <path class="day-icon-stroke" pathLength="1" d="M29 17.2c.4-2.2 2.2-3.7 4.4-3.4" />
                 </svg>
               </span>
             </article>
 
             <article class="day-beat day-beat--right">
               <span class="day-beat-icon" aria-hidden="true">
-                <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M16 20h16l-1.6 16H17.6Z" />
-                  <path d="M20 20c0-4 2.2-7 4.8-7s4.8 3 4.8 7" />
-                  <path d="M24 12.8v-2.2" />
+                <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                  <path class="day-icon-stroke" pathLength="1" d="M16 20h16l-1.6 16H17.6Z" />
+                  <path class="day-icon-stroke" pathLength="1" d="M20 20c0-4 2.2-7 4.8-7s4.8 3 4.8 7" />
+                  <path class="day-icon-stroke" pathLength="1" d="M24 12.8v-2.2" />
                 </svg>
               </span>
               <span class="day-beat-dot"></span>
@@ -703,23 +766,23 @@
               </div>
               <span class="day-beat-dot"></span>
               <span class="day-beat-icon" aria-hidden="true">
-                <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round">
-                  <circle cx="24" cy="25" r="11" />
-                  <circle cx="24" cy="25" r="6.2" />
-                  <path d="M16 14.5h16" />
+                <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+                  <circle class="day-icon-stroke" pathLength="1" cx="24" cy="25" r="11" />
+                  <circle class="day-icon-stroke" pathLength="1" cx="24" cy="25" r="6.2" />
+                  <path class="day-icon-stroke" pathLength="1" d="M16 14.5h16" />
                 </svg>
               </span>
             </article>
 
             <article class="day-beat day-beat--right">
               <span class="day-beat-icon" aria-hidden="true">
-                <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round">
-                  <path d="M24 36V18" />
-                  <path d="M24 18l-7-8" />
-                  <path d="M24 18l7-8" />
-                  <path d="M24 18l-9 1" />
-                  <path d="M24 18l9 1" />
-                  <path d="M24 18v-9" />
+                <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+                  <path class="day-icon-stroke" pathLength="1" d="M24 36V18" />
+                  <path class="day-icon-stroke" pathLength="1" d="M24 18l-7-8" />
+                  <path class="day-icon-stroke" pathLength="1" d="M24 18l7-8" />
+                  <path class="day-icon-stroke" pathLength="1" d="M24 18l-9 1" />
+                  <path class="day-icon-stroke" pathLength="1" d="M24 18l9 1" />
+                  <path class="day-icon-stroke" pathLength="1" d="M24 18v-9" />
                 </svg>
               </span>
               <span class="day-beat-dot"></span>

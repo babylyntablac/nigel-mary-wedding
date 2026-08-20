@@ -1,0 +1,170 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 100" fill="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="bfWingBlue" x1="20" y1="20" x2="55" y2="75" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#6ec8f0"/>
+      <stop offset="45%" stop-color="#2f9fd4"/>
+      <stop offset="100%" stop-color="#1a7eb8"/>
+    </linearGradient>
+    <linearGradient id="bfWingBlueR" x1="100" y1="20" x2="65" y2="75" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#6ec8f0"/>
+      <stop offset="45%" stop-color="#2f9fd4"/>
+      <stop offset="100%" stop-color="#1a7eb8"/>
+    </linearGradient>
+    <radialGradient id="bfSheen" cx="42" cy="42" r="28" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#a8e4ff" stop-opacity="0.55"/>
+      <stop offset="70%" stop-color="#2f9fd4" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Left wings (hinge at body) -->
+  <g class="bfly-wing bfly-wing-l">
+    <path
+      class="bfly-wing-fill"
+      fill="url(#bfWingBlue)"
+      d="M58 48
+         C48 28 34 14 22 10
+         C12 7 6 14 8 24
+         C10 36 18 46 28 54
+         C36 60 48 56 58 48Z"
+    />
+    <path
+      class="bfly-wing-fill"
+      fill="url(#bfWingBlue)"
+      d="M58 52
+         C46 58 32 68 24 78
+         C18 86 22 92 30 90
+         C42 86 52 72 58 58Z"
+    />
+    <path
+      fill="url(#bfSheen)"
+      d="M58 48
+         C48 28 34 14 22 10
+         C12 7 6 14 8 24
+         C10 36 18 46 28 54
+         C36 60 48 56 58 48Z"
+      opacity="0.85"
+    />
+    <path
+      class="bfly-wing-edge"
+      stroke="#1a1f1c"
+      stroke-width="2.2"
+      stroke-linejoin="round"
+      d="M58 48
+         C48 28 34 14 22 10
+         C12 7 6 14 8 24
+         C10 36 18 46 28 54
+         C36 60 48 56 58 48Z"
+    />
+    <path
+      class="bfly-wing-edge"
+      stroke="#1a1f1c"
+      stroke-width="2"
+      stroke-linejoin="round"
+      d="M58 52
+         C46 58 32 68 24 78
+         C18 86 22 92 30 90
+         C42 86 52 72 58 58Z"
+    />
+    <!-- veins -->
+    <path stroke="#145a82" stroke-width="0.7" stroke-opacity="0.55" d="M56 48 C42 36 28 28 16 20"/>
+    <path stroke="#145a82" stroke-width="0.6" stroke-opacity="0.45" d="M56 50 C40 52 28 62 22 74"/>
+    <path stroke="#145a82" stroke-width="0.55" stroke-opacity="0.4" d="M54 46 C44 40 34 38 24 36"/>
+    <!-- white margin spots -->
+    <circle cx="12" cy="16" r="1.35" fill="#f7fbff"/>
+    <circle cx="9" cy="22" r="1.05" fill="#e8f6ff"/>
+    <circle cx="11" cy="28" r="0.9" fill="#f7fbff"/>
+    <circle cx="15" cy="12" r="1.1" fill="#dceef8"/>
+    <circle cx="18" cy="18" r="0.75" fill="#f7fbff"/>
+    <circle cx="22" cy="84" r="1.1" fill="#f7fbff"/>
+    <circle cx="26" cy="88" r="0.85" fill="#e8f6ff"/>
+    <circle cx="20" cy="78" r="0.7" fill="#f7fbff"/>
+    <!-- hindwing eye mark -->
+    <circle cx="36" cy="68" r="2.4" fill="#122028" opacity="0.55"/>
+    <circle cx="36" cy="68" r="1.1" fill="#0a1218" opacity="0.7"/>
+  </g>
+
+  <!-- Right wings -->
+  <g class="bfly-wing bfly-wing-r">
+    <path
+      class="bfly-wing-fill"
+      fill="url(#bfWingBlueR)"
+      d="M62 48
+         C72 28 86 14 98 10
+         C108 7 114 14 112 24
+         C110 36 102 46 92 54
+         C84 60 72 56 62 48Z"
+    />
+    <path
+      class="bfly-wing-fill"
+      fill="url(#bfWingBlueR)"
+      d="M62 52
+         C74 58 88 68 96 78
+         C102 86 98 92 90 90
+         C78 86 68 72 62 58Z"
+    />
+    <path
+      fill="#a8e4ff"
+      opacity="0.28"
+      d="M62 48
+         C72 28 86 14 98 10
+         C108 7 114 14 112 24
+         C110 36 102 46 92 54
+         C84 60 72 56 62 48Z"
+    />
+    <path
+      class="bfly-wing-edge"
+      stroke="#1a1f1c"
+      stroke-width="2.2"
+      stroke-linejoin="round"
+      d="M62 48
+         C72 28 86 14 98 10
+         C108 7 114 14 112 24
+         C110 36 102 46 92 54
+         C84 60 72 56 62 48Z"
+    />
+    <path
+      class="bfly-wing-edge"
+      stroke="#1a1f1c"
+      stroke-width="2"
+      stroke-linejoin="round"
+      d="M62 52
+         C74 58 88 68 96 78
+         C102 86 98 92 90 90
+         C78 86 68 72 62 58Z"
+    />
+    <path stroke="#145a82" stroke-width="0.7" stroke-opacity="0.55" d="M64 48 C78 36 92 28 104 20"/>
+    <path stroke="#145a82" stroke-width="0.6" stroke-opacity="0.45" d="M64 50 C80 52 92 62 98 74"/>
+    <path stroke="#145a82" stroke-width="0.55" stroke-opacity="0.4" d="M66 46 C76 40 86 38 96 36"/>
+    <circle cx="108" cy="16" r="1.35" fill="#f7fbff"/>
+    <circle cx="111" cy="22" r="1.05" fill="#e8f6ff"/>
+    <circle cx="109" cy="28" r="0.9" fill="#f7fbff"/>
+    <circle cx="105" cy="12" r="1.1" fill="#dceef8"/>
+    <circle cx="102" cy="18" r="0.75" fill="#f7fbff"/>
+    <circle cx="98" cy="84" r="1.1" fill="#f7fbff"/>
+    <circle cx="94" cy="88" r="0.85" fill="#e8f6ff"/>
+    <circle cx="100" cy="78" r="0.7" fill="#f7fbff"/>
+    <circle cx="84" cy="68" r="2.4" fill="#122028" opacity="0.55"/>
+    <circle cx="84" cy="68" r="1.1" fill="#0a1218" opacity="0.7"/>
+  </g>
+
+  <!-- Body + antennae -->
+  <g class="bfly-body">
+    <path
+      stroke="#1a1f1c"
+      stroke-width="1.15"
+      stroke-linecap="round"
+      d="M56 22 C52 14 48 10 46 8"
+    />
+    <path
+      stroke="#1a1f1c"
+      stroke-width="1.15"
+      stroke-linecap="round"
+      d="M64 22 C68 14 72 10 74 8"
+    />
+    <circle cx="46" cy="7.5" r="1.15" fill="#1a1f1c"/>
+    <circle cx="74" cy="7.5" r="1.15" fill="#1a1f1c"/>
+    <ellipse cx="60" cy="42" rx="3.2" ry="5.2" fill="#1a1f1c"/>
+    <ellipse cx="60" cy="54" rx="2.6" ry="8.5" fill="#252a28"/>
+    <ellipse cx="60" cy="36" rx="2.4" ry="3" fill="#0f1210"/>
+  </g>
+</svg>

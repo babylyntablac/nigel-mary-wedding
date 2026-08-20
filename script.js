@@ -14,28 +14,23 @@ const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)
 
 const sceneRun = document.querySelector(".scene-run");
 const scenePhoto = document.querySelector(".scene-run-photo");
-const scenePanTrack = document.querySelector(".scene-pan-track");
 const homePanel = document.getElementById("home");
 const storyPanel = document.getElementById("story");
 
 /* Top half of image = page 1, bottom half = page 2 */
 const SCENE_PHOTO_Y_END = 50;
 
-function getScenePanDistance() {
-  if (!scenePanTrack) return window.innerHeight;
-  return scenePanTrack.offsetHeight || window.innerHeight;
-}
-
 function getStoryScrollTop() {
   if (!storyPanel) return 0;
   return storyPanel.getBoundingClientRect().top + window.scrollY;
 }
 
+/* 0 = Invite just below the fold, 1 = Invite pinned at top — same scroll that pans the hero */
 function getScenePanProgress() {
-  if (!homePanel || prefersReducedMotion) return 1;
-  const panDistance = getScenePanDistance();
-  if (panDistance <= 0) return 1;
-  const progress = window.scrollY / panDistance;
+  if (!homePanel || !storyPanel || prefersReducedMotion) return 1;
+  const vh = window.innerHeight || 1;
+  const top = storyPanel.getBoundingClientRect().top;
+  const progress = 1 - top / vh;
   return Math.min(1, Math.max(0, progress));
 }
 
@@ -76,6 +71,10 @@ function scrollToSection(id) {
   target.scrollIntoView({
     behavior: prefersReducedMotion ? "auto" : "smooth",
     block: "start",
+  });
+  requestAnimationFrame(() => {
+    updateScenePan();
+    updateBrandMorph();
   });
 }
 
@@ -175,6 +174,255 @@ function setMoreAudioActive(active) {
   fadeMoreAudio(Boolean(active));
 }
 
+/* HOME → INVITE shared-element morph (scroll-driven FLIP ghosts) */
+const brandMorphPairs = [
+  { id: "name-nigel", kind: "text" },
+  { id: "seal", kind: "img" },
+  { id: "name-mary", kind: "text" },
+  { id: "amp", kind: "amp" },
+  { id: "meta", kind: "meta" },
+];
+
+let brandMorphLayer = null;
+let brandMorphGhosts = null;
+let brandMorphState = "idle"; // idle | morphing | settled
+
+function lerp(a, b, t) {
+  return a + (b - a) * t;
+}
+
+function smoothstep(t) {
+  const x = Math.min(1, Math.max(0, t));
+  return x * x * (3 - 2 * x);
+}
+
+function readRect(el) {
+  const r = el.getBoundingClientRect();
+  return {
+    left: r.left,
+    top: r.top,
+    width: r.width,
+    height: r.height,
+  };
+}
+
+function ensureBrandMorphLayer() {
+  if (brandMorphLayer) return brandMorphLayer;
+  brandMorphLayer = document.createElement("div");
+  brandMorphLayer.className = "brand-morph-layer";
+  brandMorphLayer.setAttribute("aria-hidden", "true");
+  document.body.appendChild(brandMorphLayer);
+
+  brandMorphGhosts = {};
+  brandMorphPairs.forEach(({ id, kind }) => {
+    const from = document.querySelector(`[data-morph="${id}"]`);
+    const to = document.querySelector(`[data-morph-target="${id}"]`);
+    if (!to && kind !== "amp") return;
+    if (kind !== "amp" && !from) return;
+
+    let ghost;
+    if (kind === "img") {
+      ghost = from.cloneNode(true);
+      ghost.removeAttribute("data-morph");
+      ghost.removeAttribute("alt");
+      ghost.className = "brand-morph-ghost is-img";
+    } else if (kind === "meta") {
+      ghost = from.cloneNode(true);
+      ghost.removeAttribute("data-morph");
+      ghost.className = "brand-morph-ghost is-meta";
+    } else if (kind === "amp") {
+      ghost = document.createElement("span");
+      ghost.className = "brand-morph-ghost is-amp";
+      ghost.textContent = "&";
+    } else {
+      ghost = document.createElement("span");
+      ghost.className = "brand-morph-ghost is-text";
+      ghost.textContent = from.textContent.trim();
+    }
+
+    brandMorphLayer.appendChild(ghost);
+    brandMorphGhosts[id] = { ghost, kind, from, to };
+  });
+
+  return brandMorphLayer;
+}
+
+function paintBrandGhost(entry, t, forceMeasure) {
+  const { ghost, kind, from, to } = entry;
+  if (!to) {
+    ghost.style.opacity = "0";
+    return;
+  }
+
+  // Amp has no page-1 source — invent a start between the hero names / monogram
+  let fromRect;
+  if (kind === "amp") {
+    const sealFrom = document.querySelector('[data-morph="seal"]');
+    const base = sealFrom ? readRect(sealFrom) : readRect(to);
+    fromRect = {
+      left: base.left + base.width * 0.35,
+      top: base.top + base.height * 0.2,
+      width: Math.max(8, base.width * 0.22),
+      height: Math.max(10, base.height * 0.28),
+    };
+  } else if (!from) {
+    ghost.style.opacity = "0";
+    return;
+  } else {
+    fromRect = readRect(from);
+  }
+
+  /* Live #story rect so ghosts track Invite as it rises with the same pan progress */
+  const toRect = readRect(to);
+  if (toRect.width < 1 || toRect.height < 1) {
+    ghost.style.opacity = "0";
+    return;
+  }
+
+  const left = lerp(fromRect.left, toRect.left, t);
+  const top = lerp(fromRect.top, toRect.top, t);
+  const width = lerp(fromRect.width, toRect.width, t);
+  const height = lerp(fromRect.height, toRect.height, t);
+
+  if (kind === "img") {
+    ghost.style.left = `${left}px`;
+    ghost.style.top = `${top}px`;
+    ghost.style.width = `${width}px`;
+    ghost.style.height = `${height}px`;
+    ghost.style.transform = "";
+    ghost.style.opacity = "1";
+    ghost.style.filter = `drop-shadow(0 4px 14px rgba(0, 0, 0, ${lerp(0.35, 0.12, t)}))`;
+    return;
+  }
+
+  if (kind === "amp") {
+    const toStyle = getComputedStyle(to);
+    const cx = left + width / 2;
+    const cy = top + height / 2;
+    ghost.style.left = `${cx}px`;
+    ghost.style.top = `${cy}px`;
+    ghost.style.width = "auto";
+    ghost.style.height = "auto";
+    ghost.style.transform = "translate(-50%, -50%)";
+    ghost.style.fontSize = toStyle.fontSize;
+    ghost.style.color = toStyle.color;
+    ghost.style.opacity = String(smoothstep((t - 0.28) / 0.55));
+    return;
+  }
+
+  if (kind === "text") {
+    const fromStyle = getComputedStyle(from);
+    const toStyle = getComputedStyle(to);
+    const fs = lerp(parseFloat(fromStyle.fontSize), parseFloat(toStyle.fontSize), t);
+    const ls = lerp(parseFloat(fromStyle.letterSpacing) || 0, parseFloat(toStyle.letterSpacing) || 0, t);
+    const cx = left + width / 2;
+    const cy = top + height / 2;
+    ghost.style.left = `${cx}px`;
+    ghost.style.top = `${cy}px`;
+    ghost.style.width = "auto";
+    ghost.style.height = "auto";
+    ghost.style.transform = "translate(-50%, -50%)";
+    ghost.style.fontSize = `${fs}px`;
+    ghost.style.letterSpacing = `${ls}px`;
+
+    const tw = toStyle.color.match(/rgba?\(([^)]+)\)/);
+    let tr = 42;
+    let tg = 61;
+    let tb = 85;
+    let ta = 0.78;
+    if (tw) {
+      const parts = tw[1].split(",").map((p) => parseFloat(p.trim()));
+      tr = parts[0];
+      tg = parts[1];
+      tb = parts[2];
+      ta = parts.length > 3 ? parts[3] : 1;
+    }
+    const r = Math.round(lerp(255, tr, t));
+    const g = Math.round(lerp(255, tg, t));
+    const b = Math.round(lerp(255, tb, t));
+    const a = lerp(1, ta, t);
+    ghost.style.color = `rgba(${r}, ${g}, ${b}, ${a})`;
+    ghost.style.textShadow =
+      t < 0.65
+        ? `0 2px 14px rgba(0, 0, 0, ${lerp(0.35, 0, t / 0.65)})`
+        : "none";
+    ghost.style.opacity = "1";
+    return;
+  }
+
+  if (kind === "meta") {
+    const sx = fromRect.width > 0 ? width / fromRect.width : 1;
+    const sy = fromRect.height > 0 ? height / fromRect.height : 1;
+    ghost.style.left = `${left}px`;
+    ghost.style.top = `${top}px`;
+    ghost.style.width = `${fromRect.width}px`;
+    ghost.style.height = `${fromRect.height}px`;
+    ghost.style.transform = `scale(${sx}, ${sy})`;
+    ghost.style.transformOrigin = "top left";
+    ghost.style.opacity = "1";
+
+    const ink = lerp(255, 42, t);
+    const inkG = lerp(255, 61, t);
+    const inkB = lerp(255, 85, t);
+    const soft = `rgba(${Math.round(ink)}, ${Math.round(inkG)}, ${Math.round(inkB)}, ${lerp(0.88, 0.82, t)})`;
+    const day = `rgb(${Math.round(ink)}, ${Math.round(inkG)}, ${Math.round(inkB)})`;
+    ghost.querySelectorAll(
+      ".hero-meta-time, .hero-meta-year, .hero-meta-place, .hero-date-side"
+    ).forEach((el) => {
+      el.style.color = soft;
+      el.style.textShadow =
+        t < 0.55 ? `0 2px 12px rgba(0, 0, 0, ${lerp(0.3, 0, t / 0.55)})` : "none";
+    });
+    const dayEl = ghost.querySelector(".hero-date-day");
+    if (dayEl) {
+      dayEl.style.color = day;
+      dayEl.style.textShadow =
+        t < 0.55 ? `0 2px 12px rgba(0, 0, 0, ${lerp(0.3, 0, t / 0.55)})` : "none";
+    }
+  }
+}
+
+function updateBrandMorph(forceMeasure = false) {
+  if (prefersReducedMotion || !sceneRun || !homePanel || !storyPanel) return;
+
+  const progress = getScenePanProgress();
+  const t = smoothstep(progress);
+
+  if (progress <= 0.02) {
+    if (brandMorphState !== "idle") {
+      sceneRun.classList.remove("is-brand-morphing", "is-brand-settled");
+      homePanel.classList.add("is-inview");
+      brandMorphState = "idle";
+      if (brandMorphLayer) brandMorphLayer.classList.remove("is-active");
+    }
+    return;
+  }
+
+  if (progress >= 0.985) {
+    if (brandMorphState !== "settled") {
+      ensureBrandMorphLayer();
+      sceneRun.classList.remove("is-brand-morphing");
+      sceneRun.classList.add("is-brand-settled");
+      storyPanel.classList.add("is-inview");
+      brandMorphState = "settled";
+      if (brandMorphLayer) brandMorphLayer.classList.remove("is-active");
+    }
+    return;
+  }
+
+  ensureBrandMorphLayer();
+  if (brandMorphState !== "morphing") {
+    sceneRun.classList.add("is-brand-morphing");
+    sceneRun.classList.remove("is-brand-settled");
+    brandMorphState = "morphing";
+  }
+  if (brandMorphLayer) brandMorphLayer.classList.add("is-active");
+
+  Object.values(brandMorphGhosts || {}).forEach((entry) => {
+    paintBrandGhost(entry, t, forceMeasure);
+  });
+}
+
 /* 30% in / 30% out — each section fades independently */
 if (panels.length) {
   const ratios = new Map();
@@ -182,9 +430,12 @@ if (panels.length) {
   function updateInviteWash() {
     if (!storyPanel) return;
     const vh = window.innerHeight || 1;
-    const top = storyPanel.getBoundingClientRect().top;
+    const rect = storyPanel.getBoundingClientRect();
+    const top = rect.top;
     // 0 when story is still below the fold, 1 when fully pinned in view
-    const t = 1 - Math.min(1, Math.max(0, top / vh));
+    // Also treat "covering the viewport" (top <= 0 and bottom >= vh) as fully washed
+    let t = 1 - Math.min(1, Math.max(0, top / vh));
+    if (top <= 1 && rect.bottom >= vh - 1) t = 1;
     const eased = t * t * (3 - 2 * t);
     storyPanel.style.setProperty("--invite-pattern", eased.toFixed(4));
     storyPanel.style.setProperty("--invite-wash", (eased * 0.92).toFixed(4));
@@ -200,12 +451,23 @@ if (panels.length) {
         sceneTick = false;
         updateScenePan();
         updateInviteWash();
+        updateBrandMorph();
       });
+    },
+    { passive: true }
+  );
+  window.addEventListener(
+    "resize",
+    () => {
+      updateScenePan();
+      updateInviteWash();
+      updateBrandMorph(true);
     },
     { passive: true }
   );
   updateScenePan();
   updateInviteWash();
+  updateBrandMorph(true);
 
   const observer = new IntersectionObserver(
     (entries) => {
@@ -242,6 +504,165 @@ if (panels.length) {
 
   panels.forEach((panel) => observer.observe(panel));
 }
+
+/* Invite floral-ark butterfly — flap + waypoint flight between perch blooms */
+(function initInviteButterfly() {
+  const butterfly = document.querySelector("[data-invite-butterfly]");
+  const ark = document.querySelector(".invite-ark");
+  if (!butterfly || !ark || !storyPanel) return;
+
+  /* Percent positions across the floral ark (left bloom → apex → right) */
+  const PERCHES = [
+    { x: 11, y: 58, r: -22 },
+    { x: 28, y: 24, r: 14 },
+    { x: 49, y: 9, r: -8 },
+    { x: 74, y: 26, r: 18 },
+    { x: 90, y: 52, r: -16 },
+  ];
+
+  const EASE_FLIGHT = "cubic-bezier(0.77, 0, 0.175, 1)";
+  let perchIndex = 2;
+  let active = false;
+  let flightAnim = null;
+  let loopToken = 0;
+
+  function perchTransform(perch) {
+    const w = ark.offsetWidth || 1;
+    const h = ark.offsetHeight || 1;
+    const x = (perch.x / 100) * w;
+    const y = (perch.y / 100) * h;
+    return `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%) rotate(${perch.r}deg)`;
+  }
+
+  function arcTransform(from, to) {
+    const w = ark.offsetWidth || 1;
+    const h = ark.offsetHeight || 1;
+    const mx = ((from.x + to.x) / 2 / 100) * w;
+    const my = ((Math.min(from.y, to.y) - 14) / 100) * h;
+    const mr = (from.r + to.r) / 2;
+    return `translate3d(${mx}px, ${my}px, 0) translate(-50%, -50%) rotate(${mr}deg) scale(1.04)`;
+  }
+
+  function setPose(perch) {
+    butterfly.style.transform = perchTransform(perch);
+  }
+
+  function setFlying(isFlying) {
+    butterfly.classList.toggle("is-flying", isFlying);
+    butterfly.classList.toggle("is-perched", !isFlying);
+  }
+
+  function wait(ms, token) {
+    return new Promise((resolve) => {
+      window.setTimeout(() => resolve(token === loopToken), ms);
+    });
+  }
+
+  async function flyTo(next, token) {
+    const from = PERCHES[perchIndex];
+    const duration = 2400 + Math.random() * 700;
+    setFlying(true);
+
+    if (flightAnim) {
+      flightAnim.cancel();
+      flightAnim = null;
+    }
+
+    flightAnim = butterfly.animate(
+      [
+        { transform: perchTransform(from), offset: 0 },
+        { transform: arcTransform(from, next), offset: 0.48 },
+        { transform: perchTransform(next), offset: 1 },
+      ],
+      {
+        duration,
+        easing: EASE_FLIGHT,
+        fill: "forwards",
+      }
+    );
+
+    try {
+      await flightAnim.finished;
+      if (typeof flightAnim.commitStyles === "function") {
+        flightAnim.commitStyles();
+      }
+      flightAnim.cancel();
+    } catch {
+      /* cancelled on pause / resize */
+    }
+
+    if (token !== loopToken) return false;
+    flightAnim = null;
+    perchIndex = PERCHES.indexOf(next);
+    setPose(next);
+    setFlying(false);
+    return true;
+  }
+
+  async function loop(token) {
+    setPose(PERCHES[perchIndex]);
+    setFlying(false);
+
+    while (active && token === loopToken) {
+      const rest = 2200 + Math.random() * 1800;
+      const still = await wait(rest, token);
+      if (!still || !active) break;
+
+      let nextIndex = Math.floor(Math.random() * PERCHES.length);
+      if (nextIndex === perchIndex) {
+        nextIndex = (perchIndex + 1 + Math.floor(Math.random() * (PERCHES.length - 1))) % PERCHES.length;
+      }
+      const ok = await flyTo(PERCHES[nextIndex], token);
+      if (!ok) break;
+    }
+  }
+
+  function start() {
+    if (prefersReducedMotion || active) return;
+    active = true;
+    loopToken += 1;
+    loop(loopToken);
+  }
+
+  function stop() {
+    active = false;
+    loopToken += 1;
+    if (flightAnim) {
+      flightAnim.cancel();
+      flightAnim = null;
+    }
+    setFlying(false);
+    setPose(PERCHES[perchIndex]);
+  }
+
+  if (prefersReducedMotion) {
+    butterfly.classList.add("is-perched");
+    butterfly.classList.remove("is-flying");
+    return;
+  }
+
+  const syncVisibility = () => {
+    if (storyPanel.classList.contains("is-inview")) start();
+    else stop();
+  };
+
+  const visibilityObserver = new MutationObserver(syncVisibility);
+  visibilityObserver.observe(storyPanel, {
+    attributes: true,
+    attributeFilter: ["class"],
+  });
+
+  window.addEventListener(
+    "resize",
+    () => {
+      if (!active && !prefersReducedMotion) setPose(PERCHES[perchIndex]);
+      else if (!flightAnim) setPose(PERCHES[perchIndex]);
+    },
+    { passive: true }
+  );
+
+  syncVisibility();
+})();
 
 let envelopeOpened = false;
 
@@ -380,31 +801,6 @@ document.querySelectorAll("img[data-photo-fallback]").forEach((img) => {
   img.addEventListener("error", markEmpty);
   if (img.complete && img.naturalWidth === 0) markEmpty();
 });
-
-/* Photo album QR + upload button */
-const shareQr = document.getElementById("share-qr");
-const shareUpload = document.getElementById("share-upload");
-const albumUrl =
-  PHOTO_ALBUM_URL ||
-  new URL("#more", window.location.href).href;
-
-if (shareQr) {
-  shareQr.src = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&color=4b1d24&bgcolor=e5ded0&data=${encodeURIComponent(albumUrl)}`;
-}
-if (shareUpload) {
-  shareUpload.href = albumUrl;
-  if (PHOTO_ALBUM_URL) {
-    shareUpload.target = "_blank";
-    shareUpload.rel = "noopener noreferrer";
-  }
-}
-
-const shareContact = document.querySelector(".share-contact");
-if (shareContact && CONTACT_EMAIL) {
-  shareContact.href = `mailto:${CONTACT_EMAIL}`;
-} else if (shareContact) {
-  shareContact.href = "#rsvp";
-}
 
 if (form && statusEl) {
   form.addEventListener("submit", async (event) => {
