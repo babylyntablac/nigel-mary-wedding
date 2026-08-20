@@ -670,7 +670,8 @@ img {
   }
 }
 
-body.is-sealed .pill-nav {
+body.is-sealed .pill-nav,
+body.is-sealed .nav-toggle {
   opacity: 0;
   pointer-events: none;
 }
@@ -679,6 +680,73 @@ body.is-sealed .hero-monogram {
   opacity: 0;
 }
 
+body.is-nav-open {
+  overflow: hidden;
+}
+
+/* Mobile menu toggle — hidden on desktop */
+.nav-toggle {
+  display: none;
+  position: fixed;
+  top: max(0.85rem, env(safe-area-inset-top, 0px));
+  right: max(0.85rem, env(safe-area-inset-right, 0px));
+  z-index: 60;
+  width: 2.75rem;
+  height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, var(--cherry) 42%, transparent);
+  border-radius: 0;
+  background: color-mix(in srgb, var(--paper-bg) 82%, transparent);
+  box-shadow: 0 6px 20px rgba(26, 31, 28, 0.12);
+  backdrop-filter: blur(10px);
+  color: var(--olive);
+  cursor: pointer;
+  transition:
+    opacity 0.6s var(--ease-out),
+    background 0.22s var(--ease-out),
+    border-color 0.22s var(--ease-out);
+}
+
+.nav-toggle:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--gold) 70%, transparent);
+  outline-offset: 2px;
+}
+
+.nav-toggle-bars {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.32rem;
+  width: 1.15rem;
+}
+
+.nav-toggle-bar {
+  display: block;
+  height: 1.5px;
+  width: 100%;
+  background: currentColor;
+  transform-origin: center;
+  transition: transform 0.28s var(--ease-out), opacity 0.22s var(--ease-out);
+}
+
+.nav-toggle[aria-expanded="true"] {
+  background: color-mix(in srgb, var(--cream) 88%, white);
+  border-color: color-mix(in srgb, var(--cherry) 55%, transparent);
+  color: var(--cherry);
+}
+
+.nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(1) {
+  transform: translateY(0.37rem) rotate(45deg);
+}
+
+.nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(2) {
+  opacity: 0;
+}
+
+.nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(3) {
+  transform: translateY(-0.37rem) rotate(-45deg);
+}
 
 /* Section nav — right, rectangular, selected only */
 .pill-nav {
@@ -2280,12 +2348,12 @@ body.is-sealed .hero-meta {
 .join-panel {
   --join-col-gap: 1.5rem;
   --join-shot-width: 17rem;
-  /* Default wash matches navy (data-overlay="4") for locked Join Us look */
+  /* Locked wash: Champagne Dark */
   --join-overlay: linear-gradient(
-    180deg,
-    rgba(18, 32, 52, 0.76) 0%,
-    rgba(28, 48, 72, 0.7) 45%,
-    rgba(12, 24, 40, 0.82) 100%
+    165deg,
+    rgba(48, 38, 28, 0.74) 0%,
+    rgba(72, 54, 36, 0.68) 48%,
+    rgba(36, 28, 22, 0.8) 100%
   );
   --join-text-cream: #faf7f1;
   --join-text-shadow: 0 1px 2px rgba(20, 16, 12, 0.45), 0 0 18px rgba(12, 10, 8, 0.28);
@@ -2364,260 +2432,9 @@ body.is-sealed .hero-meta {
   position: absolute;
   inset: 0;
   background: var(--join-overlay);
-  transition: background 0.55s var(--ease-out);
 }
 
-/* Overlay washes — dark bases for cream text on photos */
-.join-panel[data-overlay="1"] {
-  --join-overlay: linear-gradient(
-    165deg,
-    rgba(48, 38, 28, 0.74) 0%,
-    rgba(72, 54, 36, 0.68) 48%,
-    rgba(36, 28, 22, 0.8) 100%
-  );
-}
-
-.join-panel[data-overlay="2"] {
-  --join-overlay: linear-gradient(
-    180deg,
-    rgba(28, 42, 28, 0.76) 0%,
-    rgba(45, 58, 38, 0.7) 50%,
-    rgba(22, 34, 24, 0.82) 100%
-  );
-}
-
-.join-panel[data-overlay="3"] {
-  --join-overlay: linear-gradient(
-    160deg,
-    rgba(72, 22, 36, 0.74) 0%,
-    rgba(92, 28, 48, 0.68) 48%,
-    rgba(48, 16, 28, 0.8) 100%
-  );
-}
-
-.join-panel[data-overlay="4"] {
-  --join-overlay: linear-gradient(
-    180deg,
-    rgba(18, 32, 52, 0.76) 0%,
-    rgba(28, 48, 72, 0.7) 45%,
-    rgba(12, 24, 40, 0.82) 100%
-  );
-}
-
-.join-panel[data-overlay="5"] {
-  --join-overlay: linear-gradient(
-    165deg,
-    rgba(52, 78, 72, 0.74) 0%,
-    rgba(68, 98, 92, 0.68) 50%,
-    rgba(40, 62, 58, 0.8) 100%
-  );
-}
-
-/* Left-middle live spacing / image size dials */
-.join-tune {
-  position: absolute;
-  left: clamp(0.45rem, 1.4vw, 1rem);
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 4;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 0.75rem;
-  width: max-content;
-  max-width: 7.25rem;
-  padding: 0.55rem 0.5rem;
-  border-radius: 0.55rem;
-  border: 1px solid color-mix(in srgb, var(--olive) 16%, transparent);
-  background: color-mix(in srgb, #faf7f1 88%, transparent);
-  box-shadow: 0 4px 18px color-mix(in srgb, var(--ink) 8%, transparent);
-  backdrop-filter: blur(8px);
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transition:
-    opacity 0.35s var(--ease-out),
-    visibility 0.35s var(--ease-out);
-}
-
-.join-panel.is-inview .join-tune {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-}
-
-.join-tune-group {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.28rem;
-}
-
-.join-tune-label {
-  font-family: var(--font-sans);
-  font-size: 0.58rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: color-mix(in srgb, var(--ink) 48%, transparent);
-}
-
-.join-tune-row {
-  display: flex;
-  align-items: center;
-  gap: 0.28rem;
-}
-
-.join-tune-btn {
-  appearance: none;
-  display: grid;
-  place-items: center;
-  width: 1.35rem;
-  height: 1.35rem;
-  margin: 0;
-  padding: 0;
-  border-radius: 0.35rem;
-  border: 1px solid color-mix(in srgb, var(--olive) 28%, transparent);
-  background: color-mix(in srgb, #fff 70%, var(--paper-deep));
-  color: var(--olive);
-  font-family: var(--font-sans);
-  font-size: 0.95rem;
-  font-weight: 600;
-  line-height: 1;
-  cursor: pointer;
-  box-shadow: 0 1px 3px color-mix(in srgb, var(--ink) 6%, transparent);
-  transition:
-    transform 0.2s var(--ease-out),
-    background 0.2s var(--ease-out),
-    border-color 0.2s var(--ease-out),
-    color 0.2s var(--ease-out);
-}
-
-.join-tune-btn:hover {
-  transform: scale(1.06);
-  border-color: color-mix(in srgb, var(--cherry) 35%, transparent);
-  color: var(--cherry);
-}
-
-.join-tune-btn:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--cherry) 50%, transparent);
-  outline-offset: 2px;
-}
-
-.join-tune-value {
-  min-width: 2.6rem;
-  text-align: center;
-  font-family: var(--font-sans);
-  font-size: 0.62rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: color-mix(in srgb, var(--ink) 62%, transparent);
-  font-variant-numeric: tabular-nums;
-}
-
-.join-bg-dots {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.28rem;
-  margin-top: 0.12rem;
-}
-
-.join-bg-dot {
-  appearance: none;
-  width: 0.38rem;
-  height: 0.38rem;
-  margin: 0;
-  padding: 0;
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--olive) 36%, transparent);
-  background: color-mix(in srgb, var(--ink) 12%, transparent);
-  cursor: pointer;
-  transition:
-    transform 0.2s var(--ease-out),
-    background 0.2s var(--ease-out),
-    border-color 0.2s var(--ease-out);
-}
-
-.join-bg-dot:hover {
-  transform: scale(1.15);
-  border-color: color-mix(in srgb, var(--cherry) 40%, transparent);
-}
-
-.join-bg-dot:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--cherry) 50%, transparent);
-  outline-offset: 2px;
-}
-
-.join-bg-dot.is-active {
-  background: color-mix(in srgb, var(--olive) 78%, var(--ink));
-  border-color: color-mix(in srgb, var(--olive) 70%, transparent);
-  transform: scale(1.2);
-}
-
-.join-overlay-swatches {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
-  max-width: 5.5rem;
-}
-
-.join-overlay-swatch {
-  appearance: none;
-  width: 0.78rem;
-  height: 0.78rem;
-  margin: 0;
-  padding: 0;
-  border-radius: 999px;
-  border: 1.5px solid color-mix(in srgb, var(--ink) 22%, transparent);
-  box-shadow: 0 2px 6px color-mix(in srgb, var(--ink) 10%, transparent);
-  cursor: pointer;
-  transition:
-    transform 0.22s var(--ease-out),
-    box-shadow 0.22s var(--ease-out),
-    border-color 0.22s var(--ease-out);
-}
-
-.join-overlay-swatch:hover {
-  transform: scale(1.12);
-}
-
-.join-overlay-swatch:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--cherry) 50%, transparent);
-  outline-offset: 2px;
-}
-
-.join-overlay-swatch.is-active {
-  transform: scale(1.18);
-  border-color: color-mix(in srgb, var(--ink) 55%, transparent);
-  box-shadow:
-    0 0 0 1.5px color-mix(in srgb, #fff 70%, transparent),
-    0 4px 10px color-mix(in srgb, var(--ink) 14%, transparent);
-}
-
-.join-overlay-swatch[data-join-overlay="1"] {
-  background: linear-gradient(145deg, #8a6e4e, #30261c);
-}
-
-.join-overlay-swatch[data-join-overlay="2"] {
-  background: linear-gradient(145deg, #3d5238, #1c2a1c);
-}
-
-.join-overlay-swatch[data-join-overlay="3"] {
-  background: linear-gradient(145deg, #7a3048, #3c1424);
-}
-
-.join-overlay-swatch[data-join-overlay="4"] {
-  background: linear-gradient(145deg, #2c4a6e, #121e34);
-}
-
-.join-overlay-swatch[data-join-overlay="5"] {
-  background: linear-gradient(145deg, #5a7e76, #283e3a);
-}
-
-/* Photo mode: light cream type + darker glass controls */
+/* Photo mode: light cream type on dark champagne wash */
 .join-panel.join-on-photo {
   color: var(--join-text-cream);
 }
@@ -2657,46 +2474,10 @@ body.is-sealed .hero-meta {
 }
 
 .join-panel.join-on-photo .join-laurel-motif {
-  /* Photoreal PNG — keep natural olive/dusty-rose color; soft lift on navy wash */
+  /* Photoreal PNG — keep natural olive/dusty-rose color; soft lift on champagne wash */
   filter: drop-shadow(0 1px 2px rgba(8, 12, 20, 0.45))
     drop-shadow(0 0 10px rgba(12, 20, 32, 0.22));
   opacity: 0.96;
-}
-
-.join-panel.join-on-photo .join-tune {
-  border-color: color-mix(in srgb, #faf7f1 28%, transparent);
-  background: color-mix(in srgb, #1a1612 62%, transparent);
-  box-shadow: 0 4px 18px rgba(8, 6, 4, 0.28);
-}
-
-.join-panel.join-on-photo .join-tune-label,
-.join-panel.join-on-photo .join-tune-value {
-  color: color-mix(in srgb, #faf7f1 72%, transparent);
-}
-
-.join-panel.join-on-photo .join-tune-btn {
-  border-color: color-mix(in srgb, #faf7f1 32%, transparent);
-  background: color-mix(in srgb, #2a241c 70%, transparent);
-  color: #f0e6d6;
-}
-
-.join-panel.join-on-photo .join-tune-btn:hover {
-  border-color: color-mix(in srgb, #faf7f1 55%, transparent);
-  color: #fff;
-}
-
-.join-panel.join-on-photo .join-bg-dot {
-  border-color: color-mix(in srgb, #faf7f1 40%, transparent);
-  background: color-mix(in srgb, #faf7f1 18%, transparent);
-}
-
-.join-panel.join-on-photo .join-bg-dot.is-active {
-  background: #faf7f1;
-  border-color: #faf7f1;
-}
-
-.join-panel.join-on-photo .join-overlay-swatch {
-  border-color: color-mix(in srgb, #fff 55%, transparent);
 }
 
 .join-panel.join-on-photo .join-directions {
@@ -3573,23 +3354,24 @@ body.is-sealed .hero-meta {
 }
 
 .entourage-panel {
+  /* Locked wash: Navy */
   --entourage-overlay: linear-gradient(
-    165deg,
-    rgba(250, 244, 232, 0.78) 0%,
-    rgba(232, 214, 180, 0.7) 48%,
-    rgba(245, 236, 220, 0.82) 100%
+    180deg,
+    rgba(18, 32, 52, 0.74) 0%,
+    rgba(28, 48, 72, 0.68) 45%,
+    rgba(12, 24, 40, 0.8) 100%
   );
-  --sponsors-navy: #1e3a5f;
+  --sponsors-navy: #e8eef6;
   --sponsors-navy-soft: #2a4a72;
-  --sponsors-ink: #1a2a3e;
+  --sponsors-ink: #f4f7fb;
   --sponsors-cream: #faf6ef;
-  --sponsors-text-shadow: 0 1px 2px rgba(250, 244, 232, 0.55), 0 0 18px rgba(250, 244, 232, 0.35);
+  --sponsors-text-shadow: 0 1px 3px rgba(6, 12, 22, 0.55), 0 0 20px rgba(6, 12, 22, 0.35);
   position: relative;
   z-index: 1;
   background: #1c241c;
   min-height: 100svh;
   height: auto;
-  /* visible so sticky controls work; media is viewport-fixed + clipped in JS */
+  /* Keep visible so sticky media can pin; neighbors’ higher z-index covers edge bleed. */
   overflow: visible;
   display: flex;
   align-items: stretch;
@@ -3597,9 +3379,7 @@ body.is-sealed .hero-meta {
   isolation: isolate;
 }
 
-/* Shell stays in the section (absolute inset) so it never affects scrollHeight.
-   The visual layer (.entourage-media-fixed) is always position:fixed and clipped
-   to #entourage’s intersection with the viewport — no absolute↔fixed toggle. */
+/* Absolute track = section height. Sticky child pins in-view without JS clip-path. */
 .entourage-media {
   position: absolute;
   inset: 0;
@@ -3608,16 +3388,12 @@ body.is-sealed .hero-meta {
 }
 
 .entourage-media-fixed {
-  position: fixed;
-  inset: 0;
-  width: auto;
-  height: auto;
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100svh;
   overflow: hidden;
-  /* Below .day-panel (z-index: 2) — belt-and-suspenders vs lag frames */
-  z-index: 0;
   pointer-events: none;
-  clip-path: inset(100% 0 0 0);
-  will-change: clip-path;
 }
 
 .entourage-media-photo {
@@ -3640,216 +3416,6 @@ body.is-sealed .hero-meta {
   position: absolute;
   inset: 0;
   background: var(--entourage-overlay);
-  transition: background 0.55s var(--ease-out);
-}
-
-/* 1 — Champagne cream (light → dark text) */
-.entourage-panel[data-overlay="1"] {
-  --entourage-overlay: linear-gradient(
-    165deg,
-    rgba(250, 244, 232, 0.78) 0%,
-    rgba(232, 214, 180, 0.7) 48%,
-    rgba(245, 236, 220, 0.82) 100%
-  );
-  --sponsors-navy: #1e3a5f;
-  --sponsors-ink: #1a2a3e;
-  --sponsors-text-shadow: 0 1px 2px rgba(250, 244, 232, 0.55), 0 0 18px rgba(250, 244, 232, 0.35);
-}
-
-/* 2 — Deep forest olive */
-.entourage-panel[data-overlay="2"] {
-  --entourage-overlay: linear-gradient(
-    180deg,
-    rgba(28, 42, 28, 0.74) 0%,
-    rgba(45, 58, 38, 0.68) 50%,
-    rgba(22, 34, 24, 0.8) 100%
-  );
-  --sponsors-navy: #f3ead8;
-  --sponsors-ink: #f7f1e6;
-  --sponsors-text-shadow: 0 1px 3px rgba(12, 18, 12, 0.55), 0 0 20px rgba(12, 18, 12, 0.35);
-}
-
-/* 3 — Burgundy / cherry wine */
-.entourage-panel[data-overlay="3"] {
-  --entourage-overlay: linear-gradient(
-    160deg,
-    rgba(72, 22, 36, 0.72) 0%,
-    rgba(92, 28, 48, 0.66) 48%,
-    rgba(48, 16, 28, 0.78) 100%
-  );
-  --sponsors-navy: #f6e8dc;
-  --sponsors-ink: #faf3ea;
-  --sponsors-text-shadow: 0 1px 3px rgba(28, 8, 14, 0.55), 0 0 20px rgba(28, 8, 14, 0.35);
-}
-
-/* 4 — Navy / ink */
-.entourage-panel[data-overlay="4"] {
-  --entourage-overlay: linear-gradient(
-    180deg,
-    rgba(18, 32, 52, 0.74) 0%,
-    rgba(28, 48, 72, 0.68) 45%,
-    rgba(12, 24, 40, 0.8) 100%
-  );
-  --sponsors-navy: #e8eef6;
-  --sponsors-ink: #f4f7fb;
-  --sponsors-text-shadow: 0 1px 3px rgba(6, 12, 22, 0.55), 0 0 20px rgba(6, 12, 22, 0.35);
-}
-
-/* 5 — Sage / muted teal */
-.entourage-panel[data-overlay="5"] {
-  --entourage-overlay: linear-gradient(
-    165deg,
-    rgba(52, 78, 72, 0.72) 0%,
-    rgba(68, 98, 92, 0.66) 50%,
-    rgba(40, 62, 58, 0.78) 100%
-  );
-  --sponsors-navy: #eef6f2;
-  --sponsors-ink: #f5faf7;
-  --sponsors-text-shadow: 0 1px 3px rgba(16, 28, 26, 0.5), 0 0 20px rgba(16, 28, 26, 0.32);
-}
-
-.entourage-panel.entourage-overlay-light {
-  --sponsors-navy: #1e3a5f;
-  --sponsors-ink: #1a2a3e;
-  --sponsors-text-shadow: 0 1px 2px rgba(250, 244, 232, 0.55), 0 0 18px rgba(250, 244, 232, 0.35);
-}
-
-/* Left-center align + overlay controls — always sticky (never fixed) so
-   flex flow / scrollHeight stay stable while scrolling names. */
-.entourage-overlay-switcher {
-  position: sticky;
-  top: max(4.25rem, calc(50svh - 8.25rem));
-  align-self: flex-start;
-  flex: 0 0 auto;
-  z-index: 4;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.85rem;
-  width: fit-content;
-  margin: 0 0 0 clamp(0.55rem, 1.6vw, 1.05rem);
-  padding: 0.35rem 0;
-  pointer-events: none;
-}
-
-.entourage-align-switcher,
-.entourage-tint-switcher {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.45rem;
-}
-
-.entourage-tint-switcher {
-  gap: 0.55rem;
-}
-
-.entourage-align {
-  pointer-events: auto;
-  appearance: none;
-  display: grid;
-  place-items: center;
-  width: 1.35rem;
-  height: 1.35rem;
-  margin: 0;
-  padding: 0;
-  border-radius: 0.35rem;
-  border: 1px solid rgba(255, 255, 255, 0.38);
-  background: rgba(18, 24, 22, 0.28);
-  color: rgba(250, 244, 232, 0.72);
-  box-shadow: 0 2px 8px rgba(12, 18, 16, 0.16);
-  cursor: pointer;
-  transition:
-    transform 0.22s var(--ease-out),
-    color 0.22s var(--ease-out),
-    background 0.22s var(--ease-out),
-    border-color 0.22s var(--ease-out),
-    box-shadow 0.22s var(--ease-out);
-}
-
-.entourage-align-icon {
-  width: 0.72rem;
-  height: 0.72rem;
-  display: block;
-}
-
-.entourage-align:hover {
-  transform: scale(1.06);
-  color: rgba(250, 244, 232, 0.95);
-  border-color: rgba(255, 255, 255, 0.55);
-}
-
-.entourage-align:focus-visible {
-  outline: 2px solid rgba(250, 244, 232, 0.95);
-  outline-offset: 2px;
-}
-
-.entourage-align.is-active {
-  transform: scale(1.08);
-  color: rgba(250, 244, 232, 0.98);
-  background: rgba(250, 244, 232, 0.18);
-  border-color: rgba(255, 255, 255, 0.78);
-  box-shadow:
-    0 0 0 1px rgba(20, 28, 24, 0.28),
-    0 0 0 3px rgba(255, 255, 255, 0.16),
-    0 4px 10px rgba(12, 18, 16, 0.2);
-}
-
-.entourage-swatch {
-  pointer-events: auto;
-  appearance: none;
-  width: 0.85rem;
-  height: 0.85rem;
-  border-radius: 999px;
-  border: 1.5px solid rgba(255, 255, 255, 0.55);
-  box-shadow:
-    0 0 0 1px rgba(20, 28, 24, 0.22),
-    0 4px 12px rgba(12, 18, 16, 0.18);
-  cursor: pointer;
-  padding: 0;
-  background: #e8d6b4;
-  transition:
-    transform 0.22s var(--ease-out),
-    box-shadow 0.22s var(--ease-out),
-    border-color 0.22s var(--ease-out);
-}
-
-.entourage-swatch:hover {
-  transform: scale(1.12);
-}
-
-.entourage-swatch:focus-visible {
-  outline: 2px solid rgba(250, 244, 232, 0.95);
-  outline-offset: 3px;
-}
-
-.entourage-swatch.is-active {
-  transform: scale(1.18);
-  border-color: rgba(255, 255, 255, 0.92);
-  box-shadow:
-    0 0 0 1.5px rgba(20, 28, 24, 0.35),
-    0 0 0 4px rgba(255, 255, 255, 0.22),
-    0 6px 14px rgba(12, 18, 16, 0.22);
-}
-
-.entourage-swatch[data-overlay="1"] {
-  background: linear-gradient(145deg, #faf4e8, #e8d6b4);
-}
-
-.entourage-swatch[data-overlay="2"] {
-  background: linear-gradient(145deg, #3d5238, #1c2a1c);
-}
-
-.entourage-swatch[data-overlay="3"] {
-  background: linear-gradient(145deg, #7a3048, #3c1424);
-}
-
-.entourage-swatch[data-overlay="4"] {
-  background: linear-gradient(145deg, #2c4a6e, #121e34);
-}
-
-.entourage-swatch[data-overlay="5"] {
-  background: linear-gradient(145deg, #5a7e76, #283e3a);
 }
 
 .day-panel,
@@ -3857,6 +3423,11 @@ body.is-sealed .hero-meta {
 .rsvp-panel {
   display: flex;
   align-items: center;
+}
+
+.more-panel {
+  position: relative;
+  z-index: 2;
 }
 
 .day-panel {
@@ -4337,8 +3908,7 @@ body.is-sealed .hero-meta {
   width: 100%;
   min-width: 0;
   margin: 0;
-  padding: clamp(1.5rem, 4vh, 2.75rem) clamp(2.25rem, 5vw, 3.5rem) clamp(1.5rem, 4vh, 2.75rem)
-    clamp(2.1rem, 4.5vw, 3.25rem);
+  padding: clamp(1.5rem, 4vh, 2.75rem) clamp(2.25rem, 5vw, 3.5rem);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -4501,6 +4071,7 @@ body.is-sealed .hero-meta {
   max-width: 38rem;
   margin-inline: auto;
   gap: 0.38rem;
+  justify-items: stretch;
 }
 
 .sponsors-party-row {
@@ -4515,16 +4086,8 @@ body.is-sealed .hero-meta {
 .sponsors-party-right {
   display: block;
   min-width: 0;
-}
-
-.sponsors-party-left {
-  text-align: left;
-  justify-self: stretch;
-}
-
-.sponsors-party-right {
-  text-align: right;
-  justify-self: stretch;
+  text-align: center;
+  justify-self: center;
 }
 
 .sponsors-list li {
@@ -4534,73 +4097,6 @@ body.is-sealed .hero-meta {
   color: var(--sponsors-ink);
   line-height: 1.4;
   text-shadow: var(--sponsors-text-shadow);
-}
-
-/* Entourage name-list alignment (data-align on #entourage) */
-.entourage-panel[data-align="left"] .sponsors-side,
-.entourage-panel[data-align="left"] .sponsors-list--col,
-.entourage-panel[data-align="left"] .sponsors-candle {
-  justify-items: start;
-  text-align: left;
-}
-
-.entourage-panel[data-align="center"] .sponsors-side,
-.entourage-panel[data-align="center"] .sponsors-list--col,
-.entourage-panel[data-align="center"] .sponsors-candle {
-  justify-items: center;
-  text-align: center;
-}
-
-.entourage-panel[data-align="right"] .sponsors-side,
-.entourage-panel[data-align="right"] .sponsors-list--col,
-.entourage-panel[data-align="right"] .sponsors-candle {
-  justify-items: end;
-  text-align: right;
-}
-
-.entourage-panel[data-align="left"] .sponsors-name,
-.entourage-panel[data-align="left"] .sponsors-list {
-  text-align: left;
-}
-
-.entourage-panel[data-align="center"] .sponsors-name,
-.entourage-panel[data-align="center"] .sponsors-list {
-  text-align: center;
-}
-
-.entourage-panel[data-align="right"] .sponsors-name,
-.entourage-panel[data-align="right"] .sponsors-list {
-  text-align: right;
-}
-
-.entourage-panel[data-align="left"] .sponsors-party-left,
-.entourage-panel[data-align="left"] .sponsors-party-right {
-  text-align: left;
-  justify-self: start;
-}
-
-.entourage-panel[data-align="center"] .sponsors-party-left,
-.entourage-panel[data-align="center"] .sponsors-party-right {
-  text-align: center;
-  justify-self: center;
-}
-
-.entourage-panel[data-align="right"] .sponsors-party-left,
-.entourage-panel[data-align="right"] .sponsors-party-right {
-  text-align: right;
-  justify-self: end;
-}
-
-.entourage-panel[data-align="left"] .sponsors-list--party {
-  justify-items: start;
-}
-
-.entourage-panel[data-align="center"] .sponsors-list--party {
-  justify-items: stretch;
-}
-
-.entourage-panel[data-align="right"] .sponsors-list--party {
-  justify-items: end;
 }
 
 .sponsors-pair-roles {
@@ -4992,39 +4488,8 @@ body.is-sealed .hero-meta {
     grid-template-columns: 1fr;
   }
 
-  .entourage-overlay-switcher {
-    top: max(3.5rem, calc(50svh - 7.25rem));
-    margin-left: 0.35rem;
-    gap: 0.65rem;
-  }
-
-  .entourage-align-switcher {
-    gap: 0.35rem;
-  }
-
-  .entourage-tint-switcher {
-    gap: 0.42rem;
-  }
-
-  .entourage-align {
-    width: 1.2rem;
-    height: 1.2rem;
-    border-radius: 0.3rem;
-  }
-
-  .entourage-align-icon {
-    width: 0.64rem;
-    height: 0.64rem;
-  }
-
-  .entourage-swatch {
-    width: 0.72rem;
-    height: 0.72rem;
-  }
-
   .sponsors-compose {
-    padding: clamp(1.25rem, 3.5vh, 2rem) clamp(1.65rem, 5vw, 2.25rem) clamp(1.25rem, 3.5vh, 2rem)
-      clamp(1.85rem, 5.5vw, 2.5rem);
+    padding: clamp(1.25rem, 3.5vh, 2rem) clamp(1.65rem, 5vw, 2.25rem);
   }
 
   .sponsors-band {
@@ -5053,7 +4518,7 @@ body.is-sealed .hero-meta {
     gap: 0.85rem;
   }
 
-  /* Classic program party list: keep flush L/R columns when space allows */
+  /* Classic program party list: keep two columns when space allows */
   .sponsors-party-row {
     grid-template-columns: 1fr 1fr;
     column-gap: 0.55rem;
@@ -5104,12 +4569,6 @@ body.is-sealed .hero-meta {
 
   .join-hours {
     max-width: calc(var(--join-shot-width) * 2 + var(--join-col-gap));
-  }
-
-  .join-tune {
-    left: 0.35rem;
-    max-width: 6.75rem;
-    padding: 0.45rem 0.4rem;
   }
 
   .pill-nav {
@@ -5350,16 +4809,70 @@ body.is-sealed .hero-meta {
     width: 2.95rem;
   }
 
+  /* Hamburger replaces the right pill rail */
+  .nav-toggle {
+    display: flex;
+  }
+
+  .pill-nav {
+    inset: 0;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    transform: none;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding:
+      max(5.5rem, calc(env(safe-area-inset-top, 0px) + 4.5rem))
+      1.75rem
+      max(2.5rem, env(safe-area-inset-bottom, 0px));
+    background:
+      radial-gradient(ellipse at 18% 8%, rgba(75, 29, 36, 0.07) 0%, transparent 42%),
+      radial-gradient(ellipse at 88% 92%, rgba(47, 70, 56, 0.08) 0%, transparent 48%),
+      linear-gradient(180deg, #f7f3ec 0%, #f3efe8 48%, #ebe6dc 100%);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity 0.35s var(--ease-out),
+      visibility 0.35s var(--ease-out);
+  }
+
+  .pill-nav.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  body.is-sealed .pill-nav.is-open {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
   .pill {
-    width: 7.35rem;
-    min-height: 1.4rem;
-    padding: 0.16rem 0.38rem 0.16rem 0.28rem;
+    width: min(18rem, 100%);
+    min-height: 2.65rem;
+    justify-content: center;
+    padding: 0.45rem 1rem;
+    border-color: color-mix(in srgb, var(--cherry) 38%, transparent);
+    background: color-mix(in srgb, var(--white) 55%, transparent);
+    text-align: center;
   }
 
   .pill-label {
     display: block;
-    font-size: 0.62rem;
-    letter-spacing: 0.08em;
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-align: center;
+  }
+
+  .pill.is-active {
+    background: rgba(26, 31, 28, 0.78);
   }
 
   .hero-title {
@@ -5369,20 +4882,28 @@ body.is-sealed .hero-meta {
 
   .hero-center {
     padding-top: clamp(2vh, 5vh, 7vh);
-    /* Keep “Heavens Agreed” clear of the fixed pill rail */
-    padding-inline-end: clamp(7.6rem, 22vw, 8.75rem);
+    padding-inline-end: 0;
     box-sizing: border-box;
   }
 
-  /* Home date/venue: full-width viewport center (ignore title’s nav-rail pad) */
+  /*
+   * Home date/venue: true viewport center.
+   * Absolute + left/right + fixed width + margin auto — independent of
+   * grid padding / title asymmetry. Transforms stay free for fade motion.
+   */
   .home-panel .hero-meta {
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: clamp(1.35rem, 4vh, 2.65rem);
+    z-index: 2;
+    width: min(22rem, calc(100vw - 2rem));
+    max-width: none;
     margin-inline: auto;
-    justify-self: center;
-    padding-inline: clamp(1.25rem, 4vw, 2rem);
+    padding-inline: 0;
+    justify-self: unset;
     text-align: center;
+    box-sizing: border-box;
   }
 
   .hero-date-block {
@@ -5590,31 +5111,6 @@ body.is-sealed .hero-meta {
     max-width: 22rem;
   }
 
-  .join-tune {
-    display: flex;
-    left: 0.28rem;
-    top: auto;
-    bottom: max(0.65rem, env(safe-area-inset-bottom, 0px));
-    transform: none;
-    max-width: min(7.25rem, 28vw);
-    padding: 0.4rem 0.35rem;
-    gap: 0.55rem;
-  }
-
-  .join-tune-group--layout {
-    display: none;
-  }
-
-  .join-overlay-swatches {
-    max-width: 4.75rem;
-    gap: 0.28rem;
-  }
-
-  .join-overlay-swatch {
-    width: 0.7rem;
-    height: 0.7rem;
-  }
-
   .join-palette {
     gap: 0.4rem;
   }
@@ -5700,12 +5196,18 @@ body.is-sealed .hero-meta {
   }
 
   .home-panel .hero-meta {
-    /* Equal inset both sides so the date block stays viewport-centered */
-    padding-inline: clamp(1.5rem, 5vw, 2.5rem);
-    text-align: center;
+    width: min(22rem, calc(100vw - 1.5rem));
+    bottom: clamp(1.15rem, 3.5vh, 2rem);
   }
 
   .invite-card > .hero-meta {
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    width: 100%;
+    max-width: 100%;
+    margin-inline: 0;
     padding-inline: 0.15rem;
   }
 

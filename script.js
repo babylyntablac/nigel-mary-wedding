@@ -1,5 +1,8 @@
 const pills = [...document.querySelectorAll(".pill-nav .pill")];
 const panels = [...document.querySelectorAll("[data-panel]")];
+const pillNav = document.querySelector(".pill-nav");
+const navToggle = document.querySelector(".nav-toggle");
+const mqMobileNav = window.matchMedia("(max-width: 820px)");
 
 // Paste your Google Apps Script Web App URL here after deploying Code.gs
 const GOOGLE_SCRIPT_URL = "";
@@ -118,9 +121,79 @@ function setActivePill(id) {
   });
 }
 
+function syncMobileNavA11y(isOpen) {
+  if (!pillNav) return;
+  if (mqMobileNav.matches) {
+    pillNav.setAttribute("aria-hidden", isOpen ? "false" : "true");
+  } else {
+    pillNav.removeAttribute("aria-hidden");
+  }
+}
+
+function setMobileNavOpen(open, { restoreFocus = true } = {}) {
+  if (!pillNav || !navToggle) return;
+  const wasOpen = pillNav.classList.contains("is-open");
+  const shouldOpen = Boolean(open) && mqMobileNav.matches;
+  pillNav.classList.toggle("is-open", shouldOpen);
+  document.body.classList.toggle("is-nav-open", shouldOpen);
+  navToggle.setAttribute("aria-expanded", shouldOpen ? "true" : "false");
+  navToggle.setAttribute("aria-label", shouldOpen ? "Close menu" : "Open menu");
+  syncMobileNavA11y(shouldOpen);
+
+  if (shouldOpen) {
+    const active = pillNav.querySelector(".pill.is-active") || pills[0];
+    active?.focus?.();
+  } else if (wasOpen && restoreFocus && mqMobileNav.matches) {
+    navToggle.focus();
+  }
+}
+
+function trapMobileNavFocus(event) {
+  if (!pillNav?.classList.contains("is-open") || event.key !== "Tab") return;
+  const focusable = [
+    navToggle,
+    ...pills.filter((pill) => !pill.hasAttribute("disabled")),
+  ].filter(Boolean);
+  if (focusable.length < 2) return;
+
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
+  }
+}
+
+navToggle?.addEventListener("click", () => {
+  const open = navToggle.getAttribute("aria-expanded") !== "true";
+  setMobileNavOpen(open);
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && pillNav?.classList.contains("is-open")) {
+    event.preventDefault();
+    setMobileNavOpen(false);
+    return;
+  }
+  trapMobileNavFocus(event);
+});
+
+mqMobileNav.addEventListener("change", () => {
+  if (!mqMobileNav.matches) {
+    setMobileNavOpen(false, { restoreFocus: false });
+  }
+  syncMobileNavA11y(pillNav?.classList.contains("is-open"));
+});
+
+syncMobileNavA11y(false);
+
 pills.forEach((pill) => {
   pill.addEventListener("click", (event) => {
     event.preventDefault();
+    setMobileNavOpen(false, { restoreFocus: false });
     scrollToSection(pill.dataset.section);
   });
 });
@@ -1037,339 +1110,6 @@ document.querySelectorAll("img[data-photo-fallback]").forEach((img) => {
   img.addEventListener("error", markEmpty);
   if (img.complete && img.naturalWidth === 0) markEmpty();
 });
-
-/* Join Us: live spacing + image size dials (sessionStorage) */
-(function initJoinTuneControls() {
-  const panel = document.getElementById("join");
-  if (!panel) return;
-
-  const GAP_KEY = "join-col-gap";
-  const SHOT_KEY = "join-shot-width";
-  const DEFAULTS = { gap: 1.5, shot: 17 };
-  const LIMITS = {
-    gap: { min: 1.5, max: 6, step: 0.25 },
-    shot: { min: 10, max: 20, step: 0.5 },
-  };
-
-  const formatRem = (value) => {
-    const rounded = Math.round(value * 100) / 100;
-    return `${Number.isInteger(rounded) ? rounded.toFixed(0) : String(rounded)}rem`;
-  };
-
-  const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
-
-  const readStored = (key, fallback) => {
-    try {
-      const raw = sessionStorage.getItem(key);
-      if (raw == null) return fallback;
-      const num = parseFloat(raw);
-      return Number.isFinite(num) ? num : fallback;
-    } catch (_) {
-      return fallback;
-    }
-  };
-
-  const writeStored = (key, value) => {
-    try {
-      sessionStorage.setItem(key, String(value));
-    } catch (_) {
-      /* ignore quota / private mode */
-    }
-  };
-
-  let gap = clamp(readStored(GAP_KEY, DEFAULTS.gap), LIMITS.gap.min, LIMITS.gap.max);
-  let shot = clamp(readStored(SHOT_KEY, DEFAULTS.shot), LIMITS.shot.min, LIMITS.shot.max);
-
-  const gapReadout = panel.querySelector('[data-join-readout="gap"]');
-  const shotReadout = panel.querySelector('[data-join-readout="shot"]');
-
-  const apply = () => {
-    panel.style.setProperty("--join-col-gap", formatRem(gap));
-    panel.style.setProperty("--join-shot-width", formatRem(shot));
-    if (gapReadout) gapReadout.textContent = formatRem(gap);
-    if (shotReadout) shotReadout.textContent = formatRem(shot);
-  };
-
-  apply();
-
-  panel.querySelectorAll("[data-join-tune]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const kind = btn.getAttribute("data-join-tune");
-      const dir = Number(btn.getAttribute("data-dir")) || 0;
-      if (kind === "gap") {
-        gap = clamp(gap + dir * LIMITS.gap.step, LIMITS.gap.min, LIMITS.gap.max);
-        writeStored(GAP_KEY, gap);
-      } else if (kind === "shot") {
-        shot = clamp(shot + dir * LIMITS.shot.step, LIMITS.shot.min, LIMITS.shot.max);
-        writeStored(SHOT_KEY, shot);
-      } else {
-        return;
-      }
-      apply();
-    });
-  });
-})();
-
-/* Join Us: full-bleed background cycle + overlay washes (sessionStorage) */
-(function initJoinBackgroundControls() {
-  const panel = document.getElementById("join");
-  if (!panel) return;
-
-  const BG_KEY = "join-bg-index";
-  const OVERLAY_KEY = "join-overlay";
-  const BG_COUNT = 6;
-  /* Locked site defaults: UI 5/6 (index 4 → join-bg-4.jpg) + navy wash */
-  const DEFAULT_BG = 4;
-  const DEFAULT_OVERLAY = "4";
-  const BG_SRCS = [
-    null,
-    "assets/join-bg-1.jpg",
-    "assets/join-bg-2.jpg",
-    "assets/join-bg-3.jpg",
-    "assets/join-bg-4.jpg",
-    "assets/join-bg-5.jpg",
-  ];
-
-  const img = panel.querySelector("[data-join-bg-img]");
-  const readout = panel.querySelector("[data-join-bg-readout]");
-  const dots = [...panel.querySelectorAll("[data-join-bg-goto]")];
-  const swatches = [...panel.querySelectorAll("[data-join-overlay]")];
-
-  const writeStored = (key, value) => {
-    try {
-      sessionStorage.setItem(key, String(value));
-    } catch (_) {
-      /* ignore quota / private mode */
-    }
-  };
-
-  const readStored = (key, fallback) => {
-    try {
-      const raw = sessionStorage.getItem(key);
-      return raw == null ? fallback : raw;
-    } catch (_) {
-      return fallback;
-    }
-  };
-
-  const preload = (src) => {
-    if (!src) return;
-    const probe = new Image();
-    probe.decoding = "async";
-    probe.src = src;
-  };
-
-  BG_SRCS.filter(Boolean).forEach(preload);
-
-  const applyBg = (index) => {
-    const i = ((Number(index) % BG_COUNT) + BG_COUNT) % BG_COUNT;
-    const onPhoto = i > 0;
-    const src = BG_SRCS[i];
-
-    panel.dataset.bg = String(i);
-    panel.classList.toggle("join-on-photo", onPhoto);
-
-    if (img) {
-      if (onPhoto && src) {
-        if (img.getAttribute("src") !== src) img.setAttribute("src", src);
-        img.removeAttribute("hidden");
-      }
-    }
-
-    if (readout) readout.textContent = `${i + 1}/${BG_COUNT}`;
-
-    dots.forEach((dot) => {
-      const active = Number(dot.dataset.joinBgGoto) === i;
-      dot.classList.toggle("is-active", active);
-      dot.setAttribute("aria-selected", active ? "true" : "false");
-    });
-
-    writeStored(BG_KEY, i);
-  };
-
-  const applyOverlay = (value) => {
-    const id = String(value);
-    if (!/^[1-5]$/.test(id)) return;
-
-    panel.dataset.overlay = id;
-
-    swatches.forEach((btn) => {
-      const active = btn.dataset.joinOverlay === id;
-      btn.classList.toggle("is-active", active);
-      btn.setAttribute("aria-checked", active ? "true" : "false");
-    });
-
-    writeStored(OVERLAY_KEY, id);
-  };
-
-  let savedBg = DEFAULT_BG;
-  let savedOverlay = DEFAULT_OVERLAY;
-  try {
-    const rawBg = parseInt(readStored(BG_KEY, String(DEFAULT_BG)), 10);
-    savedBg = Number.isFinite(rawBg) ? rawBg : DEFAULT_BG;
-    savedOverlay = readStored(OVERLAY_KEY, DEFAULT_OVERLAY);
-    if (!/^[1-5]$/.test(String(savedOverlay))) savedOverlay = DEFAULT_OVERLAY;
-  } catch (_) {
-    savedBg = DEFAULT_BG;
-    savedOverlay = DEFAULT_OVERLAY;
-  }
-
-  applyBg(savedBg);
-  applyOverlay(savedOverlay);
-
-  panel.querySelectorAll("[data-join-bg]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const dir = Number(btn.getAttribute("data-join-bg")) || 0;
-      const current = Number(panel.dataset.bg) || 0;
-      applyBg(current + dir);
-    });
-  });
-
-  dots.forEach((dot) => {
-    dot.addEventListener("click", () => {
-      applyBg(Number(dot.dataset.joinBgGoto));
-    });
-  });
-
-  swatches.forEach((btn) => {
-    btn.addEventListener("click", () => applyOverlay(btn.dataset.joinOverlay));
-  });
-})();
-
-/* Entourage: fixed bg clipped to section bounds + overlay/align controls */
-(function initEntourageControls() {
-  const panel = document.getElementById("entourage");
-  if (!panel) return;
-
-  const mediaFixed = panel.querySelector(".entourage-media-fixed");
-
-  /* Always position:fixed (no layout toggle). Clip to the section’s
-     intersection with the viewport so the pin never changes scrollHeight
-     and cannot bleed onto Day / More. */
-  const syncEntourageMediaClip = () => {
-    if (!mediaFixed) return;
-
-    const rect = panel.getBoundingClientRect();
-    const vh = window.innerHeight || document.documentElement.clientHeight;
-    const vw = document.documentElement.clientWidth || window.innerWidth;
-
-    if (rect.bottom <= 0 || rect.top >= vh || rect.right <= 0 || rect.left >= vw) {
-      mediaFixed.style.clipPath = "inset(100% 0 0 0)";
-      return;
-    }
-
-    const top = Math.max(0, rect.top);
-    const right = Math.max(0, vw - rect.right);
-    const bottom = Math.max(0, vh - rect.bottom);
-    const left = Math.max(0, rect.left);
-    mediaFixed.style.clipPath = `inset(${top}px ${right}px ${bottom}px ${left}px)`;
-  };
-
-  let clipRaf = 0;
-  let clipListening = false;
-  const scheduleMediaClip = () => {
-    if (clipRaf) return;
-    clipRaf = requestAnimationFrame(() => {
-      clipRaf = 0;
-      syncEntourageMediaClip();
-    });
-  };
-
-  const setClipListening = (on) => {
-    if (on === clipListening) return;
-    clipListening = on;
-    if (on) {
-      window.addEventListener("scroll", scheduleMediaClip, { passive: true });
-      window.addEventListener("resize", scheduleMediaClip);
-      scheduleMediaClip();
-    } else {
-      window.removeEventListener("scroll", scheduleMediaClip);
-      window.removeEventListener("resize", scheduleMediaClip);
-      if (mediaFixed) mediaFixed.style.clipPath = "inset(100% 0 0 0)";
-    }
-  };
-
-  const clipObserver = new IntersectionObserver(
-    (entries) => {
-      const visible = entries.some((entry) => entry.isIntersecting);
-      setClipListening(visible);
-    },
-    { rootMargin: "20% 0px" }
-  );
-  clipObserver.observe(panel);
-  window.addEventListener("hashchange", scheduleMediaClip);
-  syncEntourageMediaClip();
-
-  const swatches = [...panel.querySelectorAll(".entourage-swatch")];
-  const alignButtons = [...panel.querySelectorAll(".entourage-align")];
-  const OVERLAY_KEY = "entourage-overlay";
-  const ALIGN_KEY = "entourage-align";
-  const LIGHT_OVERLAYS = new Set(["1"]);
-  const ALIGN_VALUES = new Set(["left", "center", "right"]);
-
-  const applyOverlay = (value) => {
-    const id = String(value);
-    if (!/^[1-5]$/.test(id)) return;
-
-    panel.dataset.overlay = id;
-    panel.classList.toggle("entourage-overlay-light", LIGHT_OVERLAYS.has(id));
-
-    swatches.forEach((btn) => {
-      const active = btn.dataset.overlay === id;
-      btn.classList.toggle("is-active", active);
-      btn.setAttribute("aria-checked", active ? "true" : "false");
-    });
-
-    try {
-      sessionStorage.setItem(OVERLAY_KEY, id);
-    } catch (_) {
-      /* ignore quota / private mode */
-    }
-  };
-
-  const applyAlign = (value) => {
-    const align = String(value);
-    if (!ALIGN_VALUES.has(align)) return;
-
-    panel.dataset.align = align;
-
-    alignButtons.forEach((btn) => {
-      const active = btn.dataset.align === align;
-      btn.classList.toggle("is-active", active);
-      btn.setAttribute("aria-checked", active ? "true" : "false");
-    });
-
-    try {
-      sessionStorage.setItem(ALIGN_KEY, align);
-    } catch (_) {
-      /* ignore quota / private mode */
-    }
-  };
-
-  let savedOverlay = "1";
-  let savedAlign = "center";
-  try {
-    savedOverlay = sessionStorage.getItem(OVERLAY_KEY) || "1";
-    savedAlign = sessionStorage.getItem(ALIGN_KEY) || "center";
-  } catch (_) {
-    savedOverlay = "1";
-    savedAlign = "center";
-  }
-
-  if (swatches.length) {
-    applyOverlay(savedOverlay);
-    swatches.forEach((btn) => {
-      btn.addEventListener("click", () => applyOverlay(btn.dataset.overlay));
-    });
-  }
-
-  if (alignButtons.length) {
-    applyAlign(savedAlign);
-    alignButtons.forEach((btn) => {
-      btn.addEventListener("click", () => applyAlign(btn.dataset.align));
-    });
-  }
-})();
 
 if (form && statusEl) {
   form.addEventListener("submit", async (event) => {

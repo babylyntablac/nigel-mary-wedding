@@ -54,7 +54,21 @@
       </div>
     </div>
 
-    <nav class="pill-nav" aria-label="Section navigation">
+    <button
+      class="nav-toggle"
+      type="button"
+      aria-label="Open menu"
+      aria-expanded="false"
+      aria-controls="site-nav"
+    >
+      <span class="nav-toggle-bars" aria-hidden="true">
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+      </span>
+    </button>
+
+    <nav class="pill-nav" id="site-nav" aria-label="Section navigation">
       <a class="pill is-active" href="#home" data-section="home" aria-label="Home">
         <span class="pill-dot" aria-hidden="true"></span>
         <span class="pill-label">Home</span>
@@ -325,13 +339,12 @@
         class="panel join-panel join-on-photo"
         data-panel="join"
         data-bg="4"
-        data-overlay="4"
+        data-overlay="1"
         style="--join-col-gap: 1.5rem; --join-shot-width: 17rem"
       >
         <div class="join-media" aria-hidden="true">
           <div class="join-media-photo">
             <img
-              data-join-bg-img
               src="assets/join-bg-4.jpg"
               alt=""
               width="2400"
@@ -341,90 +354,6 @@
           </div>
           <div class="join-media-wash"></div>
         </div>
-
-        <aside class="join-tune" aria-label="Join Us layout controls">
-          <div class="join-tune-group join-tune-group--layout">
-            <span class="join-tune-label">Spacing</span>
-            <div class="join-tune-row">
-              <button type="button" class="join-tune-btn" data-join-tune="gap" data-dir="-1" aria-label="Decrease column spacing">−</button>
-              <output class="join-tune-value" data-join-readout="gap">1.5rem</output>
-              <button type="button" class="join-tune-btn" data-join-tune="gap" data-dir="1" aria-label="Increase column spacing">+</button>
-            </div>
-          </div>
-          <div class="join-tune-group join-tune-group--layout">
-            <span class="join-tune-label">Image</span>
-            <div class="join-tune-row">
-              <button type="button" class="join-tune-btn" data-join-tune="shot" data-dir="-1" aria-label="Decrease photo size">−</button>
-              <output class="join-tune-value" data-join-readout="shot">17rem</output>
-              <button type="button" class="join-tune-btn" data-join-tune="shot" data-dir="1" aria-label="Increase photo size">+</button>
-            </div>
-          </div>
-          <div class="join-tune-group">
-            <span class="join-tune-label">BG</span>
-            <div class="join-tune-row">
-              <button type="button" class="join-tune-btn" data-join-bg="-1" aria-label="Previous background">‹</button>
-              <output class="join-tune-value" data-join-bg-readout>5/6</output>
-              <button type="button" class="join-tune-btn" data-join-bg="1" aria-label="Next background">›</button>
-            </div>
-            <div class="join-bg-dots" role="tablist" aria-label="Background index">
-              <button type="button" class="join-bg-dot" data-join-bg-goto="0" aria-label="Background 1 of 6" aria-selected="false"></button>
-              <button type="button" class="join-bg-dot" data-join-bg-goto="1" aria-label="Background 2 of 6" aria-selected="false"></button>
-              <button type="button" class="join-bg-dot" data-join-bg-goto="2" aria-label="Background 3 of 6" aria-selected="false"></button>
-              <button type="button" class="join-bg-dot" data-join-bg-goto="3" aria-label="Background 4 of 6" aria-selected="false"></button>
-              <button type="button" class="join-bg-dot is-active" data-join-bg-goto="4" aria-label="Background 5 of 6" aria-selected="true"></button>
-              <button type="button" class="join-bg-dot" data-join-bg-goto="5" aria-label="Background 6 of 6" aria-selected="false"></button>
-            </div>
-          </div>
-          <div class="join-tune-group">
-            <span class="join-tune-label">Wash</span>
-            <div
-              class="join-overlay-swatches"
-              role="radiogroup"
-              aria-label="Join Us background tint"
-            >
-              <button
-                type="button"
-                class="join-overlay-swatch"
-                data-join-overlay="1"
-                aria-label="Champagne dark wash"
-                aria-checked="false"
-                title="Champagne dark"
-              ></button>
-              <button
-                type="button"
-                class="join-overlay-swatch"
-                data-join-overlay="2"
-                aria-label="Forest wash"
-                aria-checked="false"
-                title="Forest"
-              ></button>
-              <button
-                type="button"
-                class="join-overlay-swatch"
-                data-join-overlay="3"
-                aria-label="Burgundy wash"
-                aria-checked="false"
-                title="Burgundy"
-              ></button>
-              <button
-                type="button"
-                class="join-overlay-swatch is-active"
-                data-join-overlay="4"
-                aria-label="Navy wash"
-                aria-checked="true"
-                title="Navy"
-              ></button>
-              <button
-                type="button"
-                class="join-overlay-swatch"
-                data-join-overlay="5"
-                aria-label="Sage wash"
-                aria-checked="false"
-                title="Sage"
-              ></button>
-            </div>
-          </div>
-        </aside>
 
         <div class="join-stage">
           <header class="join-header">
@@ -610,9 +539,9 @@
 
       <section
         id="entourage"
-        class="panel entourage-panel entourage-overlay-light"
+        class="panel entourage-panel"
         data-panel="entourage"
-        data-overlay="1"
+        data-overlay="4"
         data-align="center"
       >
         <div class="entourage-media" aria-hidden="true">
@@ -628,98 +557,6 @@
               />
             </div>
             <div class="entourage-media-wash"></div>
-          </div>
-        </div>
-
-        <div class="entourage-overlay-switcher">
-          <div
-            class="entourage-align-switcher"
-            role="radiogroup"
-            aria-label="Name list alignment"
-          >
-            <button
-              type="button"
-              class="entourage-align"
-              data-align="left"
-              aria-label="Align names flush left"
-              aria-checked="false"
-              title="Flush left"
-            >
-              <svg class="entourage-align-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-                <path d="M2 3.25h12M2 8h8M2 12.75h10" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/>
-              </svg>
-            </button>
-            <button
-              type="button"
-              class="entourage-align is-active"
-              data-align="center"
-              aria-label="Align names to the middle"
-              aria-checked="true"
-              title="Middle"
-            >
-              <svg class="entourage-align-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-                <path d="M2 3.25h12M4 8h8M3 12.75h10" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/>
-              </svg>
-            </button>
-            <button
-              type="button"
-              class="entourage-align"
-              data-align="right"
-              aria-label="Align names flush right"
-              aria-checked="false"
-              title="Flush right"
-            >
-              <svg class="entourage-align-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-                <path d="M2 3.25h12M6 8h8M4 12.75h10" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/>
-              </svg>
-            </button>
-          </div>
-
-          <div
-            class="entourage-tint-switcher"
-            role="radiogroup"
-            aria-label="Entourage background tint"
-          >
-            <button
-              type="button"
-              class="entourage-swatch is-active"
-              data-overlay="1"
-              aria-label="Champagne cream wash"
-              aria-checked="true"
-              title="Champagne"
-            ></button>
-            <button
-              type="button"
-              class="entourage-swatch"
-              data-overlay="2"
-              aria-label="Deep forest olive"
-              aria-checked="false"
-              title="Forest"
-            ></button>
-            <button
-              type="button"
-              class="entourage-swatch"
-              data-overlay="3"
-              aria-label="Burgundy cherry wine"
-              aria-checked="false"
-              title="Burgundy"
-            ></button>
-            <button
-              type="button"
-              class="entourage-swatch"
-              data-overlay="4"
-              aria-label="Navy ink wash"
-              aria-checked="false"
-              title="Navy"
-            ></button>
-            <button
-              type="button"
-              class="entourage-swatch"
-              data-overlay="5"
-              aria-label="Sage muted teal"
-              aria-checked="false"
-              title="Sage"
-            ></button>
           </div>
         </div>
 
