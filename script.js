@@ -765,7 +765,7 @@ if (panels.length) {
   syncVisibility();
 })();
 
-/* Love Story — type “Once upon a time” once when the panel enters view */
+/* Love Story — loop “Once upon a time” while the panel is in view */
 (function initLoveStoryTypewriter() {
   const lovePanel = document.querySelector('[data-panel="love"]');
   const kicker = document.querySelector(".love-story-kicker[data-typewriter]");
@@ -773,51 +773,80 @@ if (panels.length) {
   if (!lovePanel || !kicker || !textEl) return;
 
   const fullText = (textEl.textContent || "Once upon a time").trim();
-  let started = false;
-  let cursorTimer = null;
+  const TYPE_MS = 58;
+  const DELETE_MS = 36;
+  const HOLD_MS = 2600;
+  const GAP_MS = 720;
+  const START_DELAY_MS = 640;
 
-  function finishCursor() {
-    kicker.classList.remove("is-typing");
-    kicker.classList.add("is-cursor");
-    if (cursorTimer) clearTimeout(cursorTimer);
-    cursorTimer = setTimeout(() => {
-      kicker.classList.remove("is-cursor");
-    }, 4200);
+  let active = false;
+  let timer = null;
+
+  function clearTimer() {
+    if (timer) {
+      clearTimeout(timer);
+      timer = null;
+    }
   }
 
   function showFull() {
+    clearTimer();
     textEl.textContent = fullText;
     kicker.classList.remove("is-typing", "is-cursor");
   }
 
-  function typeOnce() {
-    if (started) return;
-    started = true;
+  function schedule(fn, ms) {
+    clearTimer();
+    timer = setTimeout(fn, ms);
+  }
 
-    if (prefersReducedMotion) {
-      showFull();
+  function typeForward(i = 0) {
+    if (!active) return;
+    kicker.classList.add("is-typing");
+    kicker.classList.remove("is-cursor");
+
+    if (i < fullText.length) {
+      textEl.textContent = fullText.slice(0, i + 1);
+      schedule(() => typeForward(i + 1), TYPE_MS);
+      return;
+    }
+
+    kicker.classList.remove("is-typing");
+    kicker.classList.add("is-cursor");
+    schedule(deleteBack, HOLD_MS);
+  }
+
+  function deleteBack(i = fullText.length) {
+    if (!active) return;
+    kicker.classList.add("is-typing");
+    kicker.classList.remove("is-cursor");
+
+    if (i > 0) {
+      textEl.textContent = fullText.slice(0, i - 1);
+      schedule(() => deleteBack(i - 1), DELETE_MS);
       return;
     }
 
     textEl.textContent = "";
+    schedule(() => typeForward(0), GAP_MS);
+  }
+
+  function startLoop() {
+    if (active) return;
+    active = true;
+    textEl.textContent = "";
     kicker.classList.add("is-typing");
     kicker.classList.remove("is-cursor");
+    schedule(() => typeForward(0), START_DELAY_MS);
+  }
 
-    let i = 0;
-    const speed = 52;
-
-    const tick = () => {
-      if (i < fullText.length) {
-        textEl.textContent = fullText.slice(0, i + 1);
-        i += 1;
-        setTimeout(tick, speed);
-        return;
-      }
-      finishCursor();
-    };
-
-    /* Sync with .love-story entrance delay (~380ms) */
-    setTimeout(tick, 420);
+  function pauseLoop() {
+    if (!active) return;
+    active = false;
+    clearTimer();
+    textEl.textContent = "";
+    kicker.classList.add("is-typing");
+    kicker.classList.remove("is-cursor");
   }
 
   if (prefersReducedMotion) {
@@ -829,7 +858,8 @@ if (panels.length) {
   kicker.classList.add("is-typing");
 
   const sync = () => {
-    if (lovePanel.classList.contains("is-inview")) typeOnce();
+    if (lovePanel.classList.contains("is-inview")) startLoop();
+    else pauseLoop();
   };
 
   const visibilityObserver = new MutationObserver(sync);
@@ -978,6 +1008,204 @@ document.querySelectorAll("img[data-photo-fallback]").forEach((img) => {
   img.addEventListener("error", markEmpty);
   if (img.complete && img.naturalWidth === 0) markEmpty();
 });
+
+/* Join Us: live spacing + image size dials (sessionStorage) */
+(function initJoinTuneControls() {
+  const panel = document.getElementById("join");
+  if (!panel) return;
+
+  const GAP_KEY = "join-col-gap";
+  const SHOT_KEY = "join-shot-width";
+  const DEFAULTS = { gap: 1.5, shot: 17 };
+  const LIMITS = {
+    gap: { min: 1.5, max: 6, step: 0.25 },
+    shot: { min: 10, max: 20, step: 0.5 },
+  };
+
+  const formatRem = (value) => {
+    const rounded = Math.round(value * 100) / 100;
+    return `${Number.isInteger(rounded) ? rounded.toFixed(0) : String(rounded)}rem`;
+  };
+
+  const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+  const readStored = (key, fallback) => {
+    try {
+      const raw = sessionStorage.getItem(key);
+      if (raw == null) return fallback;
+      const num = parseFloat(raw);
+      return Number.isFinite(num) ? num : fallback;
+    } catch (_) {
+      return fallback;
+    }
+  };
+
+  const writeStored = (key, value) => {
+    try {
+      sessionStorage.setItem(key, String(value));
+    } catch (_) {
+      /* ignore quota / private mode */
+    }
+  };
+
+  let gap = clamp(readStored(GAP_KEY, DEFAULTS.gap), LIMITS.gap.min, LIMITS.gap.max);
+  let shot = clamp(readStored(SHOT_KEY, DEFAULTS.shot), LIMITS.shot.min, LIMITS.shot.max);
+
+  const gapReadout = panel.querySelector('[data-join-readout="gap"]');
+  const shotReadout = panel.querySelector('[data-join-readout="shot"]');
+
+  const apply = () => {
+    panel.style.setProperty("--join-col-gap", formatRem(gap));
+    panel.style.setProperty("--join-shot-width", formatRem(shot));
+    if (gapReadout) gapReadout.textContent = formatRem(gap);
+    if (shotReadout) shotReadout.textContent = formatRem(shot);
+  };
+
+  apply();
+
+  panel.querySelectorAll("[data-join-tune]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const kind = btn.getAttribute("data-join-tune");
+      const dir = Number(btn.getAttribute("data-dir")) || 0;
+      if (kind === "gap") {
+        gap = clamp(gap + dir * LIMITS.gap.step, LIMITS.gap.min, LIMITS.gap.max);
+        writeStored(GAP_KEY, gap);
+      } else if (kind === "shot") {
+        shot = clamp(shot + dir * LIMITS.shot.step, LIMITS.shot.min, LIMITS.shot.max);
+        writeStored(SHOT_KEY, shot);
+      } else {
+        return;
+      }
+      apply();
+    });
+  });
+})();
+
+/* Join Us: full-bleed background cycle + overlay washes (sessionStorage) */
+(function initJoinBackgroundControls() {
+  const panel = document.getElementById("join");
+  if (!panel) return;
+
+  const BG_KEY = "join-bg-index";
+  const OVERLAY_KEY = "join-overlay";
+  const BG_COUNT = 6;
+  /* Locked site defaults: UI 5/6 (index 4 → join-bg-4.jpg) + navy wash */
+  const DEFAULT_BG = 4;
+  const DEFAULT_OVERLAY = "4";
+  const BG_SRCS = [
+    null,
+    "assets/join-bg-1.jpg",
+    "assets/join-bg-2.jpg",
+    "assets/join-bg-3.jpg",
+    "assets/join-bg-4.jpg",
+    "assets/join-bg-5.jpg",
+  ];
+
+  const img = panel.querySelector("[data-join-bg-img]");
+  const readout = panel.querySelector("[data-join-bg-readout]");
+  const dots = [...panel.querySelectorAll("[data-join-bg-goto]")];
+  const swatches = [...panel.querySelectorAll("[data-join-overlay]")];
+
+  const writeStored = (key, value) => {
+    try {
+      sessionStorage.setItem(key, String(value));
+    } catch (_) {
+      /* ignore quota / private mode */
+    }
+  };
+
+  const readStored = (key, fallback) => {
+    try {
+      const raw = sessionStorage.getItem(key);
+      return raw == null ? fallback : raw;
+    } catch (_) {
+      return fallback;
+    }
+  };
+
+  const preload = (src) => {
+    if (!src) return;
+    const probe = new Image();
+    probe.decoding = "async";
+    probe.src = src;
+  };
+
+  BG_SRCS.filter(Boolean).forEach(preload);
+
+  const applyBg = (index) => {
+    const i = ((Number(index) % BG_COUNT) + BG_COUNT) % BG_COUNT;
+    const onPhoto = i > 0;
+    const src = BG_SRCS[i];
+
+    panel.dataset.bg = String(i);
+    panel.classList.toggle("join-on-photo", onPhoto);
+
+    if (img) {
+      if (onPhoto && src) {
+        if (img.getAttribute("src") !== src) img.setAttribute("src", src);
+        img.removeAttribute("hidden");
+      }
+    }
+
+    if (readout) readout.textContent = `${i + 1}/${BG_COUNT}`;
+
+    dots.forEach((dot) => {
+      const active = Number(dot.dataset.joinBgGoto) === i;
+      dot.classList.toggle("is-active", active);
+      dot.setAttribute("aria-selected", active ? "true" : "false");
+    });
+
+    writeStored(BG_KEY, i);
+  };
+
+  const applyOverlay = (value) => {
+    const id = String(value);
+    if (!/^[1-5]$/.test(id)) return;
+
+    panel.dataset.overlay = id;
+
+    swatches.forEach((btn) => {
+      const active = btn.dataset.joinOverlay === id;
+      btn.classList.toggle("is-active", active);
+      btn.setAttribute("aria-checked", active ? "true" : "false");
+    });
+
+    writeStored(OVERLAY_KEY, id);
+  };
+
+  let savedBg = DEFAULT_BG;
+  let savedOverlay = DEFAULT_OVERLAY;
+  try {
+    const rawBg = parseInt(readStored(BG_KEY, String(DEFAULT_BG)), 10);
+    savedBg = Number.isFinite(rawBg) ? rawBg : DEFAULT_BG;
+    savedOverlay = readStored(OVERLAY_KEY, DEFAULT_OVERLAY);
+    if (!/^[1-5]$/.test(String(savedOverlay))) savedOverlay = DEFAULT_OVERLAY;
+  } catch (_) {
+    savedBg = DEFAULT_BG;
+    savedOverlay = DEFAULT_OVERLAY;
+  }
+
+  applyBg(savedBg);
+  applyOverlay(savedOverlay);
+
+  panel.querySelectorAll("[data-join-bg]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const dir = Number(btn.getAttribute("data-join-bg")) || 0;
+      const current = Number(panel.dataset.bg) || 0;
+      applyBg(current + dir);
+    });
+  });
+
+  dots.forEach((dot) => {
+    dot.addEventListener("click", () => {
+      applyBg(Number(dot.dataset.joinBgGoto));
+    });
+  });
+
+  swatches.forEach((btn) => {
+    btn.addEventListener("click", () => applyOverlay(btn.dataset.joinOverlay));
+  });
+})();
 
 /* Entourage: fixed bg clipped to section bounds + overlay/align controls */
 (function initEntourageControls() {
