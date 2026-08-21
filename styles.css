@@ -5139,7 +5139,7 @@ body.is-sealed .hero-meta {
   }
 
   /* Keep section content clear of the floating CTA */
-  .panel:not(.home-panel) > .stage,
+  .panel:not(.home-panel):not(.day-panel) > .stage,
   .panel:not(.home-panel) > .join-stage,
   .panel:not(.home-panel) > .sponsors-compose,
   .rsvp-panel .rsvp-stage {
@@ -5252,34 +5252,54 @@ body.is-sealed .hero-meta {
     overflow: visible;
   }
 
-  /* Page 3 (The Day): fixed rem box in document stack — no 100svh reflow. */
+  /* Page 3 (The Day): fixed rem box; stage pinned + centered like Home/Invite. */
   .day-panel {
     position: relative !important;
     z-index: auto !important;
+    display: block !important;
     height: var(--page-day-h) !important;
     min-height: var(--page-day-h) !important;
     max-height: var(--page-day-h) !important;
     overflow: hidden !important;
   }
 
-  .day-panel > .day-stage,
-  .day-stage {
+  .day-panel > .day-stage {
+    position: absolute !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: min(34rem, calc(100% - 2rem)) !important;
+    height: fit-content !important;
+    max-height: calc(100% - 1rem) !important;
     min-height: 0 !important;
-    height: 100% !important;
-    max-height: 100% !important;
-  }
-
-  .day-stage {
-    padding-top: 1.35rem;
-    padding-bottom: max(1.35rem, var(--mobile-rsvp-cta-space));
+    margin: auto !important;
+    padding: 1.25rem 0.75rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    gap: 0.75rem !important;
+    box-sizing: border-box !important;
+    transform: none !important;
+    overflow: visible;
   }
 
   .day-intro .section-title {
-    font-size: clamp(2.85rem, 9vw, 4rem);
+    font-size: 3.1rem !important;
   }
 
   .day-rail {
     width: min(22rem, 100%);
+    flex: 0 0 auto !important;
+    min-height: 0;
+  }
+
+  .day-rail-track {
+    height: auto !important;
+    max-height: none !important;
+    gap: 0.55rem !important;
+    justify-content: flex-start !important;
+    margin-block: 0 !important;
   }
 
   .day-beat {
@@ -5289,6 +5309,10 @@ body.is-sealed .hero-meta {
 
   .day-beat-icon {
     width: 2.95rem;
+  }
+
+  .day-foot {
+    flex: 0 0 auto;
   }
 
   /* Hamburger replaces the right pill rail */
