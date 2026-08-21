@@ -5173,13 +5173,14 @@ body.is-sealed .hero-meta {
     overflow: visible;
   }
 
-  /* Page 4 (Join Us): same as page 1/2 — fixed rem box + centered stage; bg clipped. */
+  /* Page 4 (Join Us): content defines height (no crop). Bg fills + clips to that box.
+     Stage in normal flow — rem padding only so nothing shifts mid-scroll. */
   .join-panel {
     position: relative !important;
     display: block !important;
-    height: var(--page-join-h) !important;
+    height: auto !important;
     min-height: var(--page-join-h) !important;
-    max-height: var(--page-join-h) !important;
+    max-height: none !important;
     overflow: hidden !important;
     padding: 0 !important;
   }
@@ -5207,17 +5208,17 @@ body.is-sealed .hero-meta {
   }
 
   .join-panel > .join-stage {
-    position: absolute !important;
-    top: 0 !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
+    position: relative !important;
+    top: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
     z-index: 2;
     width: min(42rem, calc(100% - 2rem)) !important;
-    height: fit-content;
-    max-height: calc(100% - 1rem);
-    margin: auto !important;
-    padding: 2rem 0.75rem !important;
+    height: auto !important;
+    max-height: none !important;
+    margin: 0 auto !important;
+    padding: 2.25rem 0.75rem 5.5rem !important;
     gap: 1.15rem;
     transform: none !important;
     box-sizing: border-box;
@@ -5725,13 +5726,13 @@ body.is-sealed .hero-meta {
 
   .join-panel > .join-stage {
     width: min(100%, calc(100% - 1.5rem)) !important;
-    padding: 1.65rem 0.25rem !important;
-    gap: 1rem;
+    padding: 1.85rem 0.25rem 5.25rem !important;
+    gap: 1.1rem;
   }
 
-  /* Slightly tighter shots so all Join Us content fits the fixed page box. */
+  /* Phone: keep readable shot size — page height grows with content. */
   .join-panel {
-    --join-shot-width: 12.5rem;
+    --join-shot-width: 15rem;
   }
 
   .more-panel > .stage {
