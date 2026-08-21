@@ -710,8 +710,10 @@ body.is-nav-open {
   overflow: hidden;
 }
 
-/* Mobile menu toggle — hidden on desktop */
+/* Mobile menu toggle — soft frosted circle, thin strokes (hidden on desktop) */
 .nav-toggle {
+  --nav-toggle-gap: 0.4rem;
+  --nav-toggle-bar-h: 1px;
   display: none;
   position: fixed;
   top: max(0.85rem, env(safe-area-inset-top, 0px));
@@ -721,65 +723,92 @@ body.is-nav-open {
   height: 2.75rem;
   align-items: center;
   justify-content: center;
-  border: 1px solid color-mix(in srgb, var(--cherry) 36%, transparent);
-  border-radius: 0;
-  background: color-mix(in srgb, var(--paper-bg) 48%, transparent);
-  box-shadow: 0 6px 20px rgba(26, 31, 28, 0.08);
-  backdrop-filter: blur(10px);
-  color: var(--olive);
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--cream) 32%, transparent);
+  border-radius: 50%;
+  background: color-mix(in srgb, rgba(26, 31, 28, 0.28) 100%, transparent);
+  box-shadow: none;
+  backdrop-filter: blur(14px) saturate(1.15);
+  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+  color: var(--cream);
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
   transition:
     opacity 0.6s var(--ease-out),
-    background 0.22s var(--ease-out),
-    border-color 0.22s var(--ease-out),
-    box-shadow 0.22s var(--ease-out);
+    background 0.3s var(--ease-out),
+    border-color 0.3s var(--ease-out),
+    color 0.3s var(--ease-out),
+    transform 0.3s var(--ease-out);
 }
 
 .nav-toggle:hover,
 .nav-toggle:focus-visible {
-  background: color-mix(in srgb, var(--paper-bg) 72%, transparent);
-  border-color: color-mix(in srgb, var(--cherry) 48%, transparent);
-  box-shadow: 0 6px 20px rgba(26, 31, 28, 0.12);
+  background: color-mix(in srgb, rgba(26, 31, 28, 0.4) 100%, transparent);
+  border-color: color-mix(in srgb, var(--cream) 48%, transparent);
+  transform: scale(1.04);
 }
 
 .nav-toggle:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--gold) 70%, transparent);
-  outline-offset: 2px;
+  outline: 2px solid color-mix(in srgb, var(--gold) 65%, transparent);
+  outline-offset: 3px;
+}
+
+.nav-toggle:active {
+  transform: scale(0.97);
 }
 
 .nav-toggle-bars {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 0.32rem;
-  width: 1.15rem;
+  align-items: center;
+  gap: var(--nav-toggle-gap);
+  width: 1.05rem;
 }
 
 .nav-toggle-bar {
   display: block;
-  height: 1.5px;
+  height: var(--nav-toggle-bar-h);
   width: 100%;
+  border-radius: 1px;
   background: currentColor;
   transform-origin: center;
-  transition: transform 0.28s var(--ease-out), opacity 0.22s var(--ease-out);
+  transition:
+    transform 0.38s var(--ease-out),
+    opacity 0.28s var(--ease-out),
+    width 0.38s var(--ease-out);
 }
 
 .nav-toggle[aria-expanded="true"] {
-  background: color-mix(in srgb, var(--cream) 78%, transparent);
-  border-color: color-mix(in srgb, var(--cherry) 55%, transparent);
+  background: color-mix(in srgb, var(--cream) 72%, transparent);
+  border-color: color-mix(in srgb, var(--cherry) 28%, transparent);
   color: var(--cherry);
 }
 
 .nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(1) {
-  transform: translateY(0.37rem) rotate(45deg);
+  transform: translateY(calc(var(--nav-toggle-bar-h) + var(--nav-toggle-gap))) rotate(45deg);
 }
 
 .nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(2) {
   opacity: 0;
+  width: 0;
 }
 
 .nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(3) {
-  transform: translateY(-0.37rem) rotate(-45deg);
+  transform: translateY(calc(-1 * (var(--nav-toggle-bar-h) + var(--nav-toggle-gap)))) rotate(-45deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-toggle,
+  .nav-toggle-bar {
+    transition: none;
+  }
+
+  .nav-toggle:hover,
+  .nav-toggle:focus-visible,
+  .nav-toggle:active {
+    transform: none;
+  }
 }
 
 /* Section nav — right, rectangular, selected only */
