@@ -4725,7 +4725,9 @@ body.is-sealed .hero-meta {
     /* Fixed page boxes — backgrounds clip here; never vh/svh/lvh. */
     --page-home-h: 44rem;
     --page-invite-h: 50rem;
+    --page-join-h: 58rem;
     --page-day-h: 52rem;
+    --page-entourage-h: 88rem;
   }
 
   /* Phone/tablet: free native vertical scroll only — no snap, no sideways rubber-band.
@@ -5138,34 +5140,31 @@ body.is-sealed .hero-meta {
     pointer-events: none;
   }
 
-  /* Keep section content clear of the floating CTA */
-  .panel:not(.home-panel):not(.day-panel) > .stage,
-  .panel:not(.home-panel) > .join-stage,
-  .panel:not(.home-panel) > .sponsors-compose,
-  .rsvp-panel .rsvp-stage {
+  /* Keep section content clear of the floating CTA (not pinned page stages). */
+  .rsvp-panel .rsvp-stage,
+  .love-panel > .love-stage,
+  .more-panel > .stage {
     padding-bottom: max(1.5rem, var(--mobile-rsvp-cta-space));
   }
 
-  /* Join Us: content-height only — no viewport min-height (overrides .panel). */
+  /* Join Us: fixed rem box + centered stage (same pattern as Invite). */
   .join-panel {
-    height: auto;
-    min-height: 0;
-  }
-
-  .join-panel > .join-stage {
-    padding-top: 2.5rem;
-    padding-left: 1rem;
-    padding-right: 1rem;
-    padding-bottom: max(2.5rem, var(--mobile-rsvp-cta-space));
-    gap: 1.35rem;
+    position: relative !important;
+    display: block !important;
+    height: var(--page-join-h) !important;
+    min-height: var(--page-join-h) !important;
+    max-height: var(--page-join-h) !important;
+    overflow: hidden !important;
+    padding: 0 !important;
   }
 
   .join-media,
   .join-media-photo {
     position: absolute !important;
     inset: 0 !important;
-    width: auto !important;
-    height: auto !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
     transform: none !important;
   }
 
@@ -5179,17 +5178,32 @@ body.is-sealed .hero-meta {
     transform: none !important;
   }
 
-  /* Entourage: same content-height + absolute cover pattern as Join Us. */
-  .entourage-panel {
-    height: auto;
-    min-height: 0;
+  .join-panel > .join-stage {
+    position: absolute !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: min(42rem, calc(100% - 2rem)) !important;
+    height: fit-content;
+    max-height: calc(100% - 1rem);
+    margin: auto !important;
+    padding: 2.25rem 0.75rem !important;
+    gap: 1.25rem;
+    transform: none !important;
+    box-sizing: border-box;
+    overflow: visible;
   }
 
-  .entourage-panel > .sponsors-compose {
-    padding-top: 2.5rem;
-    padding-left: 1.25rem;
-    padding-right: 1.25rem;
-    padding-bottom: max(2.5rem, var(--mobile-rsvp-cta-space));
+  /* Entourage: fixed rem box + centered program. */
+  .entourage-panel {
+    position: relative !important;
+    display: block !important;
+    height: var(--page-entourage-h) !important;
+    min-height: var(--page-entourage-h) !important;
+    max-height: var(--page-entourage-h) !important;
+    overflow: hidden !important;
+    padding: 0 !important;
   }
 
   .entourage-media,
@@ -5197,8 +5211,9 @@ body.is-sealed .hero-meta {
   .entourage-media-photo {
     position: absolute !important;
     inset: 0 !important;
-    width: auto !important;
-    height: auto !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
     transform: none !important;
   }
 
@@ -5209,6 +5224,23 @@ body.is-sealed .hero-meta {
     object-fit: cover !important;
     object-position: center 38% !important;
     transform: none !important;
+  }
+
+  .entourage-panel > .sponsors-compose {
+    position: absolute !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: min(44rem, calc(100% - 2rem)) !important;
+    height: fit-content;
+    max-height: calc(100% - 1rem);
+    margin: auto !important;
+    padding: 2rem 1rem !important;
+    transform: none !important;
+    flex: none;
+    box-sizing: border-box;
+    overflow: visible;
   }
 
   /* Page 2: fixed rem box; toile/wash clipped to that height only. */
@@ -5252,7 +5284,7 @@ body.is-sealed .hero-meta {
     overflow: visible;
   }
 
-  /* Page 3 (The Day): fixed rem box; stage pinned + centered like Home/Invite. */
+  /* The Day: fixed rem box + centered stage (same pattern as Invite). */
   .day-panel {
     position: relative !important;
     z-index: auto !important;
@@ -5271,35 +5303,28 @@ body.is-sealed .hero-meta {
     right: 0 !important;
     width: min(34rem, calc(100% - 2rem)) !important;
     height: fit-content !important;
-    max-height: calc(100% - 1rem) !important;
     min-height: 0 !important;
+    max-height: calc(100% - 1rem) !important;
     margin: auto !important;
-    padding: 1.25rem 0.75rem !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    gap: 0.75rem !important;
-    box-sizing: border-box !important;
+    padding: 1.35rem 1rem !important;
     transform: none !important;
+    box-sizing: border-box;
     overflow: visible;
   }
 
+  .day-panel .day-rail,
+  .day-panel .day-rail-track {
+    height: auto !important;
+    max-height: none !important;
+    flex: 0 0 auto;
+  }
+
   .day-intro .section-title {
-    font-size: 3.1rem !important;
+    font-size: 3.25rem;
   }
 
   .day-rail {
     width: min(22rem, 100%);
-    flex: 0 0 auto !important;
-    min-height: 0;
-  }
-
-  .day-rail-track {
-    height: auto !important;
-    max-height: none !important;
-    gap: 0.55rem !important;
-    justify-content: flex-start !important;
-    margin-block: 0 !important;
   }
 
   .day-beat {
@@ -5309,10 +5334,6 @@ body.is-sealed .hero-meta {
 
   .day-beat-icon {
     width: 2.95rem;
-  }
-
-  .day-foot {
-    flex: 0 0 auto;
   }
 
   /* Hamburger replaces the right pill rail */
@@ -5484,7 +5505,9 @@ body.is-sealed .hero-meta {
   :root {
     --page-home-h: 42rem;
     --page-invite-h: 48rem;
+    --page-join-h: 76rem;
     --page-day-h: 50rem;
+    --page-entourage-h: 92rem;
   }
 
   .envelope-stage {
@@ -5652,17 +5675,13 @@ body.is-sealed .hero-meta {
   }
 
   .join-panel > .join-stage {
-    width: min(100%, calc(100% - 1.75rem));
-    /* Rem-locked vertical rhythm — no vh/dvh reflow while URL bar toggles */
-    padding-top: 2.35rem;
-    padding-left: 0.25rem;
-    padding-right: 0.25rem;
-    padding-bottom: max(2.5rem, var(--mobile-rsvp-cta-space, 2.5rem));
-    gap: 1.25rem;
+    width: min(100%, calc(100% - 1.5rem)) !important;
+    padding: 1.85rem 0.25rem !important;
+    gap: 1.15rem;
   }
 
   .join-title {
-    font-size: clamp(2.85rem, 11vw, 3.6rem);
+    font-size: 2.85rem;
   }
 
   .join-date {
@@ -5674,7 +5693,7 @@ body.is-sealed .hero-meta {
   }
 
   .join-hour-label {
-    font-size: clamp(1.85rem, 7vw, 2.35rem);
+    font-size: 2rem;
   }
 
   .join-hour-meta {
@@ -5682,7 +5701,7 @@ body.is-sealed .hero-meta {
   }
 
   .join-place-name {
-    font-size: clamp(1.55rem, 6.5vw, 1.95rem);
+    font-size: 1.75rem;
   }
 
   .join-place-address {
@@ -5692,7 +5711,7 @@ body.is-sealed .hero-meta {
   .join-hours {
     grid-template-columns: 1fr;
     justify-items: center;
-    gap: 1.65rem;
+    gap: 1.35rem;
     max-width: var(--join-shot-width);
   }
 
@@ -5705,7 +5724,12 @@ body.is-sealed .hero-meta {
   }
 
   .join-swatch {
-    width: clamp(1.75rem, 7vw, 2.35rem);
+    width: 2rem;
+  }
+
+  .entourage-panel > .sponsors-compose {
+    width: min(100%, calc(100% - 1.5rem)) !important;
+    padding: 1.65rem 0.75rem !important;
   }
 
   .join-media,
