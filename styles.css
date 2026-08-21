@@ -2176,8 +2176,9 @@ body.is-sealed .hero-meta {
 }
 
 /* Full-bleed photo + wash — fills #join's content box only (not the visual
-   viewport). Never sticky/fixed / 100dvh: mobile URL-bar show/hide would
-   resize the cover crop and read as zoom-in/out while scrolling. */
+   viewport). Stretch 100%×100% (object-fit: fill), never cover: cover
+   re-crops when section aspect changes and reads as zoom while scrolling.
+   Never sticky/fixed / 100dvh on the photo layer. */
 .join-media {
   position: absolute;
   inset: 0;
@@ -2212,11 +2213,13 @@ body.is-sealed .hero-meta {
 
 .join-media-photo img {
   display: block;
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   max-width: none;
-  object-fit: cover;
-  object-position: center 42%;
+  object-fit: fill;
+  object-position: center;
   user-select: none;
   transform: none;
   transform-origin: center center;
@@ -2297,8 +2300,8 @@ body.is-sealed .hero-meta {
   z-index: 2;
   width: min(54rem, calc(100% - 4.75rem));
   margin: 0 auto;
-  /* svh (not vh/dvh): classic vh tracks mobile chrome and reflows #join,
-     which rescales the absolute cover photo mid-scroll. */
+  /* svh (not vh/dvh): classic vh tracks mobile chrome and reflows #join;
+     padding only — photo uses width/height 100% fill, not vh. */
   padding: clamp(2.35rem, 5.5svh, 3.75rem) 1rem clamp(2.5rem, 6svh, 3.85rem);
   display: flex;
   flex-direction: column;
@@ -5070,8 +5073,8 @@ body.is-sealed .hero-meta {
     padding-bottom: max(1.5rem, var(--mobile-rsvp-cta-space));
   }
 
-  /* Join Us: rem-locked vertical rhythm so URL-bar vh/dvh toggle cannot
-     reflow #join and rescale the absolute cover photo mid-scroll. */
+  /* Join Us: rem-locked vertical rhythm; photo stretches 100%×100% fill
+     so URL-bar height changes cannot re-crop mid-scroll. */
   .join-panel {
     height: auto;
     min-height: 100svh;
@@ -5096,11 +5099,13 @@ body.is-sealed .hero-meta {
 
   .join-media-photo img,
   .join-panel.is-inview.join-on-photo .join-media-photo img {
+    position: absolute !important;
+    inset: 0 !important;
     width: 100% !important;
     height: 100% !important;
     max-width: none !important;
-    object-fit: cover !important;
-    object-position: center 42% !important;
+    object-fit: fill !important;
+    object-position: center !important;
     transform: none !important;
   }
 
@@ -5547,11 +5552,13 @@ body.is-sealed .hero-meta {
   }
 
   .join-media-photo img {
+    position: absolute !important;
+    inset: 0 !important;
     width: 100% !important;
     height: 100% !important;
     max-width: none !important;
-    object-fit: cover !important;
-    object-position: center 42% !important;
+    object-fit: fill !important;
+    object-position: center !important;
   }
 
   .itinerary-item {
