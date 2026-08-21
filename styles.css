@@ -126,74 +126,19 @@ img {
   touch-action: pan-y;
 }
 
-/* Cinematic fade — Welcome pattern on every section */
+/* Sections stay fully visible — no mid-scroll entrance translate/scale jolts.
+   is-inview remains for pill nav / audio only. */
 .panel-fade,
 .story-heading,
 .story-body,
 .story-shot img,
 .hero-brand,
 .hero-center,
-.hero-meta {
-  transition:
-    opacity 0.7s var(--ease-out),
-    transform 0.7s var(--ease-out);
-}
-
-.panel:not(.is-inview) > .panel-fade,
-.panel:not(.is-inview) > .stage,
-.panel:not(.is-inview) > .join-stage,
-.panel:not(.is-inview) > .invite-compose,
-.panel:not(.is-inview) > .sponsors-compose {
-  opacity: 0;
-  transform: translate3d(0, 18px, 0);
-}
-
-/* Skip layout/paint work for offscreen sections (keep home/invite live for scroll morph). */
-.panel:not(.home-panel):not(.story-panel) {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 100svh;
-}
-
-.panel.is-inview > .panel-fade,
-.panel.is-inview > .stage,
-.panel.is-inview > .join-stage,
-.panel.is-inview > .invite-compose,
-.panel.is-inview > .sponsors-compose {
-  opacity: 1;
-  transform: none;
-}
-
+.hero-meta,
 .stage,
 .join-stage,
 .invite-compose,
-.sponsors-compose {
-  transition:
-    opacity 0.7s var(--ease-out),
-    transform 0.7s var(--ease-out);
-}
-
-.panel.is-inview > .stage,
-.panel.is-inview > .join-stage,
-.panel.is-inview > .invite-compose,
-.panel.is-inview > .sponsors-compose {
-  transition-delay: 70ms;
-}
-
-.panel:not(.is-inview) > .stage,
-.panel:not(.is-inview) > .join-stage {
-  transform: translate3d(-22px, 0, 0);
-}
-
-.panel:not(.is-inview) > .sponsors-compose {
-  transform: translate3d(0, 22px, 0) scale(0.99);
-}
-
-.panel:not(.is-inview) > .invite-compose {
-  /* Opacity fade only — no translate/scale while scrolling Invite */
-  transform: none;
-}
-
-/* Mixed-origin fades for dense sections */
+.sponsors-compose,
 .day-grid > *,
 .day-notes > *,
 .day-beat,
@@ -215,185 +160,22 @@ img {
 .stage-card,
 .stage-look-head,
 .more-frame {
-  transition:
-    opacity 0.72s var(--ease-out),
-    transform 0.72s var(--ease-out);
-}
-
-.panel:not(.is-inview) .day-beat:nth-child(odd) {
-  opacity: 0;
-  transform: translate3d(-22px, 10px, 0);
-}
-
-.panel:not(.is-inview) .day-beat:nth-child(even) {
-  opacity: 0;
-  transform: translate3d(22px, 10px, 0);
-}
-
-.panel.is-inview .day-beat {
   opacity: 1;
   transform: none;
+  transition: none;
 }
 
-.panel.is-inview .day-beat:nth-child(1) { transition-delay: 60ms; }
-.panel.is-inview .day-beat:nth-child(2) { transition-delay: 110ms; }
-.panel.is-inview .day-beat:nth-child(3) { transition-delay: 160ms; }
-.panel.is-inview .day-beat:nth-child(4) { transition-delay: 210ms; }
-.panel.is-inview .day-beat:nth-child(5) { transition-delay: 260ms; }
-
-.panel:not(.is-inview) .day-terminal {
-  opacity: 0;
-  transform: translate3d(0, 16px, 0);
+/* Skip layout/paint work for offscreen sections. */
+.panel:not(.home-panel):not(.story-panel) {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 100svh;
 }
 
-.panel.is-inview .day-terminal {
-  opacity: 1;
-  transform: none;
-  transition-delay: 310ms;
-}
-
-.panel:not(.is-inview) .day-grid > :nth-child(1),
-.panel:not(.is-inview) .info-grid > :nth-child(1),
-.panel:not(.is-inview) .role-group:nth-child(odd),
-.panel:not(.is-inview) .itinerary-item:nth-child(odd),
-.panel:not(.is-inview) .rsvp-form,
-.panel:not(.is-inview) .more-listen {
-  opacity: 0;
-  transform: translate3d(-38px, 8px, 0);
-}
-
-.panel:not(.is-inview) .day-grid > :nth-child(2),
-.panel:not(.is-inview) .day-notes > :nth-child(2),
-.panel:not(.is-inview) .rsvp-head,
-.panel:not(.is-inview) .more-intro,
-.panel:not(.is-inview) .more-look-head {
-  opacity: 0;
-  transform: translate3d(0, -30px, 0);
-}
-
-.panel:not(.is-inview) .day-grid > :nth-child(3),
-.panel:not(.is-inview) .info-grid > :nth-child(2),
-.panel:not(.is-inview) .role-group:nth-child(even),
-.panel:not(.is-inview) .itinerary-item:nth-child(even),
-.panel:not(.is-inview) .rsvp-gifts,
-.panel:not(.is-inview) .person-card:nth-child(even) {
-  opacity: 0;
-  transform: translate3d(38px, 8px, 0);
-}
-
-.panel:not(.is-inview) .day-notes > :nth-child(1),
-.panel:not(.is-inview) .info-grid > :nth-child(3),
-.panel:not(.is-inview) .person-card:nth-child(odd),
-.panel:not(.is-inview) .rsvp-count-unit:nth-child(odd) {
-  opacity: 0;
-  transform: translate3d(-22px, 28px, 0);
-}
-
-.panel:not(.is-inview) .day-notes > :nth-child(3),
-.panel:not(.is-inview) .rsvp-count-unit:nth-child(even) {
-  opacity: 0;
-  transform: translate3d(22px, 28px, 0);
-}
-
-.panel:not(.is-inview) .day-notes > :nth-child(4) {
-  opacity: 0;
-  transform: translate3d(28px, -12px, 0);
-}
-
-.panel:not(.is-inview) .more-frame:nth-child(1) { opacity: 0; transform: translate3d(-28px, -22px, 0); }
-.panel:not(.is-inview) .more-frame:nth-child(2) { opacity: 0; transform: translate3d(24px, -18px, 0); }
-.panel:not(.is-inview) .more-frame:nth-child(3) { opacity: 0; transform: translate3d(18px, 12px, 0); }
-.panel:not(.is-inview) .more-frame:nth-child(4) { opacity: 0; transform: translate3d(32px, 8px, 0); }
-.panel:not(.is-inview) .more-frame:nth-child(5) { opacity: 0; transform: translate3d(-24px, 26px, 0); }
-.panel:not(.is-inview) .more-frame:nth-child(6) { opacity: 0; transform: translate3d(16px, 30px, 0); }
-
-.panel.is-inview .day-grid > *,
-.panel.is-inview .day-notes > *,
-.panel.is-inview .info-grid > *,
-.panel.is-inview .role-group,
-.panel.is-inview .person-card,
-.panel.is-inview .itinerary-item,
-.panel.is-inview .rsvp-head,
-.panel.is-inview .rsvp-form,
-.panel.is-inview .rsvp-gifts,
-.panel.is-inview .rsvp-count-unit,
-.panel.is-inview .rsvp-title-col,
-.panel.is-inview .rsvp-body,
-.panel.is-inview .more-intro,
-.panel.is-inview .more-listen,
-.panel.is-inview .more-look-head,
-.panel.is-inview .stage-intro,
-.panel.is-inview .stage-card,
-.panel.is-inview .stage-look-head,
-.panel.is-inview .more-frame {
-  opacity: 1;
-  transform: none;
-}
-
-.panel.is-inview .more-frame:nth-child(1) { transition-delay: 70ms; }
-.panel.is-inview .more-frame:nth-child(2) { transition-delay: 130ms; }
-.panel.is-inview .more-frame:nth-child(3) { transition-delay: 190ms; }
-.panel.is-inview .more-frame:nth-child(4) { transition-delay: 240ms; }
-.panel.is-inview .more-frame:nth-child(5) { transition-delay: 280ms; }
-.panel.is-inview .more-frame:nth-child(6) { transition-delay: 330ms; }
-.panel.is-inview .itinerary-item:nth-child(1) { transition-delay: 40ms; }
-.panel.is-inview .itinerary-item:nth-child(2) { transition-delay: 90ms; }
-.panel.is-inview .itinerary-item:nth-child(3) { transition-delay: 140ms; }
-.panel.is-inview .itinerary-item:nth-child(4) { transition-delay: 190ms; }
-.panel.is-inview .itinerary-item:nth-child(5) { transition-delay: 240ms; }
-.panel.is-inview .itinerary-item:nth-child(6) { transition-delay: 290ms; }
-.panel.is-inview .rsvp-count-unit:nth-child(1) { transition-delay: 40ms; }
-.panel.is-inview .rsvp-count-unit:nth-child(2) { transition-delay: 90ms; }
-.panel.is-inview .rsvp-count-unit:nth-child(3) { transition-delay: 140ms; }
-.panel.is-inview .rsvp-count-unit:nth-child(4) { transition-delay: 190ms; }
-.panel.is-inview .day-grid > :nth-child(2) { transition-delay: 80ms; }
-.panel.is-inview .day-grid > :nth-child(3) { transition-delay: 150ms; }
-.panel.is-inview .more-listen { transition-delay: 80ms; }
-.panel.is-inview .more-look-head { transition-delay: 110ms; }
-
-/* Home cinematic fade */
-.home-panel:not(.is-inview) .hero-brand {
-  opacity: 0;
-  transform: translate3d(0, -24px, 0);
-}
-
-.home-panel.is-inview .hero-brand {
-  opacity: 1;
-  transform: none;
-  transition-delay: 60ms;
-}
-
-.home-panel:not(.is-inview) .hero-center {
-  opacity: 0;
-  transform: translate3d(0, 20px, 0);
-}
-
-.home-panel.is-inview .hero-center {
-  opacity: 1;
-  transform: translate3d(
-    0,
-    calc(var(--scene-pan, 0) * -1 * var(--scene-title-travel, 36svh)),
-    0
-  );
-  transition-delay: 120ms;
-}
-
-.home-panel.is-inview .hero-meta,
-.scene-run.is-scene-meta-active .hero-meta {
-  opacity: 1;
-  transform: translate3d(0, 0, 0);
-}
-
-.scene-run .home-panel:not(.is-inview) .hero-center {
-  opacity: 1;
-  transform: translate3d(
-    0,
-    calc(var(--scene-pan, 0) * -1 * var(--scene-title-travel, 36svh)),
-    0
-  );
-}
-
-.scene-run .home-panel:not(.is-inview) .hero-meta {
+.panel.is-inview > .panel-fade,
+.panel.is-inview > .stage,
+.panel.is-inview > .join-stage,
+.panel.is-inview > .invite-compose,
+.panel.is-inview > .sponsors-compose {
   opacity: 1;
   transform: none;
 }
@@ -951,39 +733,39 @@ body.is-nav-open {
   outline-offset: 2px;
 }
 
-/* One tall park photo spanning Home → Invite (50% image per page).
-   Invite follows sticky Home directly so its rise shares the same scroll as --scene-pan. */
+/* Home hero photo — static absolute fill of #home only (no shared sticky pan). */
 .scene-run {
   position: relative;
-  --scene-photo-lift: 50svh;
-  --scene-photo-y-start: 0%;
-  --scene-photo-y-end: 50%;
-  --scene-photo-y: var(--scene-photo-y-start);
+  --scene-photo-lift: 0px;
+  --scene-photo-y-start: 32%;
+  --scene-photo-y-end: 32%;
+  --scene-photo-y: 32%;
   --scene-pan: 0;
-  --scene-title-travel: 36svh;
+  --scene-title-travel: 0;
   --brand-ghost-opacity: 0;
   --brand-real-opacity: 0;
 }
 
-/* Clip frame holds layout + scroll-pan geometry; Ken Burns scales the img only. */
-.scene-run-photo-frame {
-  position: fixed;
-  top: calc(-1 * var(--scene-photo-lift));
+.scene-run-photo-frame,
+.scene-run.is-photo-anchored .scene-run-photo-frame {
+  position: absolute;
+  top: 0;
   left: 0;
+  right: 0;
+  bottom: auto;
   width: 100%;
-  height: calc(100svh + var(--scene-photo-lift));
+  /* Sibling fallback before JS remount: first viewport only */
+  height: 100svh;
   overflow: hidden;
   pointer-events: none;
   z-index: 0;
+  transform: none;
 }
 
-/* Match fixed-frame geometry (100svh + lift) so the handoff does not remap the crop.
-   Soften with a short opacity bridge via the photo itself staying continuous (inline object-position). */
-.scene-run.is-photo-anchored .scene-run-photo-frame {
-  position: absolute;
-  inset: auto 0 0;
-  width: 100%;
-  height: calc(100svh + var(--scene-photo-lift));
+.home-panel > .scene-run-photo-frame {
+  inset: 0;
+  bottom: 0;
+  height: 100%;
 }
 
 .scene-run-photo {
@@ -992,22 +774,11 @@ body.is-nav-open {
   height: 100%;
   max-width: none;
   object-fit: cover;
-  object-position: center var(--scene-photo-y, var(--scene-photo-y-start, 0%));
+  object-position: center 32%;
   user-select: none;
-  transform-origin: 50% 40%;
-  animation: hero-ken 22s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
-}
-
-/* Pause Ken Burns once the park photo is anchored under Invite, or while sealed. */
-.scene-run.is-photo-anchored .scene-run-photo,
-body.is-sealed .scene-run-photo,
-.scene-run.is-photo-ken-paused .scene-run-photo {
-  animation-play-state: paused;
-}
-
-/* Do not override inline object-position — JS keeps crop continuous across the anchor. */
-.scene-run.is-photo-anchored .scene-run-photo {
-  object-position: center var(--scene-photo-y, var(--scene-photo-y-end));
+  transform: none;
+  transform-origin: center center;
+  animation: none;
 }
 
 .home-panel,
@@ -1018,11 +789,12 @@ body.is-sealed .scene-run-photo,
 
 /* Home / Hero — centered editorial invite */
 .home-panel {
-  position: sticky;
-  top: 0;
+  position: relative;
+  top: auto;
   z-index: 1;
   min-height: 100svh;
   height: 100svh;
+  overflow: hidden;
   background-color: transparent;
 }
 
@@ -1093,47 +865,28 @@ body.is-sealed .scene-run-photo,
   align-content: start;
   width: 100%;
   padding-top: clamp(4vh, 8vh, 10vh);
-  transition: opacity 0.9s var(--ease-out);
-  will-change: transform;
+  will-change: auto;
 }
 
 .scene-run .hero-title-soft {
-  color: color-mix(
-    in srgb,
-    var(--white) calc((1 - var(--scene-pan)) * 100%),
-    var(--gold-mute)
-  );
-  text-shadow: 0 2px 16px
-    color-mix(in srgb, var(--ink) calc(var(--scene-pan) * 24%), transparent);
+  color: var(--white);
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.35);
 }
 
 .scene-run .hero-title-main {
-  color: color-mix(
-    in srgb,
-    var(--white) calc((1 - var(--scene-pan)) * 100%),
-    var(--olive)
-  );
-  font-size: calc(
-    clamp(2.85rem, 8.5vw, 6.4rem) * (1 - var(--scene-pan) * 0.18)
-  );
-  text-shadow: 0 3px 24px
-    color-mix(in srgb, var(--ink) calc(var(--scene-pan) * 38%), transparent);
+  color: var(--white);
+  font-size: clamp(2.85rem, 8.5vw, 6.4rem);
+  text-shadow: 0 3px 24px rgba(0, 0, 0, 0.35);
 }
 
 .scene-run .hero-brand {
-  opacity: calc(1 - min(1, var(--scene-pan) * 1.35));
-  transform: translate3d(0, calc(var(--scene-pan) * 14px), 0);
+  opacity: 1;
+  transform: none;
 }
 
-/* Shared-element brand morph (HOME → INVITE) — scroll-driven FLIP ghosts */
+/* Brand morph layer disabled sitewide */
 .brand-morph-layer {
-  position: fixed;
-  inset: 0;
-  z-index: 35;
-  pointer-events: none;
-  overflow: visible;
-  opacity: 0;
-  visibility: hidden;
+  display: none !important;
 }
 
 .brand-morph-layer.is-active {
@@ -1301,16 +1054,14 @@ body.is-sealed .scene-run-photo,
   align-items: center;
   gap: 0.15rem;
   opacity: 1;
-  transform: translate3d(0, 0, 0);
+  transform: none;
   transform-origin: center bottom;
-  transition:
-    opacity 0.95s var(--ease-out),
-    transform 0.95s var(--ease-out);
+  transition: none;
 }
 
-.home-panel:not(.is-inview) .hero-meta {
-  opacity: 0;
-  transform: translate3d(0, 12px, 0);
+.home-panel .hero-meta {
+  opacity: 1;
+  transform: none;
 }
 
 body.is-sealed .hero-meta {
@@ -1324,14 +1075,9 @@ body.is-sealed .hero-meta {
   max-width: 100%;
   margin-top: clamp(0.65rem, 1.8vh, 1.15rem);
   padding-bottom: 0;
-  opacity: 0;
-  transform: none;
-}
-
-.story-panel.is-inview .hero-meta {
   opacity: 1;
   transform: none;
-  transition-delay: 520ms;
+  transition: none;
 }
 
 .story-panel .hero-meta-time,
@@ -1498,9 +1244,8 @@ body.is-sealed .hero-meta {
 }
 
 .story-panel {
-  --invite-wash: 0;
-  --invite-pattern: 0;
-  /* Above sticky Home so toile/wash fully cover the shared park photo */
+  --invite-wash: 0.92;
+  --invite-pattern: 1;
   z-index: 2;
   display: grid;
   grid-template-rows: 1fr;
@@ -1511,6 +1256,7 @@ body.is-sealed .hero-meta {
   height: auto;
   overflow: visible;
   color: var(--ink);
+  background-color: #f3eee4;
   padding:
     0
     clamp(1rem, 4vw, 2rem)
@@ -1524,13 +1270,12 @@ body.is-sealed .hero-meta {
   inset: -1px 0;
   z-index: 0;
   pointer-events: none;
-  opacity: var(--invite-pattern);
+  opacity: 1;
   background-color: #f3eee4;
   background-image: url("assets/invite-toile-botanical.webp");
   background-repeat: repeat;
   background-position: center center;
   background-size: clamp(22rem, 48vw, 34rem);
-  /* Settled opacity is binary (visible vs not) — no scroll-frame tween */
   transition: none;
 }
 
@@ -1546,7 +1291,7 @@ body.is-sealed .hero-meta {
       rgba(255, 252, 247, 0.14) 52%,
       transparent 74%
     );
-  opacity: var(--invite-wash);
+  opacity: 0.92;
   transition: none;
 }
 
@@ -1570,7 +1315,7 @@ body.is-sealed .hero-meta {
   pointer-events: none;
   transform: translateX(-50%);
   overflow: visible;
-  opacity: var(--invite-pattern);
+  opacity: 1;
 }
 
 .invite-ark-flora {
@@ -1592,14 +1337,10 @@ body.is-sealed .hero-meta {
   margin: 0;
   padding: 0;
   pointer-events: none;
-  opacity: 0;
+  opacity: 0.92;
   transform: translate(-50%, -50%) rotate(-8deg);
   filter: drop-shadow(0 2px 4px rgba(26, 31, 28, 0.22));
-  transition: opacity 0.7s var(--ease-out);
-}
-
-.story-panel.is-inview .invite-butterfly {
-  opacity: 0.92;
+  transition: none;
 }
 
 .invite-butterfly-svg {
@@ -1765,38 +1506,11 @@ body.is-sealed .hero-meta {
 .invite-kicker,
 .invite-title,
 .invite-names,
-.invite-seal {
-  transition:
-    opacity 0.95s cubic-bezier(0.32, 0.72, 0, 1),
-    transform 0.95s cubic-bezier(0.32, 0.72, 0, 1);
-}
-
-.story-panel:not(.is-inview) .invite-kicker,
-.story-panel:not(.is-inview) .invite-title,
-.story-panel:not(.is-inview) .invite-names,
-.story-panel:not(.is-inview) .invite-seal {
-  opacity: 0;
+.invite-seal,
+.invite-card > .hero-meta {
+  opacity: 1;
   transform: none;
-}
-
-.story-panel.is-inview .invite-kicker {
-  transition-delay: 120ms;
-}
-
-.story-panel.is-inview .invite-title {
-  transition-delay: 200ms;
-}
-
-.story-panel.is-inview .invite-seal {
-  transition-delay: 300ms;
-}
-
-.story-panel.is-inview .invite-names {
-  transition-delay: 420ms;
-}
-
-.story-panel.is-inview .invite-card > .hero-meta {
-  transition-delay: 520ms;
+  transition: none;
 }
 
 /* Love Story — premium B&W pill portraits */
@@ -1812,49 +1526,19 @@ body.is-sealed .hero-meta {
 .love-panel:not(.is-inview) .love-heading,
 .love-panel:not(.is-inview) .love-person,
 .love-panel:not(.is-inview) .love-amp,
-.love-panel:not(.is-inview) .love-story {
-  opacity: 0;
-}
-
-.love-panel:not(.is-inview) .love-heading {
-  transform: translate3d(0, 22px, 0);
-}
-
-.love-panel:not(.is-inview) .love-person {
-  transform: translate3d(0, 20px, 0) scale(0.94);
-}
-
-.love-panel:not(.is-inview) .love-amp {
-  transform: translate3d(0, 14px, 0) scale(0.88);
-}
-
-.love-panel:not(.is-inview) .love-story {
-  transform: translate3d(0, 18px, 0);
-}
-
-.love-panel.is-inview .love-heading {
-  transition-delay: 60ms;
-}
-
-.love-panel.is-inview .love-person--bride {
-  transition-delay: 180ms;
-}
-
-.love-panel.is-inview .love-amp {
-  transition-delay: 320ms;
-  animation: loveAmpFloat 5.2s ease-in-out 1.15s infinite;
-}
-
-.love-panel.is-inview .love-person--groom {
-  transition-delay: 420ms;
-}
-
+.love-panel:not(.is-inview) .love-story,
+.love-panel.is-inview .love-heading,
+.love-panel.is-inview .love-person,
+.love-panel.is-inview .love-amp,
 .love-panel.is-inview .love-story {
-  transition-delay: 560ms;
+  opacity: 1;
+  transform: none;
+  transition: none;
+  animation: none;
 }
 
 .love-panel.is-inview .love-pill {
-  animation: lovePillBreathe 5.5s ease-in-out 1.1s infinite;
+  animation: none;
 }
 
 .rsvp-form--compact {
@@ -2476,14 +2160,12 @@ body.is-sealed .hero-meta {
   object-fit: cover;
   object-position: center 42%;
   user-select: none;
-  transform: scale(1.02);
-  transition:
-    opacity 0.45s var(--ease-out),
-    transform 8s var(--ease-out);
+  transform: none;
+  transition: none;
 }
 
 .join-panel.is-inview.join-on-photo .join-media-photo img {
-  transform: scale(1.06);
+  transform: none;
 }
 
 .join-media-wash {
@@ -2812,88 +2494,31 @@ body.is-sealed .hero-meta {
     contrast(0.92)
     saturate(0.68)
     sepia(0.16);
-  transition: transform 1.4s var(--ease-out);
+  transform: none;
+  transition: none;
 }
 
 .join-shot:hover img {
-  transform: scale(1.08);
+  transform: none;
 }
 
-/* Motion: date settle, staggered photo rise, footer fade */
-.join-panel:not(.is-inview) .join-date,
-.join-panel:not(.is-inview) .join-hashtag,
-.join-panel:not(.is-inview) .join-palette,
-.join-panel:not(.is-inview) .join-laurel {
-  opacity: 0;
-  transform: translate3d(0, 12px, 0);
-}
-
-.join-panel.is-inview .join-date,
-.join-panel.is-inview .join-hashtag,
-.join-panel.is-inview .join-palette,
-.join-panel.is-inview .join-laurel {
+/* Join section — static; no entrance translate or photo scale on scroll */
+.join-panel .join-date,
+.join-panel .join-hashtag,
+.join-panel .join-palette,
+.join-panel .join-laurel,
+.join-panel .join-shot,
+.join-panel .join-footer {
   opacity: 1;
   transform: none;
-  transition:
-    opacity 0.85s var(--ease-out) 80ms,
-    transform 0.85s var(--ease-out) 80ms;
+  transition: none;
 }
 
-.join-panel.is-inview .join-hashtag {
-  transition-delay: 120ms;
-}
-
-.join-panel.is-inview .join-palette {
-  transition-delay: 160ms;
-}
-
-.join-panel.is-inview .join-laurel {
-  transition-delay: 200ms;
-}
-
-.join-panel:not(.is-inview) .join-shot {
-  opacity: 0;
-  transform: translate3d(0, 22px, 0);
-}
-
-.join-panel.is-inview .join-shot {
-  opacity: 1;
-  transform: none;
-  transition:
-    opacity 1s var(--ease-out) 120ms,
-    transform 1s var(--ease-out) 120ms;
-}
-
-.join-panel.is-inview .join-hour:nth-child(2) .join-shot {
-  transition-delay: 260ms;
-}
-
-.join-panel.is-inview .join-hour:nth-child(1) .join-shot img,
-.join-panel.is-inview .join-hour:nth-child(2) .join-shot img {
-  transform: scale(1);
-  transition: transform 1.55s var(--ease-out) 180ms;
-}
-
-.join-panel.is-inview .join-hour:nth-child(2) .join-shot img {
-  transition-delay: 320ms;
-}
-
+.join-panel .join-shot img,
+.join-panel.is-inview .join-shot img,
 .join-panel.is-inview .join-shot:hover img {
-  transform: scale(1.075);
-  transition: transform 1.15s var(--ease-out);
-}
-
-.join-panel:not(.is-inview) .join-footer {
-  opacity: 0;
-  transform: translate3d(0, 14px, 0);
-}
-
-.join-panel.is-inview .join-footer {
-  opacity: 1;
   transform: none;
-  transition:
-    opacity 0.9s var(--ease-out) 380ms,
-    transform 0.9s var(--ease-out) 380ms;
+  transition: none;
 }
 
 .join-hour-meta {
@@ -3429,15 +3054,14 @@ body.is-sealed .hero-meta {
   background: #1c241c;
   min-height: 100svh;
   height: auto;
-  /* Keep visible so sticky media can pin; neighbors’ higher z-index covers edge bleed. */
-  overflow: visible;
+  overflow: hidden;
   display: flex;
   align-items: stretch;
   padding: 0;
   isolation: isolate;
 }
 
-/* Absolute track = section height. Sticky child pins in-view without JS clip-path. */
+/* Absolute section background — no sticky pin that fights native scroll. */
 .entourage-media {
   position: absolute;
   inset: 0;
@@ -3446,10 +3070,10 @@ body.is-sealed .hero-meta {
 }
 
 .entourage-media-fixed {
-  position: sticky;
-  top: 0;
+  position: absolute;
+  inset: 0;
   width: 100%;
-  height: 100svh;
+  height: 100%;
   overflow: hidden;
   pointer-events: none;
 }
@@ -3458,7 +3082,7 @@ body.is-sealed .hero-meta {
   position: absolute;
   inset: 0;
   overflow: hidden;
-  transform: scale(1.01);
+  transform: none;
 }
 
 .entourage-media-photo img {
@@ -3516,22 +3140,9 @@ body.is-sealed .hero-meta {
 
 .title-sway {
   display: inline-block;
+  transform: none;
   transform-origin: 42% 80%;
-}
-
-.day-panel.is-inview .title-sway {
-  animation: titleSway 5.8s var(--ease-in-out) infinite;
-}
-
-@keyframes titleSway {
-  0%,
-  100% {
-    transform: rotate(-1.35deg) translate3d(0, 0, 0);
-  }
-
-  50% {
-    transform: rotate(1.55deg) translate3d(3px, -3px, 0);
-  }
+  animation: none !important;
 }
 
 .day-rail {
@@ -3605,74 +3216,8 @@ body.is-sealed .hero-meta {
 .day-icon-stroke {
   stroke-dasharray: 1;
   stroke-dashoffset: 0;
-}
-
-.day-panel.is-inview .day-icon-stroke {
-  animation: dayIconForm 3.8s ease-in-out infinite;
-}
-
-.day-panel.is-inview .day-beat:nth-child(1) .day-icon-stroke {
-  animation-duration: 3.55s;
-}
-
-.day-panel.is-inview .day-beat:nth-child(2) .day-icon-stroke {
-  animation-duration: 3.9s;
-  animation-delay: 0.18s;
-}
-
-.day-panel.is-inview .day-beat:nth-child(3) .day-icon-stroke {
-  animation-duration: 3.7s;
-  animation-delay: 0.32s;
-}
-
-.day-panel.is-inview .day-beat:nth-child(4) .day-icon-stroke {
-  animation-duration: 4s;
-  animation-delay: 0.1s;
-}
-
-.day-panel.is-inview .day-beat:nth-child(5) .day-icon-stroke {
-  animation-duration: 3.65s;
-  animation-delay: 0.24s;
-}
-
-.day-panel.is-inview .day-beat-icon .day-icon-stroke:nth-child(2) {
-  animation-delay: calc(var(--day-icon-base-delay, 0s) + 0.14s);
-}
-
-.day-panel.is-inview .day-beat-icon .day-icon-stroke:nth-child(3) {
-  animation-delay: calc(var(--day-icon-base-delay, 0s) + 0.26s);
-}
-
-.day-panel.is-inview .day-beat-icon .day-icon-stroke:nth-child(4) {
-  animation-delay: calc(var(--day-icon-base-delay, 0s) + 0.36s);
-}
-
-.day-panel.is-inview .day-beat-icon .day-icon-stroke:nth-child(5) {
-  animation-delay: calc(var(--day-icon-base-delay, 0s) + 0.44s);
-}
-
-.day-panel.is-inview .day-beat-icon .day-icon-stroke:nth-child(6) {
-  animation-delay: calc(var(--day-icon-base-delay, 0s) + 0.52s);
-}
-
-.day-panel.is-inview .day-beat:nth-child(1) {
-  --day-icon-base-delay: 0s;
-}
-
-.day-panel.is-inview .day-beat:nth-child(2) {
-  --day-icon-base-delay: 0.18s;
-}
-
-.day-panel.is-inview .day-beat:nth-child(3) {
-  --day-icon-base-delay: 0.32s;
-}
-
-.day-panel.is-inview .day-beat:nth-child(4) {
-  --day-icon-base-delay: 0.1s;
-}
-
-.day-panel.is-inview .day-beat:nth-child(5) {
-  --day-icon-base-delay: 0.24s;
+  opacity: 1;
+  animation: none !important;
 }
 
 @keyframes dayIconForm {
@@ -4179,28 +3724,15 @@ body.is-sealed .hero-meta {
   margin-top: 0.15rem;
 }
 
-.entourage-panel.is-inview .sponsors-card {
-  animation: sponsorsCardRise 1.05s var(--ease-out) both;
-}
-
-.entourage-panel.is-inview .entourage-media-photo {
-  animation: sponsorsPhotoEase 1.4s var(--ease-out) both;
-}
-
-.entourage-panel.is-inview .sponsors-script {
-  animation: sponsorsScriptIn 0.9s var(--ease-out) both;
-}
-
-.entourage-panel.is-inview .sponsors-block:nth-child(1) .sponsors-script {
-  animation-delay: 120ms;
-}
-
-.entourage-panel.is-inview .sponsors-parents .sponsors-script {
-  animation-delay: 220ms;
-}
-
+.entourage-panel.is-inview .sponsors-card,
+.entourage-panel.is-inview .entourage-media-photo,
+.entourage-panel.is-inview .sponsors-script,
+.entourage-panel.is-inview .sponsors-block:nth-child(1) .sponsors-script,
+.entourage-panel.is-inview .sponsors-parents .sponsors-script,
 .entourage-panel.is-inview .sponsors-principals .sponsors-script {
-  animation-delay: 320ms;
+  animation: none;
+  opacity: 1;
+  transform: none;
 }
 
 @keyframes sponsorsCardRise {

@@ -20,55 +20,26 @@ const scenePhoto = document.querySelector(".scene-run-photo");
 const homePanel = document.getElementById("home");
 const storyPanel = document.getElementById("story");
 
-/* Desktop (>1100): top half = page 1, bottom half = page 2 (0% → 50%).
-   ≤1100 (hamburger): no shared Home→Invite pan — page-1 hero photo only. */
+/* Narrow / phone breakpoints — layout only (no scroll-linked motion on any viewport). */
 const mqSceneNarrow = window.matchMedia("(max-width: 1100px)");
 const mqScenePhone = window.matchMedia("(max-width: 560px)");
-
-function getScenePhotoYRange() {
-  if (mqScenePhone.matches) return { start: 30, end: 30 };
-  if (mqSceneNarrow.matches) return { start: 32, end: 32 };
-  return { start: 0, end: 50 };
-}
-
-function getStoryScrollTop() {
-  if (!storyPanel) return 0;
-  return storyPanel.getBoundingClientRect().top + window.scrollY;
-}
-
-/* 0 = Invite just below the fold, 1 = Invite pinned at top — same scroll that pans the hero */
-function getScenePanProgress() {
-  if (!homePanel || !storyPanel || prefersReducedMotion) return 1;
-  /* Mobile/tablet: no scroll-linked photo pan between Home and Invite */
-  if (mqSceneNarrow.matches) return 0;
-  const vh = window.innerHeight || 1;
-  const top = storyPanel.getBoundingClientRect().top;
-  const progress = 1 - top / vh;
-  return Math.min(1, Math.max(0, progress));
-}
 
 function getScenePhotoFrame() {
   return scenePhoto?.closest(".scene-run-photo-frame") || null;
 }
 
-/* ≤1100: mount photo inside #home so it is absolute 100% of page 1 only.
-   Desktop keeps it on .scene-run for sticky Home→Invite handoff. */
+/* Hero photo lives inside #home as a static absolute fill — never fixed / sticky handoff. */
 function syncScenePhotoMount() {
   const frame = getScenePhotoFrame();
-  if (!frame || !sceneRun || !homePanel) return;
-
-  if (mqSceneNarrow.matches) {
-    if (frame.parentElement !== homePanel) {
-      homePanel.insertBefore(frame, homePanel.firstChild);
-    }
-  } else if (frame.parentElement !== sceneRun) {
-    sceneRun.insertBefore(frame, sceneRun.firstChild);
+  if (!frame || !homePanel) return;
+  if (frame.parentElement !== homePanel) {
+    homePanel.insertBefore(frame, homePanel.firstChild);
   }
 }
 
-/* One-shot mobile park: clear inline pan/crop so CSS owns a static hero.
+/* One-shot park: clear inline pan/crop so CSS owns a static hero.
    Never call from scroll — only init / mq / orientation. */
-function parkMobileScenePhoto() {
+function parkScenePhoto() {
   if (!scenePhoto || !sceneRun) return;
   syncScenePhotoMount();
   sceneRun.style.setProperty("--scene-pan", "0");
@@ -76,90 +47,36 @@ function parkMobileScenePhoto() {
   sceneRun.classList.remove("is-photo-anchored", "is-photo-ken-paused");
   scenePhoto.style.removeProperty("object-position");
   scenePhoto.style.removeProperty("transform");
-  /* Lock layout height in px so URL-bar show/hide cannot reflow/“zoom” the cover crop. */
-  const h = document.documentElement.clientHeight || window.innerHeight || 0;
-  if (h > 0) {
-    const heroH = `${h}px`;
-    sceneRun.style.setProperty("--mobile-hero-h", heroH);
-    if (homePanel) homePanel.style.setProperty("--mobile-hero-h", heroH);
+  /* Narrow: lock layout height in px so URL-bar show/hide cannot reflow the cover crop. */
+  if (mqSceneNarrow.matches) {
+    const h = document.documentElement.clientHeight || window.innerHeight || 0;
+    if (h > 0) {
+      const heroH = `${h}px`;
+      sceneRun.style.setProperty("--mobile-hero-h", heroH);
+      if (homePanel) homePanel.style.setProperty("--mobile-hero-h", heroH);
+    }
+  } else {
+    sceneRun.style.removeProperty("--mobile-hero-h");
+    if (homePanel) homePanel.style.removeProperty("--mobile-hero-h");
   }
-}
-
-function updateScenePan() {
-  if (!scenePhoto || !sceneRun || prefersReducedMotion) return;
-
-  /* ≤1100: never pan, scale, or rewrite object-position on scroll */
-  if (mqSceneNarrow.matches) return;
-
-  const progress = getScenePanProgress();
-  const storyTop = getStoryScrollTop();
-  /* Wider hysteresis + only anchor once Invite wash nearly covers the photo,
-     so fixed→absolute doesn't fire while brand morph is still settling. */
-  const wasAnchored = sceneRun.classList.contains("is-photo-anchored");
-  const anchorEnter = storyTop + 12;
-  const anchorLeave = storyTop - 28;
-  const anchored = wasAnchored
-    ? window.scrollY >= anchorLeave
-    : window.scrollY >= anchorEnter && progress >= 0.97;
-  const pan = Math.min(1, progress);
-  const { start, end } = getScenePhotoYRange();
-  const photoY = start + progress * (end - start);
-
-  sceneRun.style.setProperty("--scene-pan", pan.toFixed(4));
-  sceneRun.style.setProperty("--scene-photo-y", `${photoY.toFixed(2)}%`);
-
-  sceneRun.classList.toggle("is-photo-anchored", anchored);
-  /* Keep inline object-position continuous — never let the anchored CSS rule snap crop. */
-  scenePhoto.style.objectPosition = `center ${photoY.toFixed(2)}%`;
 }
 
 function scrollToSection(id) {
   const target = document.getElementById(id);
   if (!target) return;
 
-  /* Nav clicks may smooth-scroll on desktop; mobile stays instant (no motion feel). */
-  const scrollBehavior =
-    prefersReducedMotion || mqSceneNarrow.matches ? "auto" : "smooth";
-  const { start: photoYStart, end: photoYEnd } = getScenePhotoYRange();
-  const mobileScene = mqSceneNarrow.matches;
+  /* Native jump only — smooth scroll fights touch and feels like a jolt. */
+  const scrollBehavior = "auto";
 
-  if (id === "story" && scenePhoto && !prefersReducedMotion && !mobileScene) {
-    sceneRun?.classList.add("is-photo-anchored");
-    sceneRun?.style.setProperty("--scene-pan", "1");
-    sceneRun?.style.setProperty("--scene-photo-y", `${photoYEnd}%`);
-    scenePhoto.style.objectPosition = `center ${photoYEnd}%`;
-  }
-
-  /* Sticky #home already sits at top≈0 while Invite covers it, so
-     scrollIntoView({ block: "start" }) no-ops. Jump to document top. */
   if (id === "home") {
-    if (scenePhoto && !prefersReducedMotion) {
-      if (mobileScene) {
-        parkMobileScenePhoto();
-      } else {
-        sceneRun?.classList.remove("is-photo-anchored");
-        sceneRun?.style.setProperty("--scene-pan", "0");
-        sceneRun?.style.setProperty("--scene-photo-y", `${photoYStart}%`);
-        scenePhoto.style.objectPosition = `center ${photoYStart}%`;
-      }
-    }
-
     window.scrollTo({ top: 0, behavior: scrollBehavior });
     setActivePill("home");
-    requestAnimationFrame(() => {
-      updateScenePan();
-      updateBrandMorph();
-    });
     return;
   }
 
   target.scrollIntoView({
     behavior: scrollBehavior,
     block: "start",
-  });
-  requestAnimationFrame(() => {
-    updateScenePan();
-    updateBrandMorph();
   });
 }
 
@@ -364,339 +281,51 @@ if (spotifyEmbed) {
   }
 }
 
-/* HOME → INVITE shared-element morph (scroll-driven FLIP ghosts) */
-const brandMorphPairs = [
-  { id: "name-nigel", kind: "text" },
-  { id: "seal", kind: "img" },
-  { id: "name-mary", kind: "text" },
-  { id: "amp", kind: "amp" },
-  { id: "meta", kind: "meta" },
-];
-
-let brandMorphLayer = null;
-let brandMorphGhosts = null;
-let brandMorphState = "idle"; // idle | morphing | settled
-
-function lerp(a, b, t) {
-  return a + (b - a) * t;
-}
-
-function smoothstep(t) {
-  const x = Math.min(1, Math.max(0, t));
-  return x * x * (3 - 2 * x);
-}
-
-function readRect(el) {
-  const r = el.getBoundingClientRect();
-  return {
-    left: r.left,
-    top: r.top,
-    width: r.width,
-    height: r.height,
-  };
-}
-
-function ensureBrandMorphLayer() {
-  if (brandMorphLayer) return brandMorphLayer;
-  brandMorphLayer = document.createElement("div");
-  brandMorphLayer.className = "brand-morph-layer";
-  brandMorphLayer.setAttribute("aria-hidden", "true");
-  document.body.appendChild(brandMorphLayer);
-
-  brandMorphGhosts = {};
-  brandMorphPairs.forEach(({ id, kind }) => {
-    const from = document.querySelector(`[data-morph="${id}"]`);
-    const to = document.querySelector(`[data-morph-target="${id}"]`);
-    if (!to && kind !== "amp") return;
-    if (kind !== "amp" && !from) return;
-
-    let ghost;
-    if (kind === "img") {
-      ghost = from.cloneNode(true);
-      ghost.removeAttribute("data-morph");
-      ghost.removeAttribute("alt");
-      ghost.className = "brand-morph-ghost is-img";
-    } else if (kind === "meta") {
-      ghost = from.cloneNode(true);
-      ghost.removeAttribute("data-morph");
-      ghost.className = "brand-morph-ghost is-meta";
-    } else if (kind === "amp") {
-      ghost = document.createElement("span");
-      ghost.className = "brand-morph-ghost is-amp";
-      ghost.textContent = "&";
-    } else {
-      ghost = document.createElement("span");
-      ghost.className = "brand-morph-ghost is-text";
-      ghost.textContent = from.textContent.trim();
-    }
-
-    brandMorphLayer.appendChild(ghost);
-    brandMorphGhosts[id] = { ghost, kind, from, to };
-  });
-
-  return brandMorphLayer;
-}
-
-/* Settle window: ghosts fade out while real Invite targets fade in (overlap, never both 0). */
-const BRAND_CROSSFADE_START = 0.86;
-const BRAND_SETTLE_END = 0.995;
-
-function brandCrossfadeAmount(progress) {
-  if (progress <= BRAND_CROSSFADE_START) return 0;
-  if (progress >= BRAND_SETTLE_END) return 1;
-  return smoothstep(
-    (progress - BRAND_CROSSFADE_START) / (BRAND_SETTLE_END - BRAND_CROSSFADE_START)
+/* Brand morph / FLIP ghosts removed — no scroll-driven shared-element handoff. */
+if (sceneRun) {
+  sceneRun.classList.remove(
+    "is-brand-morphing",
+    "is-brand-settled",
+    "is-brand-handing-off"
   );
+  sceneRun.style.setProperty("--brand-ghost-opacity", "0");
+  sceneRun.style.setProperty("--brand-real-opacity", "0");
 }
 
-function paintBrandGhost(entry, t, ghostOpacity, forceMeasure) {
-  const { ghost, kind, from, to } = entry;
-  if (!to) {
-    ghost.style.opacity = "0";
-    return;
-  }
-
-  // Amp has no page-1 source — invent a start between the hero names / monogram
-  let fromRect;
-  if (kind === "amp") {
-    const sealFrom = document.querySelector('[data-morph="seal"]');
-    const base = sealFrom ? readRect(sealFrom) : readRect(to);
-    fromRect = {
-      left: base.left + base.width * 0.35,
-      top: base.top + base.height * 0.2,
-      width: Math.max(8, base.width * 0.22),
-      height: Math.max(10, base.height * 0.28),
-    };
-  } else if (!from) {
-    ghost.style.opacity = "0";
-    return;
-  } else {
-    fromRect = readRect(from);
-  }
-
-  /* Live #story rect so ghosts track Invite as it rises with the same pan progress */
-  const toRect = readRect(to);
-  if (toRect.width < 1 || toRect.height < 1) {
-    ghost.style.opacity = "0";
-    return;
-  }
-
-  const left = lerp(fromRect.left, toRect.left, t);
-  const top = lerp(fromRect.top, toRect.top, t);
-  const width = lerp(fromRect.width, toRect.width, t);
-  const height = lerp(fromRect.height, toRect.height, t);
-  const gOp = Math.max(0, Math.min(1, ghostOpacity));
-
-  if (kind === "img") {
-    ghost.style.left = `${left}px`;
-    ghost.style.top = `${top}px`;
-    ghost.style.width = `${width}px`;
-    ghost.style.height = `${height}px`;
-    ghost.style.transform = "";
-    ghost.style.opacity = String(gOp);
-    ghost.style.filter = `drop-shadow(0 4px 14px rgba(0, 0, 0, ${lerp(0.35, 0.12, t)}))`;
-    return;
-  }
-
-  if (kind === "amp") {
-    const toStyle = getComputedStyle(to);
-    const cx = left + width / 2;
-    const cy = top + height / 2;
-    ghost.style.left = `${cx}px`;
-    ghost.style.top = `${cy}px`;
-    ghost.style.width = "auto";
-    ghost.style.height = "auto";
-    ghost.style.transform = "translate(-50%, -50%)";
-    ghost.style.fontSize = toStyle.fontSize;
-    ghost.style.color = toStyle.color;
-    ghost.style.opacity = String(smoothstep((t - 0.28) / 0.55) * gOp);
-    return;
-  }
-
-  if (kind === "text") {
-    const fromStyle = getComputedStyle(from);
-    const toStyle = getComputedStyle(to);
-    const fs = lerp(parseFloat(fromStyle.fontSize), parseFloat(toStyle.fontSize), t);
-    const ls = lerp(parseFloat(fromStyle.letterSpacing) || 0, parseFloat(toStyle.letterSpacing) || 0, t);
-    const cx = left + width / 2;
-    const cy = top + height / 2;
-    ghost.style.left = `${cx}px`;
-    ghost.style.top = `${cy}px`;
-    ghost.style.width = "auto";
-    ghost.style.height = "auto";
-    ghost.style.transform = "translate(-50%, -50%)";
-    ghost.style.fontSize = `${fs}px`;
-    ghost.style.letterSpacing = `${ls}px`;
-
-    const tw = toStyle.color.match(/rgba?\(([^)]+)\)/);
-    let tr = 42;
-    let tg = 61;
-    let tb = 85;
-    let ta = 0.78;
-    if (tw) {
-      const parts = tw[1].split(",").map((p) => parseFloat(p.trim()));
-      tr = parts[0];
-      tg = parts[1];
-      tb = parts[2];
-      ta = parts.length > 3 ? parts[3] : 1;
-    }
-    const r = Math.round(lerp(255, tr, t));
-    const g = Math.round(lerp(255, tg, t));
-    const b = Math.round(lerp(255, tb, t));
-    const a = lerp(1, ta, t);
-    ghost.style.color = `rgba(${r}, ${g}, ${b}, ${a})`;
-    ghost.style.textShadow =
-      t < 0.65
-        ? `0 2px 14px rgba(0, 0, 0, ${lerp(0.35, 0, t / 0.65)})`
-        : "none";
-    ghost.style.opacity = String(gOp);
-    return;
-  }
-
-  if (kind === "meta") {
-    const sx = fromRect.width > 0 ? width / fromRect.width : 1;
-    const sy = fromRect.height > 0 ? height / fromRect.height : 1;
-    ghost.style.left = `${left}px`;
-    ghost.style.top = `${top}px`;
-    ghost.style.width = `${fromRect.width}px`;
-    ghost.style.height = `${fromRect.height}px`;
-    ghost.style.transform = `scale(${sx}, ${sy})`;
-    ghost.style.transformOrigin = "top left";
-    ghost.style.opacity = String(gOp);
-
-    const ink = lerp(255, 42, t);
-    const inkG = lerp(255, 61, t);
-    const inkB = lerp(255, 85, t);
-    const soft = `rgba(${Math.round(ink)}, ${Math.round(inkG)}, ${Math.round(inkB)}, ${lerp(0.88, 0.82, t)})`;
-    const day = `rgb(${Math.round(ink)}, ${Math.round(inkG)}, ${Math.round(inkB)})`;
-    ghost.querySelectorAll(
-      ".hero-meta-time, .hero-meta-year, .hero-meta-place, .hero-date-side"
-    ).forEach((el) => {
-      el.style.color = soft;
-      el.style.textShadow =
-        t < 0.55 ? `0 2px 12px rgba(0, 0, 0, ${lerp(0.3, 0, t / 0.55)})` : "none";
-    });
-    const dayEl = ghost.querySelector(".hero-date-day");
-    if (dayEl) {
-      dayEl.style.color = day;
-      dayEl.style.textShadow =
-        t < 0.55 ? `0 2px 12px rgba(0, 0, 0, ${lerp(0.3, 0, t / 0.55)})` : "none";
-    }
-  }
+/* Invite wash/pattern stay at final opacity — never rewritten per scroll frame. */
+if (storyPanel) {
+  storyPanel.style.setProperty("--invite-pattern", "1");
+  storyPanel.style.setProperty("--invite-wash", "0.92");
 }
 
-function setBrandMorphVars(ghostOpacity, realOpacity) {
-  sceneRun.style.setProperty("--brand-ghost-opacity", ghostOpacity.toFixed(4));
-  sceneRun.style.setProperty("--brand-real-opacity", realOpacity.toFixed(4));
-}
+parkScenePhoto();
 
-function updateBrandMorph(_forceMeasure = false) {
-  if (!sceneRun) return;
-  /* Invite is fully static: no Home→Invite brand morph / ghost slide on any viewport.
-     Desktop shared photo pan still runs via updateScenePan (home side only). */
-  if (
-    brandMorphState !== "idle" ||
-    sceneRun.classList.contains("is-brand-morphing") ||
-    sceneRun.classList.contains("is-brand-settled") ||
-    sceneRun.classList.contains("is-brand-handing-off")
-  ) {
-    sceneRun.classList.remove(
-      "is-brand-morphing",
-      "is-brand-settled",
-      "is-brand-handing-off"
-    );
-    brandMorphState = "idle";
-    setBrandMorphVars(0, 0);
-    if (brandMorphLayer) brandMorphLayer.classList.remove("is-active");
-  }
+window.addEventListener(
+  "resize",
+  () => {
+    if (mqSceneNarrow.matches) parkScenePhoto();
+  },
+  { passive: true }
+);
+const onSceneMqChange = () => parkScenePhoto();
+if (typeof mqSceneNarrow.addEventListener === "function") {
+  mqSceneNarrow.addEventListener("change", onSceneMqChange);
+  mqScenePhone.addEventListener("change", onSceneMqChange);
+} else if (typeof mqSceneNarrow.addListener === "function") {
+  mqSceneNarrow.addListener(onSceneMqChange);
+  mqScenePhone.addListener(onSceneMqChange);
 }
+window.addEventListener(
+  "orientationchange",
+  () => {
+    if (mqSceneNarrow.matches) window.setTimeout(parkScenePhoto, 50);
+  },
+  { passive: true }
+);
 
-/* 30% in / 30% out — each section fades independently */
+/* Pill active state + More audio — no style morphs tied to scroll. */
 if (panels.length) {
   const ratios = new Map();
-
-  function updateInviteWash() {
-    if (!storyPanel) return;
-    /* Binary settled look — no scroll-tweened opacity (felt like bg/items moving) */
-    const vh = window.innerHeight || 1;
-    const rect = storyPanel.getBoundingClientRect();
-    const visible = rect.bottom > 0 && rect.top < vh;
-    storyPanel.style.setProperty("--invite-pattern", visible ? "1" : "0");
-    storyPanel.style.setProperty("--invite-wash", visible ? "0.92" : "0");
-  }
-
-  let sceneTick = false;
-  const scheduleSceneTick = (forceMeasure = false) => {
-    if (mqSceneNarrow.matches) return;
-    if (sceneTick) return;
-    sceneTick = true;
-    requestAnimationFrame(() => {
-      sceneTick = false;
-      updateScenePan();
-      updateInviteWash();
-      updateBrandMorph(forceMeasure);
-    });
-  };
-  window.addEventListener("scroll", () => scheduleSceneTick(false), {
-    passive: true,
-  });
-  /* Ignore visualViewport / URL-bar resize churn on narrow — it reflows the cover crop. */
-  window.addEventListener(
-    "resize",
-    () => {
-      if (mqSceneNarrow.matches) return;
-      scheduleSceneTick(true);
-    },
-    { passive: true }
-  );
-  const onSceneMqChange = () => {
-    if (mqSceneNarrow.matches) {
-      parkMobileScenePhoto();
-      updateInviteWash();
-      updateBrandMorph(false);
-      return;
-    }
-    syncScenePhotoMount();
-    sceneRun?.style.removeProperty("--mobile-hero-h");
-    if (homePanel) homePanel.style.removeProperty("--mobile-hero-h");
-    scheduleSceneTick(true);
-  };
-  if (typeof mqSceneNarrow.addEventListener === "function") {
-    mqSceneNarrow.addEventListener("change", onSceneMqChange);
-    mqScenePhone.addEventListener("change", onSceneMqChange);
-  } else if (typeof mqSceneNarrow.addListener === "function") {
-    mqSceneNarrow.addListener(onSceneMqChange);
-    mqScenePhone.addListener(onSceneMqChange);
-  }
-  window.addEventListener(
-    "orientationchange",
-    () => {
-      if (mqSceneNarrow.matches) {
-        window.setTimeout(parkMobileScenePhoto, 50);
-      }
-    },
-    { passive: true }
-  );
-  if (mqSceneNarrow.matches) parkMobileScenePhoto();
-  else updateScenePan();
-  updateInviteWash();
-  updateBrandMorph(true);
-
-  /* Pause Ken Burns while the park photo isn’t on screen (saves paint). Desktop only. */
-  if (sceneRun && scenePhoto && !prefersReducedMotion && !mqSceneNarrow.matches) {
-    const kenIo = new IntersectionObserver(
-      ([entry]) => {
-        sceneRun.classList.toggle(
-          "is-photo-ken-paused",
-          !(entry?.isIntersecting)
-        );
-      },
-      { root: null, rootMargin: "8% 0px", threshold: 0 }
-    );
-    const kenTarget =
-      sceneRun.querySelector(".scene-run-photo-frame") || scenePhoto;
-    kenIo.observe(kenTarget);
-  }
 
   const observer = new IntersectionObserver(
     (entries) => {
@@ -715,8 +344,6 @@ if (panels.length) {
           setMoreAudioActive(nowInview);
         }
       });
-
-      updateInviteWash();
 
       let bestPanel = null;
       let bestRatio = -1;
@@ -738,182 +365,13 @@ if (panels.length) {
   panels.forEach((panel) => observer.observe(panel));
 }
 
-/* Invite floral-ark butterfly — flap + waypoint flight between perch blooms */
+/* Invite floral-ark butterfly — static perch only (no flight / scroll accompaniment). */
 (function initInviteButterfly() {
   const butterfly = document.querySelector("[data-invite-butterfly]");
-  const ark = document.querySelector(".invite-ark");
-  if (!butterfly || !ark || !storyPanel) return;
-
-  /* Percent positions across the floral ark (left bloom → apex → right) */
-  const PERCHES = [
-    { x: 11, y: 58, r: -22 },
-    { x: 28, y: 24, r: 14 },
-    { x: 49, y: 9, r: -8 },
-    { x: 74, y: 26, r: 18 },
-    { x: 90, y: 52, r: -16 },
-  ];
-
-  const EASE_FLIGHT = "cubic-bezier(0.77, 0, 0.175, 1)";
-  let perchIndex = 2;
-  let active = false;
-  let flightAnim = null;
-  let loopToken = 0;
-
-  function motionOff() {
-    /* Invite layers stay static while scrolling — no flight on any viewport */
-    return true;
-  }
-
-  function perchTransform(perch) {
-    const w = ark.offsetWidth || 1;
-    const h = ark.offsetHeight || 1;
-    const x = (perch.x / 100) * w;
-    const y = (perch.y / 100) * h;
-    return `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%) rotate(${perch.r}deg)`;
-  }
-
-  function arcTransform(from, to) {
-    const w = ark.offsetWidth || 1;
-    const h = ark.offsetHeight || 1;
-    const mx = ((from.x + to.x) / 2 / 100) * w;
-    const my = ((Math.min(from.y, to.y) - 14) / 100) * h;
-    const mr = (from.r + to.r) / 2;
-    return `translate3d(${mx}px, ${my}px, 0) translate(-50%, -50%) rotate(${mr}deg) scale(1.04)`;
-  }
-
-  function setPose(perch) {
-    butterfly.style.transform = perchTransform(perch);
-  }
-
-  function setFlying(isFlying) {
-    butterfly.classList.toggle("is-flying", isFlying);
-    butterfly.classList.toggle("is-perched", !isFlying);
-  }
-
-  function wait(ms, token) {
-    return new Promise((resolve) => {
-      window.setTimeout(() => resolve(token === loopToken), ms);
-    });
-  }
-
-  async function flyTo(next, token) {
-    const from = PERCHES[perchIndex];
-    const duration = 2400 + Math.random() * 700;
-    setFlying(true);
-
-    if (flightAnim) {
-      flightAnim.cancel();
-      flightAnim = null;
-    }
-
-    flightAnim = butterfly.animate(
-      [
-        { transform: perchTransform(from), offset: 0 },
-        { transform: arcTransform(from, next), offset: 0.48 },
-        { transform: perchTransform(next), offset: 1 },
-      ],
-      {
-        duration,
-        easing: EASE_FLIGHT,
-        fill: "forwards",
-      }
-    );
-
-    try {
-      await flightAnim.finished;
-      if (typeof flightAnim.commitStyles === "function") {
-        flightAnim.commitStyles();
-      }
-      flightAnim.cancel();
-    } catch {
-      /* cancelled on pause / resize */
-    }
-
-    if (token !== loopToken) return false;
-    flightAnim = null;
-    perchIndex = PERCHES.indexOf(next);
-    setPose(next);
-    setFlying(false);
-    return true;
-  }
-
-  async function loop(token) {
-    setPose(PERCHES[perchIndex]);
-    setFlying(false);
-
-    while (active && token === loopToken) {
-      const rest = 2200 + Math.random() * 1800;
-      const still = await wait(rest, token);
-      if (!still || !active) break;
-
-      let nextIndex = Math.floor(Math.random() * PERCHES.length);
-      if (nextIndex === perchIndex) {
-        nextIndex = (perchIndex + 1 + Math.floor(Math.random() * (PERCHES.length - 1))) % PERCHES.length;
-      }
-      const ok = await flyTo(PERCHES[nextIndex], token);
-      if (!ok) break;
-    }
-  }
-
-  function start() {
-    if (motionOff() || active) return;
-    active = true;
-    loopToken += 1;
-    loop(loopToken);
-  }
-
-  function stop() {
-    active = false;
-    loopToken += 1;
-    if (flightAnim) {
-      flightAnim.cancel();
-      flightAnim = null;
-    }
-    setFlying(false);
-    setPose(PERCHES[perchIndex]);
-  }
-
-  function parkStatic() {
-    stop();
-    butterfly.classList.add("is-perched");
-    butterfly.classList.remove("is-flying");
-    perchIndex = 2;
-    butterfly.style.transform = "";
-  }
-
-  const syncVisibility = () => {
-    if (motionOff()) {
-      parkStatic();
-      return;
-    }
-    if (storyPanel.classList.contains("is-inview")) start();
-    else stop();
-  };
-
-  const visibilityObserver = new MutationObserver(syncVisibility);
-  visibilityObserver.observe(storyPanel, {
-    attributes: true,
-    attributeFilter: ["class"],
-  });
-
-  window.addEventListener(
-    "resize",
-    () => {
-      if (motionOff()) {
-        parkStatic();
-        return;
-      }
-      if (!active) setPose(PERCHES[perchIndex]);
-      else if (!flightAnim) setPose(PERCHES[perchIndex]);
-    },
-    { passive: true }
-  );
-
-  if (typeof mqSceneNarrow.addEventListener === "function") {
-    mqSceneNarrow.addEventListener("change", syncVisibility);
-  }
-
-  syncVisibility();
+  if (!butterfly) return;
+  butterfly.classList.add("is-perched");
+  butterfly.classList.remove("is-flying");
+  butterfly.style.transform = "";
 })();
 
 /* Love Story — loop “Once upon a time” while the panel is in view */
