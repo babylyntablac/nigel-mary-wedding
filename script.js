@@ -13,8 +13,6 @@ const PHOTO_ALBUM_URL = "";
 // Optional: contact email for vendor / share inquiries
 const CONTACT_EMAIL = "";
 
-const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
 const sceneRun = document.querySelector(".scene-run");
 const scenePhoto = document.querySelector(".scene-run-photo");
 const homePanel = document.getElementById("home");
@@ -374,122 +372,14 @@ if (panels.length) {
   butterfly.style.transform = "";
 })();
 
-/* Love Story — loop “Once upon a time” while the panel is in view */
+/* Love Story kicker — static text only (no typewriter). */
 (function initLoveStoryTypewriter() {
-  const lovePanel = document.querySelector('[data-panel="love"]');
   const kicker = document.querySelector(".love-story-kicker[data-typewriter]");
   const textEl = kicker?.querySelector(".love-story-kicker-text");
-  if (!lovePanel || !kicker || !textEl) return;
-
+  if (!kicker || !textEl) return;
   const fullText = (textEl.textContent || "Once upon a time").trim();
-  const TYPE_MS = 92;
-  const DELETE_MS = 54;
-  const HOLD_MS = 2800;
-  const GAP_MS = 780;
-  const START_DELAY_MS = 640;
-
-  let active = false;
-  let timer = null;
-
-  function motionOff() {
-    return prefersReducedMotion || mqSceneNarrow.matches;
-  }
-
-  function clearTimer() {
-    if (timer) {
-      clearTimeout(timer);
-      timer = null;
-    }
-  }
-
-  function showFull() {
-    clearTimer();
-    textEl.textContent = fullText;
-    kicker.classList.remove("is-typing", "is-cursor");
-  }
-
-  function schedule(fn, ms) {
-    clearTimer();
-    timer = setTimeout(fn, ms);
-  }
-
-  function typeForward(i = 0) {
-    if (!active) return;
-    kicker.classList.add("is-typing");
-    kicker.classList.remove("is-cursor");
-
-    if (i < fullText.length) {
-      textEl.textContent = fullText.slice(0, i + 1);
-      schedule(() => typeForward(i + 1), TYPE_MS);
-      return;
-    }
-
-    kicker.classList.remove("is-typing");
-    kicker.classList.add("is-cursor");
-    schedule(deleteBack, HOLD_MS);
-  }
-
-  function deleteBack(i = fullText.length) {
-    if (!active) return;
-    kicker.classList.add("is-typing");
-    kicker.classList.remove("is-cursor");
-
-    if (i > 0) {
-      textEl.textContent = fullText.slice(0, i - 1);
-      schedule(() => deleteBack(i - 1), DELETE_MS);
-      return;
-    }
-
-    textEl.textContent = "";
-    schedule(() => typeForward(0), GAP_MS);
-  }
-
-  function startLoop() {
-    if (active || motionOff()) return;
-    active = true;
-    textEl.textContent = "";
-    kicker.classList.add("is-typing");
-    kicker.classList.remove("is-cursor");
-    schedule(() => typeForward(0), START_DELAY_MS);
-  }
-
-  function pauseLoop() {
-    if (!active) return;
-    active = false;
-    clearTimer();
-    textEl.textContent = "";
-    kicker.classList.add("is-typing");
-    kicker.classList.remove("is-cursor");
-  }
-
-  if (motionOff()) {
-    showFull();
-  } else {
-    textEl.textContent = "";
-    kicker.classList.add("is-typing");
-  }
-
-  const sync = () => {
-    if (motionOff()) {
-      active = false;
-      showFull();
-      return;
-    }
-    if (lovePanel.classList.contains("is-inview")) startLoop();
-    else pauseLoop();
-  };
-
-  const visibilityObserver = new MutationObserver(sync);
-  visibilityObserver.observe(lovePanel, {
-    attributes: true,
-    attributeFilter: ["class"],
-  });
-
-  if (typeof mqSceneNarrow.addEventListener === "function") {
-    mqSceneNarrow.addEventListener("change", sync);
-  }
-
-  sync();
+  textEl.textContent = fullText;
+  kicker.classList.remove("is-typing", "is-cursor");
 })();
 
 let envelopeOpened = false;
@@ -639,61 +529,15 @@ function openEnvelope() {
   unlockMoreAudio();
 
   const envelopeEl = document.getElementById("envelope");
-  const sealEmblem = envelopeEl?.querySelector(".envelope-emblem");
   const heroMono = document.querySelector(".hero-monogram");
-  if (!envelopeEl || !sealEmblem || !heroMono) return;
+  if (!envelopeEl) return;
 
-  const finish = () => {
-    document.body.classList.remove("is-sealed");
-    envelopeEl.classList.add("is-open");
-    envelopeEl.setAttribute("aria-hidden", "true");
-    heroMono.style.opacity = "";
-  };
-
-  if (prefersReducedMotion || mqSceneNarrow.matches) {
-    finish();
-    return;
-  }
-
-  const from = sealEmblem.getBoundingClientRect();
-  const to = heroMono.getBoundingClientRect();
-  const flyer = sealEmblem.cloneNode(true);
-  flyer.className = "envelope-flyer";
-  flyer.style.position = "fixed";
-  flyer.style.left = `${from.left}px`;
-  flyer.style.top = `${from.top}px`;
-  flyer.style.width = `${from.width}px`;
-  flyer.style.height = `${from.height}px`;
-  flyer.style.margin = "0";
-  document.body.appendChild(flyer);
-  sealEmblem.style.opacity = "0";
-  envelopeEl.classList.add("is-opening");
-
-  const dx = to.left - from.left;
-  const dy = to.top - from.top;
-  const scale = to.width / from.width;
-
-  const flight = flyer.animate(
-    [
-      { transform: "translate(0, 0) scale(1)" },
-      {
-        transform: `translate(${dx * 0.48}px, ${dy * 0.42 - 36}px) scale(${1 + (scale - 1) * 0.48})`,
-      },
-      { transform: `translate(${dx}px, ${dy}px) scale(${scale})` },
-    ],
-    {
-      duration: 1100,
-      easing: "cubic-bezier(0.77, 0, 0.175, 1)",
-      fill: "forwards",
-    }
-  );
-
-  window.setTimeout(() => envelopeEl.classList.add("is-open"), 380);
-
-  flight.finished.finally(() => {
-    flyer.remove();
-    finish();
-  });
+  /* Instant open — no WAAPI flight, flap tween, or delayed fade. */
+  document.body.classList.remove("is-sealed");
+  envelopeEl.classList.remove("is-opening");
+  envelopeEl.classList.add("is-open");
+  envelopeEl.setAttribute("aria-hidden", "true");
+  if (heroMono) heroMono.style.opacity = "";
 }
 
 (function initEnvelopeLoadGate() {
@@ -1074,14 +918,11 @@ if (mobileRsvpCta) {
       const focusTarget = incomplete || submitArea || form;
       /* Mobile: avoid block:"center" latch feel; keep free native scroll positioning. */
       focusTarget.scrollIntoView({
-        behavior: prefersReducedMotion ? "auto" : "smooth",
+        behavior: "auto",
         block: mqMobileNav.matches ? "nearest" : "center",
       });
       if (incomplete && typeof incomplete.focus === "function") {
-        window.setTimeout(
-          () => incomplete.focus({ preventScroll: true }),
-          prefersReducedMotion ? 0 : 320
-        );
+        incomplete.focus({ preventScroll: true });
       }
       return;
     }

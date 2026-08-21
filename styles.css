@@ -58,6 +58,12 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+  scroll-snap-type: none !important;
+  scroll-snap-align: none !important;
+  scroll-snap-stop: normal !important;
 }
 
 /* Native continuous scroll — never CSS snap. Pill nav uses JS behavior:"smooth". */
@@ -165,11 +171,7 @@ img {
   transition: none;
 }
 
-/* Skip layout/paint work for offscreen sections. */
-.panel:not(.home-panel):not(.story-panel) {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 100svh;
-}
+/* No content-visibility — avoid paint pop-in that feels like size/motion on scroll. */
 
 .panel.is-inview > .panel-fade,
 .panel.is-inview > .stage,
@@ -191,7 +193,7 @@ img {
   justify-content: center;
   padding: clamp(1.5rem, 4vh, 2.5rem);
   background: #faf8f5;
-  transition: opacity 0.72s var(--ease-out), visibility 0.72s;
+  transition: none;
 }
 
 .envelope.is-loading {
@@ -282,7 +284,7 @@ img {
   filter:
     drop-shadow(0 1px 0 rgba(20, 4, 8, 0.45))
     drop-shadow(0 12px 18px rgba(35, 10, 14, 0.22));
-  transition: transform 0.9s var(--ease-out), opacity 0.55s var(--ease-out);
+  transition: none;
 }
 
 .envelope-flap::after {
@@ -308,7 +310,7 @@ img {
   pointer-events: none;
   overflow: visible;
   transform-origin: 50% 0%;
-  transition: transform 0.9s var(--ease-out), opacity 0.55s var(--ease-out);
+  transition: none;
 }
 
 .envelope-flap-edge path {
@@ -359,7 +361,7 @@ img {
 }
 
 .envelope.is-opening .envelope-flap-edge {
-  transition: transform 0.9s var(--ease-out), opacity 0.55s var(--ease-out);
+  transition: none;
 }
 
 /* Wax seal sits on the tip of the downward flap */
@@ -443,8 +445,8 @@ img {
   pointer-events: none;
   filter: drop-shadow(0 8px 14px rgba(53, 20, 26, 0.18));
   transform-origin: 80% 90%;
-  animation: sprig-air 13s var(--ease-in-out) infinite;
-  transition: opacity 0.45s var(--ease-out);
+  animation: none;
+  transition: none;
 }
 
 .envelope-hint {
@@ -454,7 +456,7 @@ img {
   letter-spacing: 0.32em;
   text-transform: uppercase;
   color: color-mix(in srgb, var(--olive) 62%, transparent);
-  transition: opacity 0.45s var(--ease-out);
+  transition: none;
   min-height: 1.35em;
   text-align: center;
   max-width: 22rem;
@@ -480,17 +482,11 @@ img {
   opacity: 0.82;
 }
 
-/* Soft seal breath — desktop only; mobile ≤1100 kills animation globally */
+/* Soft seal breath disabled — site is fully static */
 @media (min-width: 1101px) {
   .envelope.is-loading .envelope-wax {
-    animation: seal-breathe 2.4s var(--ease-in-out) infinite;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .envelope.is-loading .envelope-wax {
-      animation: none;
-      opacity: 0.88;
-    }
+    animation: none;
+    opacity: 0.88;
   }
 }
 
@@ -735,7 +731,7 @@ body.is-nav-open {
     #d2b882 330deg,
     #35141a 360deg
   );
-  animation: rsvp-orbit 6.5s linear infinite;
+  animation: none;
   z-index: -2;
 }
 
@@ -751,8 +747,8 @@ body.is-nav-open {
     #2f4638 74%,
     #4b1d24 100%
   );
-  background-size: 260% 260%;
-  animation: rsvp-wash 3.8s ease-in-out infinite;
+  background-size: 100% 100%;
+  animation: none;
   z-index: -1;
 }
 
@@ -765,7 +761,7 @@ body.is-nav-open {
 }
 
 .pill-rsvp.is-active::after {
-  animation-duration: 2.6s;
+  animation: none;
 }
 
 @keyframes rsvp-orbit {
@@ -912,7 +908,7 @@ body.is-nav-open {
   width: clamp(2.4rem, 4.5vw, 3.1rem);
   height: auto;
   filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.35));
-  animation: monogram-glow 4.5s ease-in-out 1.2s infinite alternate;
+  animation: none;
 }
 
 .hero-center {
@@ -1829,14 +1825,9 @@ body.is-sealed .hero-meta {
 
 .love-story-kicker.is-typing .love-story-kicker-text::after,
 .love-story-kicker.is-cursor .love-story-kicker-text::after {
-  content: "";
-  display: inline-block;
-  width: 0.08em;
-  height: 0.95em;
-  margin-left: 0.12em;
-  vertical-align: -0.08em;
-  background: currentColor;
-  animation: love-kicker-cursor 0.85s steps(1, end) infinite;
+  content: none;
+  display: none;
+  animation: none;
 }
 
 .love-story-kicker.is-cursor .love-story-kicker-text::after {
@@ -2385,8 +2376,8 @@ body.is-sealed .hero-meta {
   );
   opacity: 0.28;
   mix-blend-mode: soft-light;
-  animation: swatch-ambient var(--ambient-dur, 16s) ease-in-out infinite;
-  animation-delay: var(--ambient-delay, 0s);
+  animation: none;
+  animation-delay: 0s;
   pointer-events: none;
 }
 
@@ -2404,8 +2395,8 @@ body.is-sealed .hero-meta {
   );
   transform: translateX(-108%) rotate(var(--glint-angle, 16deg));
   opacity: 0;
-  animation: swatch-glint var(--glint-dur, 14s) cubic-bezier(0.45, 0.05, 0.25, 1) infinite;
-  animation-delay: var(--glint-delay, 0s);
+  animation: none;
+  animation-delay: 0s;
   pointer-events: none;
 }
 
@@ -3939,12 +3930,12 @@ body.is-sealed .hero-meta {
   object-fit: cover;
   display: block;
   filter: saturate(0.9) contrast(1.04);
-  transition: transform 0.85s var(--ease-out);
+  transition: none;
 }
 
 @media (hover: hover) and (pointer: fine) {
   .more-frame:hover img {
-    transform: scale(1.045);
+    transform: none;
   }
 }
 
@@ -5549,4 +5540,182 @@ body.is-sealed .hero-meta {
   .scene-run-photo {
     object-position: center 30% !important;
   }
+}
+
+/* =============================================================================
+   STATIC SITE HARD KILL — no motion, scale, or timed effects on any viewport.
+   Appended last so it wins the cascade for hover/inview leftovers.
+   ============================================================================= */
+html,
+body,
+.snap-root,
+.panel,
+* {
+  scroll-behavior: auto !important;
+  scroll-snap-type: none !important;
+  scroll-snap-align: none !important;
+}
+
+*,
+*::before,
+*::after {
+  animation: none !important;
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+  transition: none !important;
+  transition-duration: 0s !important;
+  transition-delay: 0s !important;
+  will-change: auto !important;
+}
+
+/* Force former entrance targets to final visible state (no scroll/inview reveal) */
+.panel-fade,
+.story-heading,
+.story-body,
+.story-shot img,
+.hero-brand,
+.hero-center,
+.hero-meta,
+.stage,
+.join-stage,
+.invite-compose,
+.sponsors-compose,
+.day-grid > *,
+.day-notes > *,
+.day-beat,
+.day-terminal,
+.info-grid > *,
+.role-group,
+.person-card,
+.itinerary-item,
+.rsvp-head,
+.rsvp-form,
+.rsvp-gifts,
+.rsvp-count-unit,
+.rsvp-title-col,
+.rsvp-body,
+.more-intro,
+.more-listen,
+.more-look-head,
+.stage-intro,
+.stage-card,
+.stage-look-head,
+.more-frame,
+.love-heading,
+.love-person,
+.love-amp,
+.love-story,
+.join-date,
+.join-hashtag,
+.join-palette,
+.join-laurel,
+.join-shot,
+.join-footer,
+.invite-kicker,
+.invite-title,
+.invite-seal,
+.invite-names,
+.sponsors-card,
+.sponsors-photo,
+.sponsors-script,
+.title-sway,
+.day-icon-stroke {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+.envelope.is-open {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.envelope.is-opening .envelope-flap,
+.envelope.is-opening .envelope-flap-edge {
+  transform: none !important;
+  opacity: 1 !important;
+}
+
+/* Layout-only transforms that must remain */
+.pill-nav {
+  transform: translateY(-50%) !important;
+}
+
+.envelope-seal {
+  transform: translate(-50%, -50%) !important;
+}
+
+.invite-butterfly {
+  transform: translate(-50%, -50%) rotate(-8deg) !important;
+}
+
+.envelope-flap-copy,
+.day-rail-track::before {
+  transform: translateX(-50%) !important;
+}
+
+.nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(1) {
+  transform: translateY(calc(var(--nav-toggle-bar-h) + var(--nav-toggle-gap))) rotate(45deg) !important;
+}
+
+.nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(3) {
+  transform: translateY(calc(-1 * (var(--nav-toggle-bar-h) + var(--nav-toggle-gap)))) rotate(-45deg) !important;
+}
+
+.nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(2) {
+  opacity: 0 !important;
+}
+
+/* Kill hover / active size and travel effects */
+.nav-toggle:hover,
+.nav-toggle:focus-visible,
+.nav-toggle:active,
+.rsvp-cta:hover,
+.rsvp-cta:active,
+.btn-primary:hover,
+.btn-primary:active,
+.join-directions:hover,
+.more-frame:hover img,
+.join-shot:hover img,
+.guests-add-btn:hover,
+.guests-step-btn:hover:not(:disabled),
+.guests-modal-cancel:hover {
+  transform: none !important;
+}
+
+.scene-run-photo,
+.scene-run-photo-frame,
+.join-shot img,
+.more-frame img {
+  transform: none !important;
+}
+
+/* Pseudo-elements that only existed for looping motion */
+.pill-rsvp::before,
+.pill-rsvp::after,
+.join-swatch::before,
+.join-swatch::after {
+  animation: none !important;
+}
+
+.join-swatch::before,
+.join-swatch::after {
+  opacity: 0 !important;
+}
+
+.brand-morph-layer,
+.envelope-flyer {
+  display: none !important;
+}
+
+.invite-butterfly .bfly-wing-l,
+.invite-butterfly .bfly-wing-r {
+  animation: none !important;
+  transform: scaleX(0.85) !important;
+}
+
+.love-story-kicker.is-cursor::after,
+.love-story-kicker.is-typing::after {
+  animation: none !important;
+  opacity: 0 !important;
 }
