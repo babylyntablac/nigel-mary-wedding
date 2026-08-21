@@ -47,23 +47,49 @@ function getScenePanProgress() {
   return Math.min(1, Math.max(0, progress));
 }
 
+function getScenePhotoFrame() {
+  return scenePhoto?.closest(".scene-run-photo-frame") || null;
+}
+
+/* ≤1100: mount photo inside #home so it is absolute 100% of page 1 only.
+   Desktop keeps it on .scene-run for sticky Home→Invite handoff. */
+function syncScenePhotoMount() {
+  const frame = getScenePhotoFrame();
+  if (!frame || !sceneRun || !homePanel) return;
+
+  if (mqSceneNarrow.matches) {
+    if (frame.parentElement !== homePanel) {
+      homePanel.insertBefore(frame, homePanel.firstChild);
+    }
+  } else if (frame.parentElement !== sceneRun) {
+    sceneRun.insertBefore(frame, sceneRun.firstChild);
+  }
+}
+
+/* One-shot mobile park: clear inline pan/crop so CSS owns a static hero.
+   Never call from scroll — only init / mq / orientation. */
 function parkMobileScenePhoto() {
   if (!scenePhoto || !sceneRun) return;
-  const { start } = getScenePhotoYRange();
+  syncScenePhotoMount();
   sceneRun.style.setProperty("--scene-pan", "0");
-  sceneRun.style.setProperty("--scene-photo-y", `${start}%`);
-  sceneRun.classList.remove("is-photo-anchored");
-  scenePhoto.style.objectPosition = `center ${start}%`;
+  sceneRun.style.removeProperty("--scene-photo-y");
+  sceneRun.classList.remove("is-photo-anchored", "is-photo-ken-paused");
+  scenePhoto.style.removeProperty("object-position");
+  scenePhoto.style.removeProperty("transform");
+  /* Lock layout height in px so URL-bar show/hide cannot reflow/“zoom” the cover crop. */
+  const h = document.documentElement.clientHeight || window.innerHeight || 0;
+  if (h > 0) {
+    const heroH = `${h}px`;
+    sceneRun.style.setProperty("--mobile-hero-h", heroH);
+    if (homePanel) homePanel.style.setProperty("--mobile-hero-h", heroH);
+  }
 }
 
 function updateScenePan() {
   if (!scenePhoto || !sceneRun || prefersReducedMotion) return;
 
-  /* ≤1100: full-bleed page-1 hero only — no Ken Burns pan / sticky handoff */
-  if (mqSceneNarrow.matches) {
-    parkMobileScenePhoto();
-    return;
-  }
+  /* ≤1100: never pan, scale, or rewrite object-position on scroll */
+  if (mqSceneNarrow.matches) return;
 
   const progress = getScenePanProgress();
   const storyTop = getStoryScrollTop();
@@ -668,6 +694,7 @@ if (panels.length) {
 
   let sceneTick = false;
   const scheduleSceneTick = (forceMeasure = false) => {
+    if (mqSceneNarrow.matches) return;
     if (sceneTick) return;
     sceneTick = true;
     requestAnimationFrame(() => {
@@ -680,10 +707,27 @@ if (panels.length) {
   window.addEventListener("scroll", () => scheduleSceneTick(false), {
     passive: true,
   });
-  window.addEventListener("resize", () => scheduleSceneTick(true), {
-    passive: true,
-  });
-  const onSceneMqChange = () => scheduleSceneTick(true);
+  /* Ignore visualViewport / URL-bar resize churn on narrow — it reflows the cover crop. */
+  window.addEventListener(
+    "resize",
+    () => {
+      if (mqSceneNarrow.matches) return;
+      scheduleSceneTick(true);
+    },
+    { passive: true }
+  );
+  const onSceneMqChange = () => {
+    if (mqSceneNarrow.matches) {
+      parkMobileScenePhoto();
+      updateInviteWash();
+      updateBrandMorph(false);
+      return;
+    }
+    syncScenePhotoMount();
+    sceneRun?.style.removeProperty("--mobile-hero-h");
+    if (homePanel) homePanel.style.removeProperty("--mobile-hero-h");
+    scheduleSceneTick(true);
+  };
   if (typeof mqSceneNarrow.addEventListener === "function") {
     mqSceneNarrow.addEventListener("change", onSceneMqChange);
     mqScenePhone.addEventListener("change", onSceneMqChange);
@@ -691,7 +735,17 @@ if (panels.length) {
     mqSceneNarrow.addListener(onSceneMqChange);
     mqScenePhone.addListener(onSceneMqChange);
   }
-  updateScenePan();
+  window.addEventListener(
+    "orientationchange",
+    () => {
+      if (mqSceneNarrow.matches) {
+        window.setTimeout(parkMobileScenePhoto, 50);
+      }
+    },
+    { passive: true }
+  );
+  if (mqSceneNarrow.matches) parkMobileScenePhoto();
+  else updateScenePan();
   updateInviteWash();
   updateBrandMorph(true);
 

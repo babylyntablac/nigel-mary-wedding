@@ -5297,50 +5297,80 @@ body.is-sealed .hero-meta {
   }
 
   /* Tablet + narrow (≤1100): page-1 hero photo only — no shared pan, lift,
-     Ken Burns, or sticky Home→Invite handoff. Desktop keeps the scene run. */
+     Ken Burns, sticky handoff, or scroll-linked crop. Photo mounts inside
+     #home (JS) and fills it 100% — never fixed, never scales mid-scroll. */
   .scene-run {
     --scene-photo-lift: 0px;
     --scene-photo-y-start: 32%;
     --scene-photo-y-end: 32%;
-    --scene-photo-y: var(--scene-photo-y-start);
+    --scene-photo-y: 32%;
     --scene-pan: 0;
     --scene-title-travel: 0;
   }
 
   .home-panel {
-    position: relative;
-    top: auto;
+    position: relative !important;
+    top: auto !important;
+    height: var(--mobile-hero-h, 100svh);
+    min-height: var(--mobile-hero-h, 100svh);
+    max-height: var(--mobile-hero-h, 100svh);
+    overflow: hidden;
   }
 
+  .home-panel .hero {
+    min-height: 100%;
+    height: 100%;
+  }
+
+  /* Sibling fallback (before JS remount): only the first viewport tall */
   .scene-run-photo-frame,
   .scene-run.is-photo-anchored .scene-run-photo-frame {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: auto;
-    width: 100%;
-    height: 100svh;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: auto !important;
+    width: 100% !important;
+    height: var(--mobile-hero-h, 100svh) !important;
+    transform: none !important;
+    z-index: 0;
+  }
+
+  /* After remount: true 100% of #home */
+  .home-panel > .scene-run-photo-frame {
+    inset: 0 !important;
+    bottom: 0 !important;
+    height: 100% !important;
   }
 
   .scene-run-photo {
-    object-position: center var(--scene-photo-y, 32%);
-    transform: none;
-    animation: none;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    object-fit: cover !important;
+    object-position: center 32% !important;
+    transform: none !important;
+    transform-origin: center center !important;
+    animation: none !important;
+    animation-play-state: paused !important;
   }
 
   .brand-morph-layer {
     display: none !important;
   }
 
+  .hero-center {
+    will-change: auto;
+  }
+
   .home-panel.is-inview .hero-center,
   .scene-run .home-panel:not(.is-inview) .hero-center {
-    transform: none;
+    transform: none !important;
   }
 
   .scene-run .hero-brand {
-    opacity: 1;
-    transform: none;
+    opacity: 1 !important;
+    transform: none !important;
   }
 
   .scene-run .hero-title-soft {
@@ -5930,10 +5960,10 @@ body.is-sealed .hero-meta {
   .scene-run {
     --scene-photo-y-start: 30%;
     --scene-photo-y-end: 30%;
-    --scene-photo-y: var(--scene-photo-y-start);
+    --scene-photo-y: 30%;
   }
 
   .scene-run-photo {
-    object-position: center var(--scene-photo-y, 30%);
+    object-position: center 30% !important;
   }
 }
