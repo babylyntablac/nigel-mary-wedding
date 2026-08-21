@@ -4943,10 +4943,58 @@ body.is-sealed .hero-meta {
   }
 
   .home-panel .hero {
+    /* Absolute slots only — no grid 1fr / env() padding that reflows mid-scroll. */
+    display: block;
+    position: relative;
     min-height: 100%;
     height: 100%;
-    /* Clear floating RSVP CTA in flow — do not absolute-anchor .hero-meta. */
-    padding-bottom: calc(var(--mobile-rsvp-cta-space) + 0.35rem);
+    padding: 0;
+    overflow: hidden;
+  }
+
+  /* Pin brand / title / meta to the fixed --page-home-h box (rem only). */
+  .home-panel .hero-brand {
+    position: absolute !important;
+    top: 2rem;
+    left: 0;
+    right: 0;
+    width: 100%;
+    margin: 0;
+    transform: none !important;
+  }
+
+  .home-panel .hero-center {
+    position: absolute !important;
+    top: 11.5rem;
+    left: 0;
+    right: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0 !important;
+    transform: none !important;
+  }
+
+  .home-panel .hero-title {
+    margin: 0;
+  }
+
+  .home-panel .hero-meta {
+    position: absolute !important;
+    top: auto !important;
+    bottom: 5.75rem;
+    left: 0;
+    right: 0;
+    width: min(22rem, calc(100% - 2rem));
+    max-width: none;
+    margin-inline: auto;
+    padding: 0;
+    transform: none !important;
+    justify-self: auto;
+  }
+
+  .scene-run .hero-title-main {
+    /* Rem only — vw font size would reflow when chrome width-churns. */
+    font-size: 3rem !important;
   }
 
   /* Photo = absolute fill of fixed #home box — clipped by overflow:hidden. */
@@ -5004,7 +5052,7 @@ body.is-sealed .hero-meta {
 
   .scene-run .hero-title-main {
     color: var(--white);
-    font-size: clamp(2.4rem, 11vw, 3.6rem);
+    font-size: 3rem !important;
     text-shadow: 0 3px 24px rgba(0, 0, 0, 0.35);
   }
 
@@ -5290,36 +5338,20 @@ body.is-sealed .hero-meta {
     box-sizing: border-box;
   }
 
-  .hero-center {
-    padding-top: 3rem;
+  /*
+   * Home title + meta: absolute rem pins on #home (see ≤1100 block).
+   * Do not revert to relative/grid flow here.
+   */
+  .home-panel .hero-center {
+    top: 10.25rem;
+    padding-top: 0 !important;
     padding-inline-end: 0;
     box-sizing: border-box;
   }
 
-  /*
-   * Home date/venue: grid row 3 of .hero (normal flow).
-   * Never absolute/fixed to viewport bottom — URL-bar / scroll chrome
-   * would shift meta relative to the hero photo.
-   */
   .home-panel .hero-meta {
-    position: relative;
-    left: auto;
-    right: auto;
-    bottom: auto;
-    top: auto;
-    z-index: 2;
-    width: min(22rem, calc(100% - 2rem));
-    max-width: none;
-    margin-inline: auto;
-    padding-inline: 0;
-    justify-self: center;
-    text-align: center;
-    box-sizing: border-box;
-  }
-
-  .hero-date-block {
-    min-width: min(92%, 18rem);
-    gap: 0.55rem;
+    bottom: 5.5rem;
+    width: min(22rem, calc(100% - 1.5rem));
   }
 
   .home-panel .hero-date-block {
@@ -5332,12 +5364,18 @@ body.is-sealed .hero-meta {
     min-width: 0;
   }
 
+  .hero-date-block {
+    min-width: min(92%, 18rem);
+    gap: 0.55rem;
+  }
+
+  .scene-run .hero-title-main,
   .hero-title-main {
-    font-size: clamp(2.4rem, 11vw, 3.6rem);
+    font-size: 2.75rem !important;
   }
 
   .hero-date-day {
-    font-size: clamp(2.8rem, 14vw, 4rem);
+    font-size: 3.25rem;
   }
 
   .story-panel .hero-date-day {
@@ -5710,14 +5748,6 @@ body.is-sealed .hero-meta {
 
   .hero-brand-name {
     letter-spacing: 0.18em;
-  }
-
-  .home-panel .hero-meta {
-    width: min(22rem, calc(100% - 1.5rem));
-  }
-
-  .home-panel .hero {
-    padding-bottom: calc(var(--mobile-rsvp-cta-space) + 0.2rem);
   }
 
   .invite-card > .hero-meta {
