@@ -59,25 +59,34 @@ function parkScenePhoto() {
   }
 }
 
-/* Join Us bg: lock cover <img> to #join client box in px once (load / orientation /
-   mq only — never scroll). Complements rem-only section height so URL-bar chrome
-   cannot rescale object-fit:cover mid-scroll. */
+/* Cover section bgs: lock <img> to section client box in px once (load /
+   orientation / mq / width-only resize — never scroll or URL-bar height churn).
+   Complements rem-only section height so chrome cannot rescale object-fit:cover. */
 const joinPanel = document.getElementById("join");
 const joinBgImg = joinPanel?.querySelector(".join-media-photo img") || null;
+const entouragePanel = document.getElementById("entourage");
+const entourageBgImg =
+  entouragePanel?.querySelector(".entourage-media-photo img") || null;
 
-function lockJoinBgSize() {
-  if (!joinPanel || !joinBgImg) return;
+function lockSectionBgSize(section, img) {
+  if (!section || !img) return;
   if (!mqSceneNarrow.matches) {
-    joinBgImg.style.removeProperty("width");
-    joinBgImg.style.removeProperty("height");
+    img.style.removeProperty("width");
+    img.style.removeProperty("height");
     return;
   }
-  const w = joinPanel.clientWidth;
-  const h = joinPanel.clientHeight;
+  const w = section.clientWidth;
+  const h = section.clientHeight;
   if (w < 1 || h < 1) return;
   /* Beat mobile stylesheet !important so the crop stays px-stable. */
-  joinBgImg.style.setProperty("width", `${w}px`, "important");
-  joinBgImg.style.setProperty("height", `${h}px`, "important");
+  img.style.setProperty("width", `${w}px`, "important");
+  img.style.setProperty("height", `${h}px`, "important");
+}
+
+function lockCoverSectionBgs() {
+  lockSectionBgSize(joinPanel, joinBgImg);
+  lockSectionBgSize(entouragePanel, entourageBgImg);
+  lockSectionBgSize(homePanel, scenePhoto);
 }
 
 function scrollToSection(id) {
@@ -318,29 +327,50 @@ if (storyPanel) {
 }
 
 parkScenePhoto();
-lockJoinBgSize();
-/* After layout / lazy join-shot images settle, re-lock once (never on scroll). */
-if (joinPanel && typeof window.requestAnimationFrame === "function") {
+lockCoverSectionBgs();
+/* After layout / lazy images settle, re-lock once (never on scroll). */
+if (typeof window.requestAnimationFrame === "function") {
   window.requestAnimationFrame(() => {
-    window.requestAnimationFrame(lockJoinBgSize);
+    window.requestAnimationFrame(lockCoverSectionBgs);
   });
 }
-window.addEventListener("load", lockJoinBgSize, { passive: true });
+window.addEventListener("load", lockCoverSectionBgs, { passive: true });
 joinPanel?.querySelectorAll(".join-shot img").forEach((shot) => {
   if (shot.complete) return;
-  shot.addEventListener("load", lockJoinBgSize, { once: true, passive: true });
+  shot.addEventListener("load", lockCoverSectionBgs, {
+    once: true,
+    passive: true,
+  });
 });
+if (entourageBgImg && !entourageBgImg.complete) {
+  entourageBgImg.addEventListener("load", lockCoverSectionBgs, {
+    once: true,
+    passive: true,
+  });
+}
+if (scenePhoto && !scenePhoto.complete) {
+  scenePhoto.addEventListener("load", lockCoverSectionBgs, {
+    once: true,
+    passive: true,
+  });
+}
 
+/* Width-only resize — ignore height churn from mobile URL-bar show/hide. */
+let lastLayoutWidth = window.innerWidth;
 window.addEventListener(
   "resize",
   () => {
-    if (mqSceneNarrow.matches) parkScenePhoto();
+    const w = window.innerWidth;
+    if (Math.abs(w - lastLayoutWidth) < 1) return;
+    lastLayoutWidth = w;
+    parkScenePhoto();
+    lockCoverSectionBgs();
   },
   { passive: true }
 );
 const onSceneMqChange = () => {
   parkScenePhoto();
-  lockJoinBgSize();
+  lockCoverSectionBgs();
 };
 if (typeof mqSceneNarrow.addEventListener === "function") {
   mqSceneNarrow.addEventListener("change", onSceneMqChange);
@@ -352,8 +382,10 @@ if (typeof mqSceneNarrow.addEventListener === "function") {
 window.addEventListener(
   "orientationchange",
   () => {
-    if (mqSceneNarrow.matches) window.setTimeout(parkScenePhoto, 50);
-    window.setTimeout(lockJoinBgSize, 60);
+    window.setTimeout(() => {
+      parkScenePhoto();
+      lockCoverSectionBgs();
+    }, 60);
   },
   { passive: true }
 );
