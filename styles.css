@@ -844,7 +844,7 @@ body.is-nav-open {
   position: relative;
   top: auto;
   z-index: 1;
-  /* Desktop: one screen. Mobile overrides with px-locked --mobile-hero-h. */
+  /* Desktop: one screen. ≤1100 uses fixed rem --page-home-h + overflow clip. */
   min-height: 100lvh;
   height: 100lvh;
   overflow: hidden;
@@ -1312,7 +1312,7 @@ body.is-sealed .hero-meta {
   grid-template-rows: 1fr;
   place-items: center;
   align-content: stretch;
-  /* Content-only height — never vh/svh/dvh (toile layer fills this box). */
+  /* Desktop: content height. ≤1100 uses fixed rem --page-invite-h + overflow clip. */
   min-height: 0;
   height: auto;
   overflow: visible;
@@ -4717,6 +4717,9 @@ body.is-sealed .hero-meta {
   /* Clearance for fixed bottom RSVP CTA + iOS home indicator */
   :root {
     --mobile-rsvp-cta-space: calc(4.35rem + env(safe-area-inset-bottom, 0px));
+    /* Fixed page boxes — backgrounds clip here; never vh/svh/lvh. */
+    --page-home-h: 44rem;
+    --page-invite-h: 50rem;
   }
 
   /* Phone/tablet: free native vertical scroll only — no snap, no sideways rubber-band.
@@ -4919,14 +4922,14 @@ body.is-sealed .hero-meta {
     --scene-title-travel: 0;
   }
 
+  /* Page 1: fixed rem box; photo clipped to that height only. */
   .home-panel {
     position: relative !important;
     top: auto !important;
-    /* Px from JS (--mobile-hero-h); lvh fallback is stable vs URL-bar show/hide. */
-    height: var(--mobile-hero-h, 100lvh);
-    min-height: var(--mobile-hero-h, 100lvh);
-    max-height: var(--mobile-hero-h, 100lvh);
-    overflow: hidden;
+    height: var(--page-home-h) !important;
+    min-height: var(--page-home-h) !important;
+    max-height: var(--page-home-h) !important;
+    overflow: hidden !important;
   }
 
   .home-panel .hero {
@@ -4936,7 +4939,7 @@ body.is-sealed .hero-meta {
     padding-bottom: calc(var(--mobile-rsvp-cta-space) + 0.35rem);
   }
 
-  /* Cover = absolute fill of #home only (Join Us pattern). Never vh/svh/dvh. */
+  /* Photo = absolute fill of fixed #home box — clipped by overflow:hidden. */
   .scene-run-photo-frame,
   .scene-run.is-photo-anchored .scene-run-photo-frame,
   .home-panel > .scene-run-photo-frame {
@@ -4948,6 +4951,8 @@ body.is-sealed .hero-meta {
     bottom: 0 !important;
     width: 100% !important;
     height: 100% !important;
+    max-height: 100% !important;
+    overflow: hidden !important;
     transform: none !important;
     z-index: 0;
   }
@@ -5149,18 +5154,21 @@ body.is-sealed .hero-meta {
     transform: none !important;
   }
 
-  /* Invite: content-height only — toile fills the section box (Join Us pattern). */
+  /* Page 2: fixed rem box; toile/wash clipped to that height only. */
   .story-panel {
-    height: auto;
-    min-height: 0;
+    height: var(--page-invite-h) !important;
+    min-height: var(--page-invite-h) !important;
+    max-height: var(--page-invite-h) !important;
+    overflow: hidden !important;
   }
 
   .invite-pattern,
   .invite-wash {
     position: absolute !important;
-    inset: -1px 0 !important;
-    width: auto !important;
-    height: auto !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
     transform: none !important;
   }
 
@@ -5362,6 +5370,11 @@ body.is-sealed .hero-meta {
 }
 
 @media (max-width: 560px) {
+  :root {
+    --page-home-h: 42rem;
+    --page-invite-h: 48rem;
+  }
+
   .envelope-stage {
     gap: 0.85rem;
   }

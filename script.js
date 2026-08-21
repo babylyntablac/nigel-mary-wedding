@@ -36,7 +36,8 @@ function syncScenePhotoMount() {
 }
 
 /* One-shot park: clear inline pan/crop so CSS owns a static hero.
-   Never call from scroll — only init / mq / orientation. */
+   Never call from scroll — only init / mq / orientation.
+   Page height is CSS rem (--page-home-h); do not write viewport px. */
 function parkScenePhoto() {
   if (!scenePhoto || !sceneRun) return;
   syncScenePhotoMount();
@@ -45,29 +46,17 @@ function parkScenePhoto() {
   sceneRun.classList.remove("is-photo-anchored", "is-photo-ken-paused");
   scenePhoto.style.removeProperty("object-position");
   scenePhoto.style.removeProperty("transform");
-  /* Narrow: lock layout height in px so URL-bar show/hide cannot reflow the cover crop. */
-  if (mqSceneNarrow.matches) {
-    const h = document.documentElement.clientHeight || window.innerHeight || 0;
-    if (h > 0) {
-      const heroH = `${h}px`;
-      sceneRun.style.setProperty("--mobile-hero-h", heroH);
-      if (homePanel) homePanel.style.setProperty("--mobile-hero-h", heroH);
-    }
-  } else {
-    sceneRun.style.removeProperty("--mobile-hero-h");
-    if (homePanel) homePanel.style.removeProperty("--mobile-hero-h");
-  }
+  sceneRun.style.removeProperty("--mobile-hero-h");
+  if (homePanel) homePanel.style.removeProperty("--mobile-hero-h");
 }
 
-/* Cover section bgs: lock <img> to section client box in px once (load /
-   orientation / mq / width-only resize — never scroll or URL-bar height churn).
-   Complements rem-only section height so chrome cannot rescale object-fit:cover. */
+/* Cover section bgs (Join / Entourage only): lock <img> to section box in px
+   once. Home/Invite use fixed rem page heights + overflow clip — no lock. */
 const joinPanel = document.getElementById("join");
 const joinBgImg = joinPanel?.querySelector(".join-media-photo img") || null;
 const entouragePanel = document.getElementById("entourage");
 const entourageBgImg =
   entouragePanel?.querySelector(".entourage-media-photo img") || null;
-const invitePattern = storyPanel?.querySelector(".invite-pattern") || null;
 
 function lockSectionBgSize(section, img) {
   if (!section || !img) return;
@@ -84,26 +73,9 @@ function lockSectionBgSize(section, img) {
   img.style.setProperty("height", `${h}px`, "important");
 }
 
-/* Invite toile: lock repeat tile size in px (matches clamp(22rem, 48vw, 34rem)). */
-function lockInvitePatternSize() {
-  if (!invitePattern || !storyPanel) return;
-  if (!mqSceneNarrow.matches) {
-    invitePattern.style.removeProperty("background-size");
-    return;
-  }
-  const rootPx =
-    parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
-  const w = storyPanel.clientWidth || window.innerWidth || 0;
-  if (w < 1) return;
-  const tile = Math.min(34 * rootPx, Math.max(22 * rootPx, w * 0.48));
-  invitePattern.style.setProperty("background-size", `${tile}px`, "important");
-}
-
 function lockCoverSectionBgs() {
   lockSectionBgSize(joinPanel, joinBgImg);
   lockSectionBgSize(entouragePanel, entourageBgImg);
-  lockSectionBgSize(homePanel, scenePhoto);
-  lockInvitePatternSize();
 }
 
 function scrollToSection(id) {
@@ -361,12 +333,6 @@ joinPanel?.querySelectorAll(".join-shot img").forEach((shot) => {
 });
 if (entourageBgImg && !entourageBgImg.complete) {
   entourageBgImg.addEventListener("load", lockCoverSectionBgs, {
-    once: true,
-    passive: true,
-  });
-}
-if (scenePhoto && !scenePhoto.complete) {
-  scenePhoto.addEventListener("load", lockCoverSectionBgs, {
     once: true,
     passive: true,
   });
