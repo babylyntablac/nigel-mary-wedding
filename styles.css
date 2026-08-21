@@ -194,6 +194,15 @@ img {
   transition: opacity 0.72s var(--ease-out), visibility 0.72s;
 }
 
+.envelope.is-loading {
+  cursor: default;
+}
+
+.envelope.is-loading .envelope-seal {
+  pointer-events: none;
+  cursor: default;
+}
+
 .envelope.is-open {
   opacity: 0;
   visibility: hidden;
@@ -446,6 +455,53 @@ img {
   text-transform: uppercase;
   color: color-mix(in srgb, var(--olive) 62%, transparent);
   transition: opacity 0.45s var(--ease-out);
+  min-height: 1.35em;
+  text-align: center;
+  max-width: 22rem;
+}
+
+.envelope-hint.is-loading {
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: color-mix(in srgb, var(--olive) 78%, transparent);
+}
+
+.envelope-hint.is-ready-flash {
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: color-mix(in srgb, var(--olive) 88%, transparent);
+}
+
+.envelope.is-loading .envelope-wax {
+  opacity: 0.82;
+}
+
+/* Soft seal breath — desktop only; mobile ≤1100 kills animation globally */
+@media (min-width: 1101px) {
+  .envelope.is-loading .envelope-wax {
+    animation: seal-breathe 2.4s var(--ease-in-out) infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .envelope.is-loading .envelope-wax {
+      animation: none;
+      opacity: 0.88;
+    }
+  }
+}
+
+@keyframes seal-breathe {
+  0%,
+  100% {
+    opacity: 0.78;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 .envelope.is-opening .envelope-sprig,

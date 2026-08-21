@@ -493,9 +493,148 @@ if (panels.length) {
 })();
 
 let envelopeOpened = false;
+let envelopeReady = false;
+
+const ENVELOPE_ASSET_BASE = `${import.meta.env?.BASE_URL ?? ""}`;
+const ENVELOPE_LOAD_TIMEOUT_MS = 14000;
+const ENVELOPE_PHRASE_MS = 2000;
+const ENVELOPE_READY_FLASH_MS = 1400;
+
+const ENVELOPE_LOADING_PHRASES = [
+  "Preparing your invitation…",
+  "Folding the envelope…",
+  "Pressing the wax seal…",
+  "Gathering wedding details…",
+  "Almost ready…",
+];
+
+function envelopeOpenHint() {
+  return mqSceneNarrow.matches ? "Tap to open" : "Click to open";
+}
+
+function waitForWindowLoad() {
+  if (document.readyState === "complete") return Promise.resolve();
+  return new Promise((resolve) => {
+    window.addEventListener("load", () => resolve(), { once: true });
+  });
+}
+
+function waitForFontsReady() {
+  if (!document.fonts?.ready) return Promise.resolve();
+  return document.fonts.ready.catch(() => {});
+}
+
+function waitForStylesheets() {
+  const sheets = [...document.querySelectorAll('link[rel="stylesheet"]')];
+  if (!sheets.length) return Promise.resolve();
+  return Promise.all(
+    sheets.map((link) => {
+      if (link.sheet) return Promise.resolve();
+      return new Promise((resolve) => {
+        link.addEventListener("load", () => resolve(), { once: true });
+        link.addEventListener("error", () => resolve(), { once: true });
+      });
+    })
+  );
+}
+
+function decodeImageElement(img) {
+  if (!img) return Promise.resolve();
+  const settle = () => {
+    if (typeof img.decode === "function") {
+      return img.decode().catch(() => {});
+    }
+    return Promise.resolve();
+  };
+  if (img.complete && img.naturalWidth > 0) return settle();
+  if (img.complete && img.naturalWidth === 0) return Promise.resolve();
+  return new Promise((resolve) => {
+    img.addEventListener(
+      "load",
+      () => {
+        settle().then(resolve);
+      },
+      { once: true }
+    );
+    img.addEventListener("error", () => resolve(), { once: true });
+  });
+}
+
+function preloadImageSrc(src) {
+  if (!src) return Promise.resolve();
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.decoding = "async";
+    img.onload = () => {
+      if (typeof img.decode === "function") {
+        img.decode().then(resolve).catch(resolve);
+      } else {
+        resolve();
+      }
+    };
+    img.onerror = () => resolve();
+    img.src = src;
+  });
+}
+
+function withTimeout(promise, ms) {
+  return Promise.race([
+    Promise.resolve(promise)
+      .then(() => ({ timedOut: false }))
+      .catch(() => ({ timedOut: false })),
+    new Promise((resolve) => {
+      window.setTimeout(() => resolve({ timedOut: true }), ms);
+    }),
+  ]);
+}
+
+function criticalEnvelopeAssets() {
+  const base = ENVELOPE_ASSET_BASE;
+  const scenePhotoEl = document.querySelector(".scene-run-photo");
+  const arkEl = document.querySelector(".invite-ark-flora");
+  const emblemEl = document.querySelector(".envelope-emblem");
+  const sprigEl = document.querySelector(".envelope-sprig");
+  const heroMonoEl = document.querySelector(".hero-monogram");
+
+  /* Warm lazy assets so they are ready before the envelope opens. */
+  if (arkEl && arkEl.loading === "lazy") {
+    arkEl.loading = "eager";
+  }
+
+  const fromDom = [
+    decodeImageElement(scenePhotoEl),
+    decodeImageElement(arkEl),
+    decodeImageElement(emblemEl),
+    decodeImageElement(sprigEl),
+    decodeImageElement(heroMonoEl),
+  ];
+
+  const fromSrc = [
+    preloadImageSrc(`${base}assets/scene.jpg`),
+    preloadImageSrc(`${base}assets/invite-toile-botanical.webp`),
+    preloadImageSrc(`${base}assets/invite-floral-ark.webp`),
+    preloadImageSrc(`${base}assets/envelope-paper.jpg`),
+    preloadImageSrc(`${base}assets/monogram-cut.png`),
+    preloadImageSrc(`${base}assets/envelope-sprig.webp`),
+  ];
+
+  return Promise.all([...fromDom, ...fromSrc]);
+}
+
+function waitForEnvelopeResources() {
+  return withTimeout(
+    Promise.all([
+      waitForWindowLoad(),
+      waitForFontsReady(),
+      waitForStylesheets(),
+      criticalEnvelopeAssets(),
+    ]),
+    ENVELOPE_LOAD_TIMEOUT_MS
+  );
+}
 
 function openEnvelope() {
-  if (envelopeOpened) return;
+  if (!envelopeReady || envelopeOpened) return;
   envelopeOpened = true;
   unlockMoreAudio();
 
@@ -557,10 +696,79 @@ function openEnvelope() {
   });
 }
 
-const envelope = document.getElementById("envelope");
-if (envelope) {
-  envelope.addEventListener("click", openEnvelope);
-}
+(function initEnvelopeLoadGate() {
+  const envelope = document.getElementById("envelope");
+  if (!envelope) return;
+
+  const seal = envelope.querySelector(".envelope-seal");
+  const hint = document.getElementById("envelope-hint");
+  let phraseIndex = 0;
+  let phraseTimer = null;
+
+  function setHint(text, mode) {
+    if (!hint) return;
+    hint.textContent = text;
+    hint.classList.toggle("is-loading", mode === "loading");
+    hint.classList.toggle("is-ready-flash", mode === "ready");
+  }
+
+  function stopPhrases() {
+    if (phraseTimer) {
+      window.clearInterval(phraseTimer);
+      phraseTimer = null;
+    }
+  }
+
+  function startPhrases() {
+    if (!hint) return;
+    setHint(ENVELOPE_LOADING_PHRASES[0], "loading");
+    phraseTimer = window.setInterval(() => {
+      phraseIndex = (phraseIndex + 1) % ENVELOPE_LOADING_PHRASES.length;
+      setHint(ENVELOPE_LOADING_PHRASES[phraseIndex], "loading");
+    }, ENVELOPE_PHRASE_MS);
+  }
+
+  function markEnvelopeReady({ timedOut = false } = {}) {
+    if (envelopeReady) return;
+    envelopeReady = true;
+    stopPhrases();
+
+    document.body.classList.remove("is-envelope-loading");
+    envelope.classList.remove("is-loading");
+    envelope.setAttribute("aria-busy", "false");
+
+    if (seal) {
+      seal.setAttribute("aria-disabled", "false");
+      seal.setAttribute("aria-label", "Open the invitation");
+      seal.removeAttribute("tabindex");
+    }
+
+    setHint(timedOut ? "Ready" : "Your invitation is ready", "ready");
+    window.setTimeout(() => {
+      setHint(envelopeOpenHint(), "open");
+    }, ENVELOPE_READY_FLASH_MS);
+  }
+
+  startPhrases();
+
+  envelope.addEventListener("click", (event) => {
+    if (!envelopeReady) {
+      event.preventDefault();
+      return;
+    }
+    openEnvelope();
+  });
+
+  seal?.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    if (!envelopeReady) {
+      event.preventDefault();
+      return;
+    }
+  });
+
+  waitForEnvelopeResources().then(markEnvelopeReady);
+})();
 
 const form = document.getElementById("rsvp-form");
 const statusEl = document.getElementById("rsvp-status");

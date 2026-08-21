@@ -14,8 +14,8 @@
     />
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body class="is-sealed">
-    <div class="envelope" id="envelope">
+  <body class="is-sealed is-envelope-loading">
+    <div class="envelope is-loading" id="envelope" aria-busy="true">
       <div class="envelope-stage">
         <header class="envelope-intro">
           <p class="envelope-kicker">The wedding of</p>
@@ -38,7 +38,13 @@
           >
             <path d="M0 0 L50 58 L100 0" fill="none" />
           </svg>
-          <button class="envelope-seal" type="button" aria-label="Open the invitation">
+          <button
+            class="envelope-seal"
+            type="button"
+            aria-label="Invitation is still loading"
+            aria-disabled="true"
+            tabindex="-1"
+          >
             <span class="envelope-wax" aria-hidden="true"></span>
             <img class="envelope-emblem" src="assets/monogram-cut.png" alt="" />
           </button>
@@ -50,7 +56,9 @@
           />
         </div>
 
-        <p class="envelope-hint">Click to open</p>
+        <p class="envelope-hint is-loading" id="envelope-hint" aria-live="polite">
+          Preparing your invitation…
+        </p>
       </div>
     </div>
 
