@@ -4725,7 +4725,6 @@ body.is-sealed .hero-meta {
     /* Fixed page boxes — backgrounds clip here; never vh/svh/lvh. */
     --page-home-h: 44rem;
     --page-invite-h: 50rem;
-    --page-join-h: 58rem;
     --page-day-h: 52rem;
     --page-entourage-h: 88rem;
   }
@@ -5147,13 +5146,13 @@ body.is-sealed .hero-meta {
     padding-bottom: max(1.5rem, var(--mobile-rsvp-cta-space));
   }
 
-  /* Join Us: fixed rem box + centered stage (same pattern as Invite). */
+  /* Join Us: height = content (100% of contents). Only the bg image is clipped. */
   .join-panel {
     position: relative !important;
     display: block !important;
-    height: var(--page-join-h) !important;
-    min-height: var(--page-join-h) !important;
-    max-height: var(--page-join-h) !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
     overflow: hidden !important;
     padding: 0 !important;
   }
@@ -5165,7 +5164,9 @@ body.is-sealed .hero-meta {
     width: 100% !important;
     height: 100% !important;
     max-height: 100% !important;
+    overflow: hidden !important;
     transform: none !important;
+    z-index: 0;
   }
 
   .join-media-photo img,
@@ -5179,16 +5180,18 @@ body.is-sealed .hero-meta {
   }
 
   .join-panel > .join-stage {
-    position: absolute !important;
-    top: 0 !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
+    position: relative !important;
+    top: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+    z-index: 2;
     width: min(42rem, calc(100% - 2rem)) !important;
-    height: fit-content;
-    max-height: calc(100% - 1rem);
-    margin: auto !important;
-    padding: 2.25rem 0.75rem !important;
+    height: auto !important;
+    max-height: none !important;
+    margin: 0 auto !important;
+    /* Rem-only padding — no env()/vh so layout cannot reflow mid-scroll. */
+    padding: 2.25rem 0.75rem 5.5rem !important;
     gap: 1.25rem;
     transform: none !important;
     box-sizing: border-box;
@@ -5505,7 +5508,6 @@ body.is-sealed .hero-meta {
   :root {
     --page-home-h: 42rem;
     --page-invite-h: 48rem;
-    --page-join-h: 76rem;
     --page-day-h: 50rem;
     --page-entourage-h: 92rem;
   }
@@ -5676,7 +5678,7 @@ body.is-sealed .hero-meta {
 
   .join-panel > .join-stage {
     width: min(100%, calc(100% - 1.5rem)) !important;
-    padding: 1.85rem 0.25rem !important;
+    padding: 1.85rem 0.25rem 5.25rem !important;
     gap: 1.15rem;
   }
 
