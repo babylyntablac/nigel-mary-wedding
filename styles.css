@@ -843,7 +843,7 @@ body.is-nav-open {
 .home-panel {
   position: relative;
   top: auto;
-  z-index: 1;
+  z-index: auto;
   /* Desktop: one screen. ≤1100 uses fixed rem --page-home-h + overflow clip. */
   min-height: 100lvh;
   height: 100lvh;
@@ -1307,7 +1307,7 @@ body.is-sealed .hero-meta {
 .story-panel {
   --invite-wash: 0.92;
   --invite-pattern: 1;
-  z-index: 2;
+  z-index: auto;
   display: grid;
   grid-template-rows: 1fr;
   place-items: center;
@@ -2158,8 +2158,7 @@ body.is-sealed .hero-meta {
      Absolute .join-media fills this box; URL-bar chrome cannot rescale cover. */
   height: auto;
   min-height: 0;
-  overflow-x: hidden;
-  overflow-y: visible;
+  overflow: hidden;
   isolation: isolate;
   color: var(--ink);
   background:
@@ -3100,10 +3099,12 @@ body.is-sealed .hero-meta {
 }
 
 .day-panel {
+  /* Document-flow stack only — no elevated z-index over neighbors. */
   position: relative;
-  z-index: 2;
+  z-index: auto;
   background: #ffffff;
-  min-height: 100svh;
+  /* Desktop: content height. ≤1100 uses fixed rem --page-day-h. */
+  min-height: 0;
   height: auto;
   overflow: hidden;
 }
@@ -3122,7 +3123,7 @@ body.is-sealed .hero-meta {
   --sponsors-cream: #faf6ef;
   --sponsors-text-shadow: 0 1px 3px rgba(6, 12, 22, 0.55), 0 0 20px rgba(6, 12, 22, 0.35);
   position: relative;
-  z-index: 1;
+  z-index: auto;
   background: #1c241c;
   /* Content-only height — never vh/svh/dvh (overrides .panel min-height).
      Absolute .entourage-media fills this box; URL-bar chrome cannot rescale cover. */
@@ -3191,7 +3192,7 @@ body.is-sealed .hero-meta {
 
 .more-panel {
   position: relative;
-  z-index: 2;
+  z-index: auto;
 }
 
 .day-panel {
@@ -3201,11 +3202,15 @@ body.is-sealed .hero-meta {
 .day-stage {
   display: flex;
   flex-direction: column;
-  min-height: 100svh;
+  /* Content-sized on desktop; mobile fills fixed --page-day-h. Never 100svh. */
+  min-height: 42rem;
+  height: auto;
+  flex: 1 1 auto;
   justify-content: flex-start;
   gap: 0.9rem;
   padding-top: 1.75rem;
   padding-bottom: 1.75rem;
+  box-sizing: border-box;
 }
 
 .day-intro {
@@ -4720,6 +4725,7 @@ body.is-sealed .hero-meta {
     /* Fixed page boxes — backgrounds clip here; never vh/svh/lvh. */
     --page-home-h: 44rem;
     --page-invite-h: 50rem;
+    --page-day-h: 52rem;
   }
 
   /* Phone/tablet: free native vertical scroll only — no snap, no sideways rubber-band.
@@ -4735,10 +4741,14 @@ body.is-sealed .hero-meta {
   }
 
   .panel {
+    position: relative;
+    z-index: auto;
     scroll-snap-align: none;
     scroll-snap-stop: normal;
     touch-action: pan-y;
     max-width: 100%;
+    /* Stack in document order only — no float/overlap over neighbors. */
+    transform: none;
   }
 
   /* Hard kill: no CSS motion on hamburger / phone+tablet. Desktop (>1100) unchanged. */
@@ -5172,6 +5182,23 @@ body.is-sealed .hero-meta {
     transform: none !important;
   }
 
+  /* Page 3 (The Day): fixed rem box in document stack — no 100svh reflow. */
+  .day-panel {
+    position: relative !important;
+    z-index: auto !important;
+    height: var(--page-day-h) !important;
+    min-height: var(--page-day-h) !important;
+    max-height: var(--page-day-h) !important;
+    overflow: hidden !important;
+  }
+
+  .day-panel > .day-stage,
+  .day-stage {
+    min-height: 0 !important;
+    height: 100% !important;
+    max-height: 100% !important;
+  }
+
   .day-stage {
     padding-top: 1.35rem;
     padding-bottom: max(1.35rem, var(--mobile-rsvp-cta-space));
@@ -5373,6 +5400,7 @@ body.is-sealed .hero-meta {
   :root {
     --page-home-h: 42rem;
     --page-invite-h: 48rem;
+    --page-day-h: 50rem;
   }
 
   .envelope-stage {
