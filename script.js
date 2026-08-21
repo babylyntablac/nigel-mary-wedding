@@ -91,8 +91,9 @@ function scrollToSection(id) {
   const target = document.getElementById(id);
   if (!target) return;
 
-  /* Nav clicks may smooth-scroll; finger scroll stays CSS scroll-behavior:auto on mobile. */
-  const scrollBehavior = prefersReducedMotion ? "auto" : "smooth";
+  /* Nav clicks may smooth-scroll on desktop; mobile stays instant (no motion feel). */
+  const scrollBehavior =
+    prefersReducedMotion || mqSceneNarrow.matches ? "auto" : "smooth";
   const { start: photoYStart, end: photoYEnd } = getScenePhotoYRange();
   const mobileScene = mqSceneNarrow.matches;
 
@@ -694,8 +695,8 @@ if (panels.length) {
   updateInviteWash();
   updateBrandMorph(true);
 
-  /* Pause Ken Burns while the park photo isn’t on screen (saves paint). */
-  if (sceneRun && scenePhoto && !prefersReducedMotion) {
+  /* Pause Ken Burns while the park photo isn’t on screen (saves paint). Desktop only. */
+  if (sceneRun && scenePhoto && !prefersReducedMotion && !mqSceneNarrow.matches) {
     const kenIo = new IntersectionObserver(
       ([entry]) => {
         sceneRun.classList.toggle(
@@ -770,6 +771,10 @@ if (panels.length) {
   let active = false;
   let flightAnim = null;
   let loopToken = 0;
+
+  function motionOff() {
+    return prefersReducedMotion || mqSceneNarrow.matches;
+  }
 
   function perchTransform(perch) {
     const w = ark.offsetWidth || 1;
@@ -863,7 +868,7 @@ if (panels.length) {
   }
 
   function start() {
-    if (prefersReducedMotion || active) return;
+    if (motionOff() || active) return;
     active = true;
     loopToken += 1;
     loop(loopToken);
@@ -880,13 +885,19 @@ if (panels.length) {
     setPose(PERCHES[perchIndex]);
   }
 
-  if (prefersReducedMotion) {
+  function parkStatic() {
+    stop();
     butterfly.classList.add("is-perched");
     butterfly.classList.remove("is-flying");
-    return;
+    perchIndex = 2;
+    butterfly.style.transform = "";
   }
 
   const syncVisibility = () => {
+    if (motionOff()) {
+      parkStatic();
+      return;
+    }
     if (storyPanel.classList.contains("is-inview")) start();
     else stop();
   };
@@ -900,11 +911,19 @@ if (panels.length) {
   window.addEventListener(
     "resize",
     () => {
-      if (!active && !prefersReducedMotion) setPose(PERCHES[perchIndex]);
+      if (motionOff()) {
+        parkStatic();
+        return;
+      }
+      if (!active) setPose(PERCHES[perchIndex]);
       else if (!flightAnim) setPose(PERCHES[perchIndex]);
     },
     { passive: true }
   );
+
+  if (typeof mqSceneNarrow.addEventListener === "function") {
+    mqSceneNarrow.addEventListener("change", syncVisibility);
+  }
 
   syncVisibility();
 })();
@@ -925,6 +944,10 @@ if (panels.length) {
 
   let active = false;
   let timer = null;
+
+  function motionOff() {
+    return prefersReducedMotion || mqSceneNarrow.matches;
+  }
 
   function clearTimer() {
     if (timer) {
@@ -976,7 +999,7 @@ if (panels.length) {
   }
 
   function startLoop() {
-    if (active) return;
+    if (active || motionOff()) return;
     active = true;
     textEl.textContent = "";
     kicker.classList.add("is-typing");
@@ -993,15 +1016,19 @@ if (panels.length) {
     kicker.classList.remove("is-cursor");
   }
 
-  if (prefersReducedMotion) {
+  if (motionOff()) {
     showFull();
-    return;
+  } else {
+    textEl.textContent = "";
+    kicker.classList.add("is-typing");
   }
 
-  textEl.textContent = "";
-  kicker.classList.add("is-typing");
-
   const sync = () => {
+    if (motionOff()) {
+      active = false;
+      showFull();
+      return;
+    }
     if (lovePanel.classList.contains("is-inview")) startLoop();
     else pauseLoop();
   };
@@ -1011,6 +1038,10 @@ if (panels.length) {
     attributes: true,
     attributeFilter: ["class"],
   });
+
+  if (typeof mqSceneNarrow.addEventListener === "function") {
+    mqSceneNarrow.addEventListener("change", sync);
+  }
 
   sync();
 })();
@@ -1034,7 +1065,7 @@ function openEnvelope() {
     heroMono.style.opacity = "";
   };
 
-  if (prefersReducedMotion) {
+  if (prefersReducedMotion || mqSceneNarrow.matches) {
     finish();
     return;
   }

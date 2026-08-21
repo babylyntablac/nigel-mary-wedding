@@ -5127,6 +5127,162 @@ body.is-sealed .hero-meta {
     max-width: 100%;
   }
 
+  /* Hard kill: no CSS motion on hamburger / phone+tablet. Desktop (>1100) unchanged. */
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+
+  .snap-root::after {
+    display: none;
+  }
+
+  .panel:not(.is-inview) > .panel-fade,
+  .panel:not(.is-inview) > .stage,
+  .panel:not(.is-inview) > .join-stage,
+  .panel:not(.is-inview) > .invite-compose,
+  .panel:not(.is-inview) > .sponsors-compose,
+  .home-panel:not(.is-inview) .hero-brand,
+  .home-panel:not(.is-inview) .hero-center,
+  .home-panel:not(.is-inview) .hero-meta,
+  .panel:not(.is-inview) .day-beat,
+  .panel:not(.is-inview) .day-terminal,
+  .panel:not(.is-inview) .day-grid > *,
+  .panel:not(.is-inview) .day-notes > *,
+  .panel:not(.is-inview) .info-grid > *,
+  .panel:not(.is-inview) .role-group,
+  .panel:not(.is-inview) .person-card,
+  .panel:not(.is-inview) .itinerary-item,
+  .panel:not(.is-inview) .rsvp-head,
+  .panel:not(.is-inview) .rsvp-form,
+  .panel:not(.is-inview) .rsvp-gifts,
+  .panel:not(.is-inview) .rsvp-count-unit,
+  .panel:not(.is-inview) .rsvp-title-col,
+  .panel:not(.is-inview) .rsvp-body,
+  .panel:not(.is-inview) .more-intro,
+  .panel:not(.is-inview) .more-listen,
+  .panel:not(.is-inview) .more-look-head,
+  .panel:not(.is-inview) .stage-intro,
+  .panel:not(.is-inview) .stage-card,
+  .panel:not(.is-inview) .stage-look-head,
+  .panel:not(.is-inview) .more-frame,
+  .story-panel:not(.is-inview) .invite-kicker,
+  .story-panel:not(.is-inview) .invite-title,
+  .story-panel:not(.is-inview) .invite-names,
+  .story-panel:not(.is-inview) .invite-seal,
+  .story-panel:not(.is-inview) .invite-card > .hero-meta,
+  .love-panel:not(.is-inview) .love-heading,
+  .love-panel:not(.is-inview) .love-person,
+  .love-panel:not(.is-inview) .love-amp,
+  .love-panel:not(.is-inview) .love-story,
+  .join-panel:not(.is-inview) .join-date,
+  .join-panel:not(.is-inview) .join-hashtag,
+  .join-panel:not(.is-inview) .join-palette,
+  .join-panel:not(.is-inview) .join-laurel,
+  .join-panel:not(.is-inview) .join-shot,
+  .join-panel:not(.is-inview) .join-footer {
+    opacity: 1 !important;
+    transform: none !important;
+    visibility: visible !important;
+  }
+
+  .hero-brand,
+  .hero-title,
+  .hero-meta,
+  .hero-center {
+    opacity: 1;
+    transform: none;
+  }
+
+  .hero-monogram,
+  .envelope-sprig,
+  .scene-run-photo,
+  .day-panel.is-inview .day-icon-stroke,
+  .love-panel.is-inview .love-pill,
+  .love-panel.is-inview .love-amp,
+  .mobile-rsvp-cta::before,
+  .mobile-rsvp-cta::after,
+  .swatch-ambient,
+  .swatch-glint,
+  .sponsors-compose.is-inview,
+  .sponsors-compose.is-inview .sponsors-photo,
+  .sponsors-compose.is-inview .sponsors-script {
+    animation: none !important;
+  }
+
+  .day-icon-stroke {
+    stroke-dashoffset: 0;
+    opacity: 1;
+    animation: none !important;
+  }
+
+  .join-shot img,
+  .join-panel.is-inview .join-shot img,
+  .join-panel.is-inview .join-shot:hover img,
+  .join-media-photo img,
+  .join-panel.is-inview.join-on-photo .join-media-photo img,
+  .scene-run-photo,
+  .home-panel.is-inview .hero-center,
+  .scene-run .home-panel:not(.is-inview) .hero-center,
+  .scene-run .hero-brand,
+  .nav-toggle:hover,
+  .nav-toggle:focus-visible,
+  .nav-toggle:active,
+  .mobile-rsvp-cta:active {
+    transform: none !important;
+  }
+
+  .mobile-rsvp-cta:active {
+    transform: translateX(-50%) !important;
+  }
+
+  .invite-butterfly {
+    opacity: 0.88;
+    left: 49%;
+    top: 9%;
+    transform: translate(-50%, -50%) rotate(-8deg) !important;
+  }
+
+  .invite-butterfly .bfly-wing-l,
+  .invite-butterfly .bfly-wing-r {
+    animation: none !important;
+    transform: scaleX(0.85);
+  }
+
+  .brand-morph-layer {
+    display: none !important;
+  }
+
+  .scene-run.is-brand-morphing .hero-brand,
+  .scene-run.is-brand-morphing .home-panel > .hero .hero-meta,
+  .scene-run.is-brand-morphing [data-morph],
+  .scene-run.is-brand-morphing [data-morph-target],
+  .scene-run.is-brand-morphing .invite-seal,
+  .scene-run.is-brand-morphing .invite-names,
+  .scene-run.is-brand-morphing .invite-card > .hero-meta,
+  .scene-run.is-brand-morphing.is-brand-handing-off [data-morph-target],
+  .scene-run.is-brand-morphing.is-brand-handing-off .invite-seal,
+  .scene-run.is-brand-morphing.is-brand-handing-off .invite-names,
+  .scene-run.is-brand-morphing.is-brand-handing-off .invite-card > .hero-meta,
+  .scene-run.is-brand-settled .home-panel .hero-brand,
+  .scene-run.is-brand-settled .home-panel .hero-meta[data-morph] {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  .love-story-kicker.is-typing .love-story-kicker-text::after,
+  .love-story-kicker.is-cursor .love-story-kicker-text::after {
+    animation: none !important;
+    display: none;
+  }
+
+  .nav-toggle-bar {
+    transition: none !important;
+  }
+
   /* Avoid 100vw / large vw mins that inflate scroll width on iOS */
   .hero-title {
     max-width: min(94%, 48rem);
@@ -5204,55 +5360,6 @@ body.is-sealed .hero-meta {
     background-color: #f3eee4;
   }
 
-  /* Fade-only panel entrances — no scale / slide zoom feel on phone scroll */
-  .panel:not(.is-inview) > .panel-fade,
-  .panel:not(.is-inview) > .stage,
-  .panel:not(.is-inview) > .join-stage,
-  .panel:not(.is-inview) > .invite-compose,
-  .panel:not(.is-inview) > .sponsors-compose,
-  .panel:not(.is-inview) .day-beat,
-  .panel:not(.is-inview) .day-terminal,
-  .panel:not(.is-inview) .day-grid > *,
-  .panel:not(.is-inview) .day-notes > *,
-  .panel:not(.is-inview) .info-grid > *,
-  .panel:not(.is-inview) .role-group,
-  .panel:not(.is-inview) .person-card,
-  .panel:not(.is-inview) .itinerary-item,
-  .panel:not(.is-inview) .rsvp-head,
-  .panel:not(.is-inview) .rsvp-form,
-  .panel:not(.is-inview) .rsvp-gifts,
-  .panel:not(.is-inview) .rsvp-count-unit,
-  .panel:not(.is-inview) .rsvp-title-col,
-  .panel:not(.is-inview) .rsvp-body,
-  .panel:not(.is-inview) .more-intro,
-  .panel:not(.is-inview) .more-listen,
-  .panel:not(.is-inview) .more-look-head,
-  .panel:not(.is-inview) .stage-intro,
-  .panel:not(.is-inview) .stage-card,
-  .panel:not(.is-inview) .stage-look-head,
-  .panel:not(.is-inview) .more-frame,
-  .love-panel:not(.is-inview) .love-heading,
-  .love-panel:not(.is-inview) .love-person,
-  .love-panel:not(.is-inview) .love-amp,
-  .love-panel:not(.is-inview) .love-story,
-  .home-panel:not(.is-inview) .hero-brand,
-  .home-panel:not(.is-inview) .hero-center,
-  .home-panel:not(.is-inview) .hero-meta {
-    transform: none;
-  }
-
-  .panel:not(.is-inview) > .panel-fade,
-  .panel:not(.is-inview) > .stage,
-  .panel:not(.is-inview) > .join-stage,
-  .panel:not(.is-inview) > .invite-compose,
-  .panel:not(.is-inview) > .sponsors-compose,
-  .love-panel:not(.is-inview) .love-heading,
-  .love-panel:not(.is-inview) .love-person,
-  .love-panel:not(.is-inview) .love-amp,
-  .love-panel:not(.is-inview) .love-story {
-    transition: opacity 0.55s var(--ease-out);
-  }
-
   /* Persistent bottom CTA — primary; menu RSVP stays as secondary */
   .mobile-rsvp-cta {
     display: inline-flex;
@@ -5282,10 +5389,6 @@ body.is-sealed .hero-meta {
     box-shadow:
       0 10px 28px rgba(53, 20, 26, 0.38),
       0 0 0 1px color-mix(in srgb, var(--gold) 22%, transparent);
-    transition:
-      opacity 0.35s ease,
-      visibility 0.35s ease,
-      transform 0.22s var(--ease-out);
   }
 
   .mobile-rsvp-cta::before {
@@ -5302,7 +5405,6 @@ body.is-sealed .hero-meta {
       #d2b882 330deg,
       #35141a 360deg
     );
-    animation: rsvp-orbit 6.5s linear infinite;
     z-index: -2;
   }
 
@@ -5319,7 +5421,6 @@ body.is-sealed .hero-meta {
       #4b1d24 100%
     );
     background-size: 260% 260%;
-    animation: rsvp-wash 3.8s ease-in-out infinite;
     z-index: -1;
   }
 
@@ -5328,22 +5429,11 @@ body.is-sealed .hero-meta {
     outline-offset: 3px;
   }
 
-  .mobile-rsvp-cta:active {
-    transform: translateX(-50%) scale(0.98);
-  }
-
   /* Hide while the full-screen hamburger menu is open */
   body.is-nav-open .mobile-rsvp-cta {
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .mobile-rsvp-cta::before,
-    .mobile-rsvp-cta::after {
-      animation: none;
-    }
   }
 
   /* Keep section content clear of the floating CTA */
@@ -5405,9 +5495,6 @@ body.is-sealed .hero-meta {
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transition:
-      opacity 0.35s var(--ease-out),
-      visibility 0.35s var(--ease-out);
   }
 
   .pill-nav.is-open {
