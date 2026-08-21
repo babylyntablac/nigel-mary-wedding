@@ -2149,9 +2149,10 @@ body.is-sealed .hero-meta {
   display: flex;
   align-items: safe center;
   justify-content: center;
-  /* Content-sized section — bg absolute fill tracks this box, not the viewport */
+  /* Content-only height — never vh/svh/dvh (overrides .panel min-height).
+     Absolute .join-media fills this box; URL-bar chrome cannot rescale cover. */
   height: auto;
-  min-height: 100svh;
+  min-height: 0;
   overflow-x: hidden;
   overflow-y: visible;
   isolation: isolate;
@@ -2176,9 +2177,8 @@ body.is-sealed .hero-meta {
 }
 
 /* Full-bleed photo + wash — fills #join's content box only (not the visual
-   viewport). Stretch 100%×100% (object-fit: fill), never cover: cover
-   re-crops when section aspect changes and reads as zoom while scrolling.
-   Never sticky/fixed / 100dvh on the photo layer. */
+   viewport). Never sticky/fixed / 100dvh: mobile URL-bar show/hide would
+   resize the cover crop and read as zoom-in/out while scrolling. */
 .join-media {
   position: absolute;
   inset: 0;
@@ -2213,13 +2213,11 @@ body.is-sealed .hero-meta {
 
 .join-media-photo img {
   display: block;
-  position: absolute;
-  inset: 0;
   width: 100%;
   height: 100%;
   max-width: none;
-  object-fit: fill;
-  object-position: center;
+  object-fit: cover;
+  object-position: center 42%;
   user-select: none;
   transform: none;
   transform-origin: center center;
@@ -2233,7 +2231,13 @@ body.is-sealed .hero-meta {
 .join-media-wash {
   position: absolute;
   inset: 0;
+  width: auto;
+  height: auto;
   background: var(--join-overlay);
+  background-size: 100% 100%;
+  transform: none;
+  opacity: 1;
+  pointer-events: none;
 }
 
 /* Photo mode: light cream type on dark champagne wash */
@@ -2300,13 +2304,12 @@ body.is-sealed .hero-meta {
   z-index: 2;
   width: min(54rem, calc(100% - 4.75rem));
   margin: 0 auto;
-  /* svh (not vh/dvh): classic vh tracks mobile chrome and reflows #join;
-     padding only — photo uses width/height 100% fill, not vh. */
-  padding: clamp(2.35rem, 5.5svh, 3.75rem) 1rem clamp(2.5rem, 6svh, 3.85rem);
+  /* Rem-only vertical rhythm — zero viewport units so cover crop stays fixed. */
+  padding: 2.75rem 1rem 3rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(1.15rem, 2.8svh, 1.85rem);
+  gap: 1.45rem;
   text-align: center;
 }
 
@@ -2326,7 +2329,7 @@ body.is-sealed .hero-meta {
 .join-title {
   margin: 0;
   color: var(--olive);
-  font-size: clamp(3.15rem, 7.8svh, 4.85rem);
+  font-size: clamp(3.15rem, 6.5vw, 4.85rem);
   line-height: 0.92;
   letter-spacing: 0.01em;
 }
@@ -2338,7 +2341,7 @@ body.is-sealed .hero-meta {
   border-radius: 0;
   background: none;
   font-family: var(--font-sans);
-  font-size: clamp(0.92rem, 1.9svh, 1.05rem);
+  font-size: clamp(0.92rem, 1.35vw, 1.05rem);
   font-weight: 600;
   letter-spacing: 0.12em;
   color: color-mix(in srgb, var(--ink) 58%, transparent);
@@ -2347,7 +2350,7 @@ body.is-sealed .hero-meta {
 .join-hashtag {
   margin: 0;
   font-family: var(--font-sans);
-  font-size: clamp(0.72rem, 1.45svh, 0.84rem);
+  font-size: clamp(0.72rem, 1.1vw, 0.84rem);
   font-weight: 500;
   letter-spacing: 0.04em;
   color: color-mix(in srgb, var(--ink) 52%, transparent);
@@ -2512,7 +2515,7 @@ body.is-sealed .hero-meta {
 .join-hour-label {
   margin: 0;
   font-family: var(--font-script);
-  font-size: clamp(1.95rem, 4svh, 2.7rem);
+  font-size: clamp(1.95rem, 3.2vw, 2.7rem);
   font-weight: 400;
   line-height: 1;
   color: var(--cherry);
@@ -2588,7 +2591,7 @@ body.is-sealed .hero-meta {
 .join-hour-meta {
   margin: 0.1rem 0 0;
   font-family: var(--font-sans);
-  font-size: clamp(0.7rem, 1.45svh, 0.82rem);
+  font-size: clamp(0.7rem, 1.05vw, 0.82rem);
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -2629,7 +2632,7 @@ body.is-sealed .hero-meta {
 .join-place-name {
   margin: 0.08rem 0 0;
   font-family: var(--font-script);
-  font-size: clamp(1.7rem, 3.4svh, 2.2rem);
+  font-size: clamp(1.7rem, 2.8vw, 2.2rem);
   font-style: normal;
   font-weight: 400;
   line-height: 1.08;
@@ -2639,7 +2642,7 @@ body.is-sealed .hero-meta {
 .join-place-address {
   margin: 0.2rem 0 0;
   font-family: var(--font-body);
-  font-size: clamp(0.82rem, 1.55svh, 0.92rem);
+  font-size: clamp(0.82rem, 1.2vw, 0.92rem);
   line-height: 1.45;
   color: color-mix(in srgb, var(--ink) 55%, transparent);
 }
@@ -4493,8 +4496,8 @@ body.is-sealed .hero-meta {
 
   .join-stage {
     width: min(42rem, calc(100% - 2.5rem));
-    padding: clamp(1.85rem, 4.2svh, 2.65rem) 0.5rem clamp(2.1rem, 4.8svh, 2.9rem);
-    gap: clamp(1.05rem, 2.6svh, 1.55rem);
+    padding: 2.35rem 0.5rem 2.65rem;
+    gap: 1.25rem;
   }
 
   .join-hours {
@@ -5073,11 +5076,10 @@ body.is-sealed .hero-meta {
     padding-bottom: max(1.5rem, var(--mobile-rsvp-cta-space));
   }
 
-  /* Join Us: rem-locked vertical rhythm; photo stretches 100%×100% fill
-     so URL-bar height changes cannot re-crop mid-scroll. */
+  /* Join Us: content-height only — no viewport min-height (overrides .panel). */
   .join-panel {
     height: auto;
-    min-height: 100svh;
+    min-height: 0;
   }
 
   .join-panel > .join-stage {
@@ -5099,13 +5101,11 @@ body.is-sealed .hero-meta {
 
   .join-media-photo img,
   .join-panel.is-inview.join-on-photo .join-media-photo img {
-    position: absolute !important;
-    inset: 0 !important;
     width: 100% !important;
     height: 100% !important;
     max-width: none !important;
-    object-fit: fill !important;
-    object-position: center !important;
+    object-fit: cover !important;
+    object-position: center 42% !important;
     transform: none !important;
   }
 
@@ -5552,13 +5552,11 @@ body.is-sealed .hero-meta {
   }
 
   .join-media-photo img {
-    position: absolute !important;
-    inset: 0 !important;
     width: 100% !important;
     height: 100% !important;
     max-width: none !important;
-    object-fit: fill !important;
-    object-position: center !important;
+    object-fit: cover !important;
+    object-position: center 42% !important;
   }
 
   .itinerary-item {

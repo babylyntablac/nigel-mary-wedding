@@ -59,6 +59,27 @@ function parkScenePhoto() {
   }
 }
 
+/* Join Us bg: lock cover <img> to #join client box in px once (load / orientation /
+   mq only — never scroll). Complements rem-only section height so URL-bar chrome
+   cannot rescale object-fit:cover mid-scroll. */
+const joinPanel = document.getElementById("join");
+const joinBgImg = joinPanel?.querySelector(".join-media-photo img") || null;
+
+function lockJoinBgSize() {
+  if (!joinPanel || !joinBgImg) return;
+  if (!mqSceneNarrow.matches) {
+    joinBgImg.style.removeProperty("width");
+    joinBgImg.style.removeProperty("height");
+    return;
+  }
+  const w = joinPanel.clientWidth;
+  const h = joinPanel.clientHeight;
+  if (w < 1 || h < 1) return;
+  /* Beat mobile stylesheet !important so the crop stays px-stable. */
+  joinBgImg.style.setProperty("width", `${w}px`, "important");
+  joinBgImg.style.setProperty("height", `${h}px`, "important");
+}
+
 function scrollToSection(id) {
   const target = document.getElementById(id);
   if (!target) return;
@@ -297,6 +318,18 @@ if (storyPanel) {
 }
 
 parkScenePhoto();
+lockJoinBgSize();
+/* After layout / lazy join-shot images settle, re-lock once (never on scroll). */
+if (joinPanel && typeof window.requestAnimationFrame === "function") {
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(lockJoinBgSize);
+  });
+}
+window.addEventListener("load", lockJoinBgSize, { passive: true });
+joinPanel?.querySelectorAll(".join-shot img").forEach((shot) => {
+  if (shot.complete) return;
+  shot.addEventListener("load", lockJoinBgSize, { once: true, passive: true });
+});
 
 window.addEventListener(
   "resize",
@@ -305,7 +338,10 @@ window.addEventListener(
   },
   { passive: true }
 );
-const onSceneMqChange = () => parkScenePhoto();
+const onSceneMqChange = () => {
+  parkScenePhoto();
+  lockJoinBgSize();
+};
 if (typeof mqSceneNarrow.addEventListener === "function") {
   mqSceneNarrow.addEventListener("change", onSceneMqChange);
   mqScenePhone.addEventListener("change", onSceneMqChange);
@@ -317,6 +353,7 @@ window.addEventListener(
   "orientationchange",
   () => {
     if (mqSceneNarrow.matches) window.setTimeout(parkScenePhoto, 50);
+    window.setTimeout(lockJoinBgSize, 60);
   },
   { passive: true }
 );
