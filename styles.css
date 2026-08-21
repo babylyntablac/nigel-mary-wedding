@@ -806,8 +806,8 @@ body.is-nav-open {
   right: 0;
   bottom: auto;
   width: 100%;
-  /* Sibling fallback before JS remount: first viewport only */
-  height: 100svh;
+  /* Fill parent box only — never vh/svh/dvh (URL-bar chrome would reflow crop). */
+  height: 100%;
   overflow: hidden;
   pointer-events: none;
   z-index: 0;
@@ -844,22 +844,25 @@ body.is-nav-open {
   position: relative;
   top: auto;
   z-index: 1;
-  min-height: 100svh;
-  height: 100svh;
+  /* Desktop: one screen. Mobile overrides with px-locked --mobile-hero-h. */
+  min-height: 100lvh;
+  height: 100lvh;
   overflow: hidden;
   background-color: transparent;
 }
 
 .hero {
   position: relative;
-  min-height: 100svh;
+  min-height: 100%;
+  height: 100%;
   display: grid;
   grid-template-rows: auto 1fr auto;
   align-items: center;
   justify-items: center;
   color: var(--white);
   overflow: hidden;
-  /* Rem-only padding — zero vh so hero box / cover crop stay fixed. */
+  /* Rem-only padding — zero vh so hero box / cover crop stay fixed.
+     Meta stays in grid row 3 (document flow), not absolute/fixed to viewport. */
   padding: 2rem 1.5rem 2.25rem;
 }
 
@@ -1110,6 +1113,14 @@ body.is-nav-open {
 }
 
 .home-panel .hero-meta {
+  position: relative;
+  inset: auto;
+  width: min(22rem, calc(100% - 2rem));
+  max-width: none;
+  margin-inline: auto;
+  justify-self: center;
+  text-align: center;
+  box-sizing: border-box;
   opacity: 1;
   transform: none;
 }
@@ -4911,36 +4922,34 @@ body.is-sealed .hero-meta {
   .home-panel {
     position: relative !important;
     top: auto !important;
-    height: var(--mobile-hero-h, 100svh);
-    min-height: var(--mobile-hero-h, 100svh);
-    max-height: var(--mobile-hero-h, 100svh);
+    /* Px from JS (--mobile-hero-h); lvh fallback is stable vs URL-bar show/hide. */
+    height: var(--mobile-hero-h, 100lvh);
+    min-height: var(--mobile-hero-h, 100lvh);
+    max-height: var(--mobile-hero-h, 100lvh);
     overflow: hidden;
   }
 
   .home-panel .hero {
     min-height: 100%;
     height: 100%;
+    /* Clear floating RSVP CTA in flow — do not absolute-anchor .hero-meta. */
+    padding-bottom: calc(var(--mobile-rsvp-cta-space) + 0.35rem);
   }
 
-  /* Sibling fallback (before JS remount): only the first viewport tall */
+  /* Cover = absolute fill of #home only (Join Us pattern). Never vh/svh/dvh. */
   .scene-run-photo-frame,
-  .scene-run.is-photo-anchored .scene-run-photo-frame {
+  .scene-run.is-photo-anchored .scene-run-photo-frame,
+  .home-panel > .scene-run-photo-frame {
     position: absolute !important;
+    inset: 0 !important;
     top: 0 !important;
     left: 0 !important;
     right: 0 !important;
-    bottom: auto !important;
+    bottom: 0 !important;
     width: 100% !important;
-    height: var(--mobile-hero-h, 100svh) !important;
+    height: 100% !important;
     transform: none !important;
     z-index: 0;
-  }
-
-  /* After remount: true 100% of #home */
-  .home-panel > .scene-run-photo-frame {
-    inset: 0 !important;
-    bottom: 0 !important;
-    height: 100% !important;
   }
 
   .scene-run-photo {
@@ -5140,10 +5149,19 @@ body.is-sealed .hero-meta {
     transform: none !important;
   }
 
-  /* Invite: content-height only — toile fills the section box. */
+  /* Invite: content-height only — toile fills the section box (Join Us pattern). */
   .story-panel {
     height: auto;
     min-height: 0;
+  }
+
+  .invite-pattern,
+  .invite-wash {
+    position: absolute !important;
+    inset: -1px 0 !important;
+    width: auto !important;
+    height: auto !important;
+    transform: none !important;
   }
 
   .day-stage {
@@ -5244,23 +5262,22 @@ body.is-sealed .hero-meta {
   }
 
   /*
-   * Home date/venue: true viewport center.
-   * Absolute + left/right + fixed width + margin auto — independent of
-   * grid padding / title asymmetry. Transforms stay free for fade motion.
+   * Home date/venue: grid row 3 of .hero (normal flow).
+   * Never absolute/fixed to viewport bottom — URL-bar / scroll chrome
+   * would shift meta relative to the hero photo.
    */
   .home-panel .hero-meta {
-    position: absolute;
-    left: 0;
-    right: 0;
-    /* Sit above floating RSVP CTA + home indicator */
-    bottom: calc(var(--mobile-rsvp-cta-space) + 0.35rem);
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    top: auto;
     z-index: 2;
-    /* 100% = hero/layout width (not 100vw) so scrollbar never skews centering */
     width: min(22rem, calc(100% - 2rem));
     max-width: none;
     margin-inline: auto;
     padding-inline: 0;
-    justify-self: unset;
+    justify-self: center;
     text-align: center;
     box-sizing: border-box;
   }
@@ -5656,7 +5673,10 @@ body.is-sealed .hero-meta {
 
   .home-panel .hero-meta {
     width: min(22rem, calc(100% - 1.5rem));
-    bottom: calc(var(--mobile-rsvp-cta-space) + 0.2rem);
+  }
+
+  .home-panel .hero {
+    padding-bottom: calc(var(--mobile-rsvp-cta-space) + 0.2rem);
   }
 
   .invite-card > .hero-meta {

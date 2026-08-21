@@ -67,6 +67,7 @@ const joinBgImg = joinPanel?.querySelector(".join-media-photo img") || null;
 const entouragePanel = document.getElementById("entourage");
 const entourageBgImg =
   entouragePanel?.querySelector(".entourage-media-photo img") || null;
+const invitePattern = storyPanel?.querySelector(".invite-pattern") || null;
 
 function lockSectionBgSize(section, img) {
   if (!section || !img) return;
@@ -83,10 +84,26 @@ function lockSectionBgSize(section, img) {
   img.style.setProperty("height", `${h}px`, "important");
 }
 
+/* Invite toile: lock repeat tile size in px (matches clamp(22rem, 48vw, 34rem)). */
+function lockInvitePatternSize() {
+  if (!invitePattern || !storyPanel) return;
+  if (!mqSceneNarrow.matches) {
+    invitePattern.style.removeProperty("background-size");
+    return;
+  }
+  const rootPx =
+    parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+  const w = storyPanel.clientWidth || window.innerWidth || 0;
+  if (w < 1) return;
+  const tile = Math.min(34 * rootPx, Math.max(22 * rootPx, w * 0.48));
+  invitePattern.style.setProperty("background-size", `${tile}px`, "important");
+}
+
 function lockCoverSectionBgs() {
   lockSectionBgSize(joinPanel, joinBgImg);
   lockSectionBgSize(entouragePanel, entourageBgImg);
   lockSectionBgSize(homePanel, scenePhoto);
+  lockInvitePatternSize();
 }
 
 function scrollToSection(id) {
