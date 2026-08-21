@@ -4729,6 +4729,8 @@ body.is-sealed .hero-meta {
     --page-join-h: 62rem;
     --page-day-h: 52rem;
     --page-entourage-h: 88rem;
+    --page-more-h: 78rem;
+    --page-rsvp-h: 68rem;
   }
 
   /* Phone/tablet: free native vertical scroll only — no snap, no sideways rubber-band.
@@ -5141,11 +5143,7 @@ body.is-sealed .hero-meta {
     pointer-events: none;
   }
 
-  /* Keep section content clear of the floating CTA (not pinned page stages). */
-  .rsvp-panel .rsvp-stage,
-  .more-panel > .stage {
-    padding-bottom: max(1.5rem, var(--mobile-rsvp-cta-space));
-  }
+  /* Pinned page stages — no env()/vh padding (FAB floats separately). */
 
   /* Page 3 (Our Story): same as page 1/2 — fixed rem box + centered stage. */
   .love-panel {
@@ -5221,6 +5219,65 @@ body.is-sealed .hero-meta {
     margin: auto !important;
     padding: 2rem 0.75rem !important;
     gap: 1.15rem;
+    transform: none !important;
+    box-sizing: border-box;
+    overflow: visible;
+  }
+
+  /* Page 7 (More): same as page 1/2 — fixed rem box + centered stage. */
+  .more-panel {
+    position: relative !important;
+    display: block !important;
+    height: var(--page-more-h) !important;
+    min-height: var(--page-more-h) !important;
+    max-height: var(--page-more-h) !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+  }
+
+  .more-panel > .stage {
+    position: absolute !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: min(42rem, calc(100% - 2rem)) !important;
+    height: fit-content;
+    max-height: calc(100% - 1rem);
+    margin: auto !important;
+    padding: 1.75rem 1rem !important;
+    transform: none !important;
+    box-sizing: border-box;
+    overflow: visible;
+  }
+
+  .more-panel .playlist-slot iframe {
+    min-height: 14rem !important;
+    height: 14rem !important;
+  }
+
+  /* Page 8 (RSVP): same as page 1/2 — fixed rem box + centered stage. */
+  .rsvp-panel {
+    position: relative !important;
+    display: block !important;
+    height: var(--page-rsvp-h) !important;
+    min-height: var(--page-rsvp-h) !important;
+    max-height: var(--page-rsvp-h) !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+  }
+
+  .rsvp-panel > .rsvp-stage {
+    position: absolute !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: min(40rem, calc(100% - 2rem)) !important;
+    height: fit-content;
+    max-height: calc(100% - 1rem);
+    margin: auto !important;
+    padding: 1.75rem 1rem !important;
     transform: none !important;
     box-sizing: border-box;
     overflow: visible;
@@ -5540,6 +5597,8 @@ body.is-sealed .hero-meta {
     --page-join-h: 82rem;
     --page-day-h: 50rem;
     --page-entourage-h: 92rem;
+    --page-more-h: 92rem;
+    --page-rsvp-h: 78rem;
   }
 
   .envelope-stage {
@@ -5673,6 +5732,21 @@ body.is-sealed .hero-meta {
   /* Slightly tighter shots so all Join Us content fits the fixed page box. */
   .join-panel {
     --join-shot-width: 12.5rem;
+  }
+
+  .more-panel > .stage {
+    width: min(100%, calc(100% - 1.5rem)) !important;
+    padding: 1.5rem 0.75rem !important;
+  }
+
+  .more-panel .playlist-slot iframe {
+    min-height: 12.5rem !important;
+    height: 12.5rem !important;
+  }
+
+  .rsvp-panel > .rsvp-stage {
+    width: min(100%, calc(100% - 1.5rem)) !important;
+    padding: 1.5rem 0.75rem !important;
   }
 
   .love-pill {
