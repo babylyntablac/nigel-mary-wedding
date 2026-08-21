@@ -2149,6 +2149,9 @@ body.is-sealed .hero-meta {
   display: flex;
   align-items: safe center;
   justify-content: center;
+  /* Content-sized section — bg absolute fill tracks this box, not the viewport */
+  height: auto;
+  min-height: 100svh;
   overflow-x: hidden;
   overflow-y: visible;
   isolation: isolate;
@@ -2172,12 +2175,17 @@ body.is-sealed .hero-meta {
   transition: opacity 0.45s var(--ease-out);
 }
 
-/* Full-bleed photo + wash — contained to #join (no bleed) */
+/* Full-bleed photo + wash — fills #join's content box only (not the visual
+   viewport). Never sticky/fixed / 100dvh: mobile URL-bar show/hide would
+   resize the cover crop and read as zoom-in/out while scrolling. */
 .join-media {
   position: absolute;
   inset: 0;
+  width: auto;
+  height: auto;
   z-index: 0;
   pointer-events: none;
+  overflow: hidden;
   opacity: 0;
   visibility: hidden;
   transition:
@@ -2197,6 +2205,8 @@ body.is-sealed .hero-meta {
 .join-media-photo {
   position: absolute;
   inset: 0;
+  width: auto;
+  height: auto;
   overflow: hidden;
 }
 
@@ -2204,10 +2214,12 @@ body.is-sealed .hero-meta {
   display: block;
   width: 100%;
   height: 100%;
+  max-width: none;
   object-fit: cover;
   object-position: center 42%;
   user-select: none;
   transform: none;
+  transform-origin: center center;
   transition: none;
 }
 
@@ -2285,11 +2297,13 @@ body.is-sealed .hero-meta {
   z-index: 2;
   width: min(54rem, calc(100% - 4.75rem));
   margin: 0 auto;
-  padding: clamp(2.35rem, 5.5vh, 3.75rem) 1rem clamp(2.5rem, 6vh, 3.85rem);
+  /* svh (not vh/dvh): classic vh tracks mobile chrome and reflows #join,
+     which rescales the absolute cover photo mid-scroll. */
+  padding: clamp(2.35rem, 5.5svh, 3.75rem) 1rem clamp(2.5rem, 6svh, 3.85rem);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(1.15rem, 2.8vh, 1.85rem);
+  gap: clamp(1.15rem, 2.8svh, 1.85rem);
   text-align: center;
 }
 
@@ -2309,7 +2323,7 @@ body.is-sealed .hero-meta {
 .join-title {
   margin: 0;
   color: var(--olive);
-  font-size: clamp(3.15rem, 7.8vh, 4.85rem);
+  font-size: clamp(3.15rem, 7.8svh, 4.85rem);
   line-height: 0.92;
   letter-spacing: 0.01em;
 }
@@ -2321,7 +2335,7 @@ body.is-sealed .hero-meta {
   border-radius: 0;
   background: none;
   font-family: var(--font-sans);
-  font-size: clamp(0.92rem, 1.9vh, 1.05rem);
+  font-size: clamp(0.92rem, 1.9svh, 1.05rem);
   font-weight: 600;
   letter-spacing: 0.12em;
   color: color-mix(in srgb, var(--ink) 58%, transparent);
@@ -2330,7 +2344,7 @@ body.is-sealed .hero-meta {
 .join-hashtag {
   margin: 0;
   font-family: var(--font-sans);
-  font-size: clamp(0.72rem, 1.45vh, 0.84rem);
+  font-size: clamp(0.72rem, 1.45svh, 0.84rem);
   font-weight: 500;
   letter-spacing: 0.04em;
   color: color-mix(in srgb, var(--ink) 52%, transparent);
@@ -2495,7 +2509,7 @@ body.is-sealed .hero-meta {
 .join-hour-label {
   margin: 0;
   font-family: var(--font-script);
-  font-size: clamp(1.95rem, 4vh, 2.7rem);
+  font-size: clamp(1.95rem, 4svh, 2.7rem);
   font-weight: 400;
   line-height: 1;
   color: var(--cherry);
@@ -2571,7 +2585,7 @@ body.is-sealed .hero-meta {
 .join-hour-meta {
   margin: 0.1rem 0 0;
   font-family: var(--font-sans);
-  font-size: clamp(0.7rem, 1.45vh, 0.82rem);
+  font-size: clamp(0.7rem, 1.45svh, 0.82rem);
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -2612,7 +2626,7 @@ body.is-sealed .hero-meta {
 .join-place-name {
   margin: 0.08rem 0 0;
   font-family: var(--font-script);
-  font-size: clamp(1.7rem, 3.4vh, 2.2rem);
+  font-size: clamp(1.7rem, 3.4svh, 2.2rem);
   font-style: normal;
   font-weight: 400;
   line-height: 1.08;
@@ -2622,7 +2636,7 @@ body.is-sealed .hero-meta {
 .join-place-address {
   margin: 0.2rem 0 0;
   font-family: var(--font-body);
-  font-size: clamp(0.82rem, 1.55vh, 0.92rem);
+  font-size: clamp(0.82rem, 1.55svh, 0.92rem);
   line-height: 1.45;
   color: color-mix(in srgb, var(--ink) 55%, transparent);
 }
@@ -3108,19 +3122,23 @@ body.is-sealed .hero-meta {
   isolation: isolate;
 }
 
-/* Absolute section background — no sticky pin that fights native scroll. */
+/* Absolute section background — no sticky pin / no viewport-tied height.
+   Fills #entourage content box so cover crop stays stable while scrolling. */
 .entourage-media {
   position: absolute;
   inset: 0;
+  width: auto;
+  height: auto;
   z-index: 0;
   pointer-events: none;
+  overflow: hidden;
 }
 
 .entourage-media-fixed {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
+  width: auto;
+  height: auto;
   overflow: hidden;
   pointer-events: none;
 }
@@ -3136,9 +3154,12 @@ body.is-sealed .hero-meta {
   display: block;
   width: 100%;
   height: 100%;
+  max-width: none;
   object-fit: cover;
   object-position: center 38%;
   user-select: none;
+  transform: none;
+  transform-origin: center center;
 }
 
 .entourage-media-wash {
@@ -4469,8 +4490,8 @@ body.is-sealed .hero-meta {
 
   .join-stage {
     width: min(42rem, calc(100% - 2.5rem));
-    padding: clamp(1.85rem, 4.2vh, 2.65rem) 0.5rem clamp(2.1rem, 4.8vh, 2.9rem);
-    gap: clamp(1.05rem, 2.6vh, 1.55rem);
+    padding: clamp(1.85rem, 4.2svh, 2.65rem) 0.5rem clamp(2.1rem, 4.8svh, 2.9rem);
+    gap: clamp(1.05rem, 2.6svh, 1.55rem);
   }
 
   .join-hours {
@@ -5049,6 +5070,59 @@ body.is-sealed .hero-meta {
     padding-bottom: max(1.5rem, var(--mobile-rsvp-cta-space));
   }
 
+  /* Join Us: rem-locked vertical rhythm so URL-bar vh/dvh toggle cannot
+     reflow #join and rescale the absolute cover photo mid-scroll. */
+  .join-panel {
+    height: auto;
+    min-height: 100svh;
+  }
+
+  .join-panel > .join-stage {
+    padding-top: 2.5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-bottom: max(2.5rem, var(--mobile-rsvp-cta-space));
+    gap: 1.35rem;
+  }
+
+  .join-media,
+  .join-media-photo {
+    position: absolute !important;
+    inset: 0 !important;
+    width: auto !important;
+    height: auto !important;
+    transform: none !important;
+  }
+
+  .join-media-photo img,
+  .join-panel.is-inview.join-on-photo .join-media-photo img {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    object-fit: cover !important;
+    object-position: center 42% !important;
+    transform: none !important;
+  }
+
+  .entourage-media,
+  .entourage-media-fixed,
+  .entourage-media-photo {
+    position: absolute !important;
+    inset: 0 !important;
+    width: auto !important;
+    height: auto !important;
+    transform: none !important;
+  }
+
+  .entourage-media-photo img {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    object-fit: cover !important;
+    object-position: center 38% !important;
+    transform: none !important;
+  }
+
   .day-stage {
     padding-top: clamp(1.1rem, 3vh, 1.75rem);
     padding-bottom: max(clamp(1.1rem, 3vh, 1.75rem), var(--mobile-rsvp-cta-space));
@@ -5408,15 +5482,42 @@ body.is-sealed .hero-meta {
     place-items: center;
   }
 
-  .join-stage {
+  .join-panel > .join-stage {
     width: min(100%, calc(100% - 1.75rem));
+    /* Rem-locked vertical rhythm — no vh/dvh reflow while URL bar toggles */
+    padding-top: 2.35rem;
     padding-left: 0.25rem;
     padding-right: 0.25rem;
+    padding-bottom: max(2.5rem, var(--mobile-rsvp-cta-space, 2.5rem));
     gap: 1.25rem;
   }
 
   .join-title {
     font-size: clamp(2.85rem, 11vw, 3.6rem);
+  }
+
+  .join-date {
+    font-size: 0.95rem;
+  }
+
+  .join-hashtag {
+    font-size: 0.76rem;
+  }
+
+  .join-hour-label {
+    font-size: clamp(1.85rem, 7vw, 2.35rem);
+  }
+
+  .join-hour-meta {
+    font-size: 0.72rem;
+  }
+
+  .join-place-name {
+    font-size: clamp(1.55rem, 6.5vw, 1.95rem);
+  }
+
+  .join-place-address {
+    font-size: 0.86rem;
   }
 
   .join-hours {
@@ -5436,6 +5537,21 @@ body.is-sealed .hero-meta {
 
   .join-swatch {
     width: clamp(1.75rem, 7vw, 2.35rem);
+  }
+
+  .join-media,
+  .join-media-photo,
+  .join-media-photo img,
+  .join-panel.is-inview.join-on-photo .join-media-photo img {
+    transform: none !important;
+  }
+
+  .join-media-photo img {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    object-fit: cover !important;
+    object-position: center 42% !important;
   }
 
   .itinerary-item {
