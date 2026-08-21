@@ -4965,7 +4965,7 @@ body.is-sealed .hero-meta {
 
   .home-panel .hero-center {
     position: absolute !important;
-    top: 11.5rem;
+    top: 13.5rem;
     left: 0;
     right: 0;
     width: 100%;
@@ -5141,7 +5141,6 @@ body.is-sealed .hero-meta {
   /* Keep section content clear of the floating CTA */
   .panel:not(.home-panel) > .stage,
   .panel:not(.home-panel) > .join-stage,
-  .panel:not(.home-panel) > .invite-compose,
   .panel:not(.home-panel) > .sponsors-compose,
   .rsvp-panel .rsvp-stage {
     padding-bottom: max(1.5rem, var(--mobile-rsvp-cta-space));
@@ -5214,10 +5213,13 @@ body.is-sealed .hero-meta {
 
   /* Page 2: fixed rem box; toile/wash clipped to that height only. */
   .story-panel {
+    position: relative !important;
+    display: block !important;
     height: var(--page-invite-h) !important;
     min-height: var(--page-invite-h) !important;
     max-height: var(--page-invite-h) !important;
     overflow: hidden !important;
+    padding: 0 !important;
   }
 
   .invite-pattern,
@@ -5228,6 +5230,26 @@ body.is-sealed .hero-meta {
     height: 100% !important;
     max-height: 100% !important;
     transform: none !important;
+  }
+
+  /* Pin invite card dead-center in the fixed page-2 box (no flow/safe-area shift). */
+  .story-panel > .invite-compose {
+    position: absolute !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: min(26rem, calc(100% - 2.5rem)) !important;
+    height: fit-content;
+    max-height: calc(100% - 1rem);
+    margin: auto !important;
+    padding-top: 3.25rem !important;
+    padding-bottom: 2.25rem !important;
+    transform: none !important;
+    justify-self: auto;
+    align-self: auto;
+    box-sizing: border-box;
+    overflow: visible;
   }
 
   /* Page 3 (The Day): fixed rem box in document stack — no 100svh reflow. */
@@ -5343,7 +5365,7 @@ body.is-sealed .hero-meta {
    * Do not revert to relative/grid flow here.
    */
   .home-panel .hero-center {
-    top: 10.25rem;
+    top: 12.25rem;
     padding-top: 0 !important;
     padding-inline-end: 0;
     box-sizing: border-box;
@@ -5494,10 +5516,13 @@ body.is-sealed .hero-meta {
   }
 
   .invite-compose {
-    width: min(22rem, calc(100% - 1.4rem));
-    margin-top: 1.5rem;
-    padding-top: 2.5rem;
-    padding-bottom: 2rem;
+    width: min(22rem, calc(100% - 1.4rem)) !important;
+    padding-top: 2.5rem !important;
+    padding-bottom: 2rem !important;
+  }
+
+  .story-panel > .invite-compose {
+    width: min(22rem, calc(100% - 1.4rem)) !important;
   }
 
   .invite-ark {
