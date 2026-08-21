@@ -590,82 +590,25 @@ function setBrandMorphVars(ghostOpacity, realOpacity) {
   sceneRun.style.setProperty("--brand-real-opacity", realOpacity.toFixed(4));
 }
 
-function updateBrandMorph(forceMeasure = false) {
-  if (prefersReducedMotion || !sceneRun || !homePanel || !storyPanel) return;
-  /* ≤1100: no shared Home→Invite brand morph / photo handoff */
-  if (mqSceneNarrow.matches) {
-    if (brandMorphState !== "idle") {
-      sceneRun.classList.remove(
-        "is-brand-morphing",
-        "is-brand-settled",
-        "is-brand-handing-off"
-      );
-      brandMorphState = "idle";
-      setBrandMorphVars(0, 0);
-      if (brandMorphLayer) brandMorphLayer.classList.remove("is-active");
-    }
-    return;
+function updateBrandMorph(_forceMeasure = false) {
+  if (!sceneRun) return;
+  /* Invite is fully static: no Home→Invite brand morph / ghost slide on any viewport.
+     Desktop shared photo pan still runs via updateScenePan (home side only). */
+  if (
+    brandMorphState !== "idle" ||
+    sceneRun.classList.contains("is-brand-morphing") ||
+    sceneRun.classList.contains("is-brand-settled") ||
+    sceneRun.classList.contains("is-brand-handing-off")
+  ) {
+    sceneRun.classList.remove(
+      "is-brand-morphing",
+      "is-brand-settled",
+      "is-brand-handing-off"
+    );
+    brandMorphState = "idle";
+    setBrandMorphVars(0, 0);
+    if (brandMorphLayer) brandMorphLayer.classList.remove("is-active");
   }
-
-  const progress = getScenePanProgress();
-  const t = smoothstep(Math.min(1, progress / BRAND_SETTLE_END));
-  const cross = brandCrossfadeAmount(progress);
-  /* Overlap: real rises ahead of ghost fall so coverage stays ≥ ~1 through the blend */
-  const realOpacity = Math.min(1, cross * 1.2);
-  const ghostOpacity = Math.max(0, 1 - cross);
-
-  if (progress <= 0.02) {
-    if (brandMorphState !== "idle") {
-      sceneRun.classList.remove(
-        "is-brand-morphing",
-        "is-brand-settled",
-        "is-brand-handing-off"
-      );
-      homePanel.classList.add("is-inview");
-      brandMorphState = "idle";
-      setBrandMorphVars(0, 0);
-      if (brandMorphLayer) brandMorphLayer.classList.remove("is-active");
-    }
-    return;
-  }
-
-  if (progress >= BRAND_SETTLE_END) {
-    ensureBrandMorphLayer();
-    /* Final paint at t=1 while layer still up — then settle (no empty frame). */
-    if (brandMorphState !== "settled") {
-      Object.values(brandMorphGhosts || {}).forEach((entry) => {
-        paintBrandGhost(entry, 1, 0, forceMeasure);
-      });
-      sceneRun.classList.remove("is-brand-morphing", "is-brand-handing-off");
-      sceneRun.classList.add("is-brand-settled");
-      storyPanel.classList.add("is-inview");
-      brandMorphState = "settled";
-      setBrandMorphVars(0, 1);
-      if (brandMorphLayer) brandMorphLayer.classList.remove("is-active");
-    } else if (forceMeasure) {
-      setBrandMorphVars(0, 1);
-    }
-    return;
-  }
-
-  ensureBrandMorphLayer();
-  const handingOff = cross > 0.02;
-  if (brandMorphState !== "morphing") {
-    sceneRun.classList.add("is-brand-morphing");
-    sceneRun.classList.remove("is-brand-settled");
-    brandMorphState = "morphing";
-  }
-  sceneRun.classList.toggle("is-brand-handing-off", handingOff);
-  if (handingOff) {
-    /* Unlock real targets for the blend; keep Invite entrance delays from replaying. */
-    storyPanel.classList.add("is-inview");
-  }
-  setBrandMorphVars(ghostOpacity, realOpacity);
-  if (brandMorphLayer) brandMorphLayer.classList.add("is-active");
-
-  Object.values(brandMorphGhosts || {}).forEach((entry) => {
-    paintBrandGhost(entry, t, ghostOpacity, forceMeasure);
-  });
 }
 
 /* 30% in / 30% out — each section fades independently */
@@ -674,22 +617,12 @@ if (panels.length) {
 
   function updateInviteWash() {
     if (!storyPanel) return;
-    /* Mobile/tablet: Invite owns its toile — no scroll-tied reveal over shared photo */
-    if (mqSceneNarrow.matches) {
-      storyPanel.style.setProperty("--invite-pattern", "1");
-      storyPanel.style.setProperty("--invite-wash", "0.92");
-      return;
-    }
+    /* Binary settled look — no scroll-tweened opacity (felt like bg/items moving) */
     const vh = window.innerHeight || 1;
     const rect = storyPanel.getBoundingClientRect();
-    const top = rect.top;
-    // 0 when story is still below the fold, 1 when fully pinned in view
-    // Also treat "covering the viewport" (top <= 0 and bottom >= vh) as fully washed
-    let t = 1 - Math.min(1, Math.max(0, top / vh));
-    if (top <= 1 && rect.bottom >= vh - 1) t = 1;
-    const eased = t * t * (3 - 2 * t);
-    storyPanel.style.setProperty("--invite-pattern", eased.toFixed(4));
-    storyPanel.style.setProperty("--invite-wash", (eased * 0.92).toFixed(4));
+    const visible = rect.bottom > 0 && rect.top < vh;
+    storyPanel.style.setProperty("--invite-pattern", visible ? "1" : "0");
+    storyPanel.style.setProperty("--invite-wash", visible ? "0.92" : "0");
   }
 
   let sceneTick = false;
@@ -827,7 +760,8 @@ if (panels.length) {
   let loopToken = 0;
 
   function motionOff() {
-    return prefersReducedMotion || mqSceneNarrow.matches;
+    /* Invite layers stay static while scrolling — no flight on any viewport */
+    return true;
   }
 
   function perchTransform(perch) {

@@ -189,7 +189,8 @@ img {
 }
 
 .panel:not(.is-inview) > .invite-compose {
-  transform: translate3d(0, 26px, 0) scale(0.985);
+  /* Opacity fade only — no translate/scale while scrolling Invite */
+  transform: none;
 }
 
 /* Mixed-origin fades for dense sections */
@@ -1324,7 +1325,7 @@ body.is-sealed .hero-meta {
   margin-top: clamp(0.65rem, 1.8vh, 1.15rem);
   padding-bottom: 0;
   opacity: 0;
-  transform: translate3d(0, 12px, 0);
+  transform: none;
 }
 
 .story-panel.is-inview .hero-meta {
@@ -1529,9 +1530,8 @@ body.is-sealed .hero-meta {
   background-repeat: repeat;
   background-position: center center;
   background-size: clamp(22rem, 48vw, 34rem);
-  /* Scroll drives opacity each frame — avoid lagging CSS transition jumps */
+  /* Settled opacity is binary (visible vs not) — no scroll-frame tween */
   transition: none;
-  will-change: opacity;
 }
 
 .invite-wash {
@@ -1581,11 +1581,11 @@ body.is-sealed .hero-meta {
   filter: drop-shadow(0 8px 18px rgba(26, 31, 28, 0.16));
 }
 
-/* Invite blue butterfly — flies between floral-ark perch points */
+/* Invite blue butterfly — static perch on center rose (no flight while scrolling) */
 .invite-butterfly {
   position: absolute;
-  left: 0;
-  top: 0;
+  left: 49%;
+  top: 9%;
   z-index: 4;
   width: clamp(1.55rem, 5.2vw, 2.25rem);
   height: auto;
@@ -1593,8 +1593,7 @@ body.is-sealed .hero-meta {
   padding: 0;
   pointer-events: none;
   opacity: 0;
-  will-change: transform;
-  transform: translate3d(0, 0, 0) translate(-50%, -50%) rotate(0deg);
+  transform: translate(-50%, -50%) rotate(-8deg);
   filter: drop-shadow(0 2px 4px rgba(26, 31, 28, 0.22));
   transition: opacity 0.7s var(--ease-out);
 }
@@ -1624,20 +1623,16 @@ body.is-sealed .hero-meta {
   transform-origin: left center;
 }
 
-.invite-butterfly.is-flying .bfly-wing-l {
-  animation: bfly-flap-l 0.16s ease-in-out infinite alternate;
-}
-
-.invite-butterfly.is-flying .bfly-wing-r {
-  animation: bfly-flap-r 0.16s ease-in-out infinite alternate;
-}
-
-.story-panel.is-inview .invite-butterfly.is-perched .bfly-wing-l {
-  animation: bfly-rest-l 2.8s var(--ease-in-out) infinite alternate;
-}
-
+.invite-butterfly.is-flying .bfly-wing-l,
+.invite-butterfly.is-flying .bfly-wing-r,
+.story-panel.is-inview .invite-butterfly.is-perched .bfly-wing-l,
 .story-panel.is-inview .invite-butterfly.is-perched .bfly-wing-r {
-  animation: bfly-rest-r 2.8s var(--ease-in-out) infinite alternate;
+  animation: none;
+}
+
+.invite-butterfly .bfly-wing-l,
+.invite-butterfly .bfly-wing-r {
+  transform: scaleX(0.85);
 }
 
 @keyframes bfly-flap-l {
@@ -1781,7 +1776,7 @@ body.is-sealed .hero-meta {
 .story-panel:not(.is-inview) .invite-names,
 .story-panel:not(.is-inview) .invite-seal {
   opacity: 0;
-  transform: translate3d(0, 18px, 0);
+  transform: none;
 }
 
 .story-panel.is-inview .invite-kicker {
