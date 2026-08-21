@@ -4852,7 +4852,9 @@ body.is-sealed .hero-meta {
   .section-shell--narrow,
   .more-stage {
     width: min(920px, calc(100% - 2.5rem));
-    padding-right: 2.5rem;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+    box-sizing: border-box;
   }
 
   .stage-layout,
@@ -5109,13 +5111,117 @@ body.is-sealed .hero-meta {
     width: min(72rem, 94%);
   }
 
-  /* Tablet + narrow: desktop 50svh lift crops heads. Zero lift and face-bias
-     object-position (phone keeps a tighter override at ≤560px). */
+  /* Tablet + narrow (≤1100): page-1 hero photo only — no shared pan, lift,
+     Ken Burns, or sticky Home→Invite handoff. Desktop keeps the scene run. */
   .scene-run {
     --scene-photo-lift: 0px;
-    --scene-photo-y-start: 28%;
-    --scene-photo-y-end: 44%;
+    --scene-photo-y-start: 32%;
+    --scene-photo-y-end: 32%;
     --scene-photo-y: var(--scene-photo-y-start);
+    --scene-pan: 0;
+    --scene-title-travel: 0;
+  }
+
+  .home-panel {
+    position: relative;
+    top: auto;
+  }
+
+  .scene-run-photo-frame,
+  .scene-run.is-photo-anchored .scene-run-photo-frame {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: auto;
+    width: 100%;
+    height: 100svh;
+  }
+
+  .scene-run-photo {
+    object-position: center var(--scene-photo-y, 32%);
+    transform: none;
+    animation: none;
+  }
+
+  .brand-morph-layer {
+    display: none !important;
+  }
+
+  .home-panel.is-inview .hero-center,
+  .scene-run .home-panel:not(.is-inview) .hero-center {
+    transform: none;
+  }
+
+  .scene-run .hero-brand {
+    opacity: 1;
+    transform: none;
+  }
+
+  .scene-run .hero-title-soft {
+    color: var(--white);
+    text-shadow: 0 2px 18px rgba(0, 0, 0, 0.35);
+  }
+
+  .scene-run .hero-title-main {
+    color: var(--white);
+    font-size: clamp(2.4rem, 11vw, 3.6rem);
+    text-shadow: 0 3px 24px rgba(0, 0, 0, 0.35);
+  }
+
+  .story-panel {
+    --invite-pattern: 1;
+    --invite-wash: 0.92;
+    background-color: #f3eee4;
+  }
+
+  /* Fade-only panel entrances — no scale / slide zoom feel on phone scroll */
+  .panel:not(.is-inview) > .panel-fade,
+  .panel:not(.is-inview) > .stage,
+  .panel:not(.is-inview) > .join-stage,
+  .panel:not(.is-inview) > .invite-compose,
+  .panel:not(.is-inview) > .sponsors-compose,
+  .panel:not(.is-inview) .day-beat,
+  .panel:not(.is-inview) .day-terminal,
+  .panel:not(.is-inview) .day-grid > *,
+  .panel:not(.is-inview) .day-notes > *,
+  .panel:not(.is-inview) .info-grid > *,
+  .panel:not(.is-inview) .role-group,
+  .panel:not(.is-inview) .person-card,
+  .panel:not(.is-inview) .itinerary-item,
+  .panel:not(.is-inview) .rsvp-head,
+  .panel:not(.is-inview) .rsvp-form,
+  .panel:not(.is-inview) .rsvp-gifts,
+  .panel:not(.is-inview) .rsvp-count-unit,
+  .panel:not(.is-inview) .rsvp-title-col,
+  .panel:not(.is-inview) .rsvp-body,
+  .panel:not(.is-inview) .more-intro,
+  .panel:not(.is-inview) .more-listen,
+  .panel:not(.is-inview) .more-look-head,
+  .panel:not(.is-inview) .stage-intro,
+  .panel:not(.is-inview) .stage-card,
+  .panel:not(.is-inview) .stage-look-head,
+  .panel:not(.is-inview) .more-frame,
+  .love-panel:not(.is-inview) .love-heading,
+  .love-panel:not(.is-inview) .love-person,
+  .love-panel:not(.is-inview) .love-amp,
+  .love-panel:not(.is-inview) .love-story,
+  .home-panel:not(.is-inview) .hero-brand,
+  .home-panel:not(.is-inview) .hero-center,
+  .home-panel:not(.is-inview) .hero-meta {
+    transform: none;
+  }
+
+  .panel:not(.is-inview) > .panel-fade,
+  .panel:not(.is-inview) > .stage,
+  .panel:not(.is-inview) > .join-stage,
+  .panel:not(.is-inview) > .invite-compose,
+  .panel:not(.is-inview) > .sponsors-compose,
+  .love-panel:not(.is-inview) .love-heading,
+  .love-panel:not(.is-inview) .love-person,
+  .love-panel:not(.is-inview) .love-amp,
+  .love-panel:not(.is-inview) .love-story {
+    transition: opacity 0.55s var(--ease-out);
   }
 
   /* Persistent bottom CTA — primary; menu RSVP stays as secondary */
@@ -5218,13 +5324,6 @@ body.is-sealed .hero-meta {
   .panel:not(.home-panel) > .sponsors-compose,
   .rsvp-panel .rsvp-stage {
     padding-bottom: max(1.5rem, var(--mobile-rsvp-cta-space));
-  }
-
-  .scene-run-photo {
-    object-position: center var(--scene-photo-y, 28%);
-    transform-origin: 50% 32%;
-    animation-name: hero-ken-mobile;
-    animation-duration: 28s;
   }
 
   .day-stage {
@@ -5382,12 +5481,20 @@ body.is-sealed .hero-meta {
   }
 
   /*
-   * RSVP: desktop .stage keeps right-only padding for the pill rail.
-   * With the hamburger (≤1100), center the column with equal inset.
-   * Higher specificity beats later .stage { padding-right } overrides.
+   * Hamburger breakpoint: desktop .stage keeps right-only padding for the pill rail.
+   * Center More + RSVP with equal inset, width, and margin auto.
    */
+  .stage {
+    width: min(1180px, calc(100% - 2.5rem));
+    max-width: 100%;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+    box-sizing: border-box;
+  }
+
   .stage.rsvp-stage {
     width: min(40rem, calc(100% - 2.5rem));
+    max-width: calc(100% - 2.5rem);
     margin-inline: auto;
     padding-inline: 1.25rem;
     box-sizing: border-box;
@@ -5453,7 +5560,18 @@ body.is-sealed .hero-meta {
 
   .stage {
     width: min(920px, calc(100% - 2.5rem));
-    padding-right: 2.5rem;
+    max-width: 100%;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+    box-sizing: border-box;
+  }
+
+  .stage.rsvp-stage {
+    width: min(40rem, calc(100% - 2.5rem));
+    max-width: calc(100% - 2.5rem);
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+    box-sizing: border-box;
   }
 
   .stage-layout,
@@ -5692,17 +5810,14 @@ body.is-sealed .hero-meta {
     padding-inline: 0.15rem;
   }
 
-  /* Phone: face-centered crop; no Ken Burns so zoom can’t clip heads */
+  /* Phone: face-centered crop; hero stays page-1 only (≤1100 already disables pan/KB) */
   .scene-run {
-    --scene-photo-lift: 0px;
     --scene-photo-y-start: 30%;
-    --scene-photo-y-end: 42%;
+    --scene-photo-y-end: 30%;
     --scene-photo-y: var(--scene-photo-y-start);
   }
 
   .scene-run-photo {
     object-position: center var(--scene-photo-y, 30%);
-    transform-origin: 50% 30%;
-    animation: none;
   }
 }

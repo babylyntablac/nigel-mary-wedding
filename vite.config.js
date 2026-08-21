@@ -1,11 +1,5 @@
 import { defineConfig } from "vite";
 
-const noCache = {
-  "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
-  Pragma: "no-cache",
-  Expires: "0",
-};
-
 export default defineConfig({
   base: "/nigel-mary-wedding/",
   appType: "mpa",
@@ -23,7 +17,6 @@ export default defineConfig({
     port: 8123,
     strictPort: true,
     open: false,
-    headers: noCache,
     watch: {
       ignored: [
         "**/.agents/**",
@@ -33,8 +26,5 @@ export default defineConfig({
         "**/scripts/**",
       ],
     },
-  },
-  preview: {
-    headers: noCache,
   },
 });

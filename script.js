@@ -21,14 +21,13 @@ const homePanel = document.getElementById("home");
 const storyPanel = document.getElementById("story");
 
 /* Desktop (>1100): top half = page 1, bottom half = page 2 (0% → 50%).
-   Tablet/narrow (≤1100): faces ~28–44%; phone (≤560): ~30–42%.
-   CSS zeros --scene-photo-lift in those ranges so heads stay in frame. */
+   ≤1100 (hamburger): no shared Home→Invite pan — page-1 hero photo only. */
 const mqSceneNarrow = window.matchMedia("(max-width: 1100px)");
 const mqScenePhone = window.matchMedia("(max-width: 560px)");
 
 function getScenePhotoYRange() {
-  if (mqScenePhone.matches) return { start: 30, end: 42 };
-  if (mqSceneNarrow.matches) return { start: 28, end: 44 };
+  if (mqScenePhone.matches) return { start: 30, end: 30 };
+  if (mqSceneNarrow.matches) return { start: 32, end: 32 };
   return { start: 0, end: 50 };
 }
 
@@ -40,14 +39,31 @@ function getStoryScrollTop() {
 /* 0 = Invite just below the fold, 1 = Invite pinned at top — same scroll that pans the hero */
 function getScenePanProgress() {
   if (!homePanel || !storyPanel || prefersReducedMotion) return 1;
+  /* Mobile/tablet: no scroll-linked photo pan between Home and Invite */
+  if (mqSceneNarrow.matches) return 0;
   const vh = window.innerHeight || 1;
   const top = storyPanel.getBoundingClientRect().top;
   const progress = 1 - top / vh;
   return Math.min(1, Math.max(0, progress));
 }
 
+function parkMobileScenePhoto() {
+  if (!scenePhoto || !sceneRun) return;
+  const { start } = getScenePhotoYRange();
+  sceneRun.style.setProperty("--scene-pan", "0");
+  sceneRun.style.setProperty("--scene-photo-y", `${start}%`);
+  sceneRun.classList.remove("is-photo-anchored");
+  scenePhoto.style.objectPosition = `center ${start}%`;
+}
+
 function updateScenePan() {
   if (!scenePhoto || !sceneRun || prefersReducedMotion) return;
+
+  /* ≤1100: full-bleed page-1 hero only — no Ken Burns pan / sticky handoff */
+  if (mqSceneNarrow.matches) {
+    parkMobileScenePhoto();
+    return;
+  }
 
   const progress = getScenePanProgress();
   const storyTop = getStoryScrollTop();
@@ -78,8 +94,9 @@ function scrollToSection(id) {
   /* Nav clicks may smooth-scroll; finger scroll stays CSS scroll-behavior:auto on mobile. */
   const scrollBehavior = prefersReducedMotion ? "auto" : "smooth";
   const { start: photoYStart, end: photoYEnd } = getScenePhotoYRange();
+  const mobileScene = mqSceneNarrow.matches;
 
-  if (id === "story" && scenePhoto && !prefersReducedMotion) {
+  if (id === "story" && scenePhoto && !prefersReducedMotion && !mobileScene) {
     sceneRun?.classList.add("is-photo-anchored");
     sceneRun?.style.setProperty("--scene-pan", "1");
     sceneRun?.style.setProperty("--scene-photo-y", `${photoYEnd}%`);
@@ -90,10 +107,14 @@ function scrollToSection(id) {
      scrollIntoView({ block: "start" }) no-ops. Jump to document top. */
   if (id === "home") {
     if (scenePhoto && !prefersReducedMotion) {
-      sceneRun?.classList.remove("is-photo-anchored");
-      sceneRun?.style.setProperty("--scene-pan", "0");
-      sceneRun?.style.setProperty("--scene-photo-y", `${photoYStart}%`);
-      scenePhoto.style.objectPosition = `center ${photoYStart}%`;
+      if (mobileScene) {
+        parkMobileScenePhoto();
+      } else {
+        sceneRun?.classList.remove("is-photo-anchored");
+        sceneRun?.style.setProperty("--scene-pan", "0");
+        sceneRun?.style.setProperty("--scene-photo-y", `${photoYStart}%`);
+        scenePhoto.style.objectPosition = `center ${photoYStart}%`;
+      }
     }
 
     window.scrollTo({ top: 0, behavior: scrollBehavior });
@@ -544,6 +565,20 @@ function setBrandMorphVars(ghostOpacity, realOpacity) {
 
 function updateBrandMorph(forceMeasure = false) {
   if (prefersReducedMotion || !sceneRun || !homePanel || !storyPanel) return;
+  /* ≤1100: no shared Home→Invite brand morph / photo handoff */
+  if (mqSceneNarrow.matches) {
+    if (brandMorphState !== "idle") {
+      sceneRun.classList.remove(
+        "is-brand-morphing",
+        "is-brand-settled",
+        "is-brand-handing-off"
+      );
+      brandMorphState = "idle";
+      setBrandMorphVars(0, 0);
+      if (brandMorphLayer) brandMorphLayer.classList.remove("is-active");
+    }
+    return;
+  }
 
   const progress = getScenePanProgress();
   const t = smoothstep(Math.min(1, progress / BRAND_SETTLE_END));
@@ -612,6 +647,12 @@ if (panels.length) {
 
   function updateInviteWash() {
     if (!storyPanel) return;
+    /* Mobile/tablet: Invite owns its toile — no scroll-tied reveal over shared photo */
+    if (mqSceneNarrow.matches) {
+      storyPanel.style.setProperty("--invite-pattern", "1");
+      storyPanel.style.setProperty("--invite-wash", "0.92");
+      return;
+    }
     const vh = window.innerHeight || 1;
     const rect = storyPanel.getBoundingClientRect();
     const top = rect.top;
@@ -876,10 +917,10 @@ if (panels.length) {
   if (!lovePanel || !kicker || !textEl) return;
 
   const fullText = (textEl.textContent || "Once upon a time").trim();
-  const TYPE_MS = 58;
-  const DELETE_MS = 36;
-  const HOLD_MS = 2600;
-  const GAP_MS = 720;
+  const TYPE_MS = 92;
+  const DELETE_MS = 54;
+  const HOLD_MS = 2800;
+  const GAP_MS = 780;
   const START_DELAY_MS = 640;
 
   let active = false;
