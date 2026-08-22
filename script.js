@@ -1039,7 +1039,7 @@ function attachGoldWriteStroke(svg) {
   gold.removeAttribute("mask");
   gold.setAttribute("fill", "none");
   gold.setAttribute("pathLength", "1");
-  gold.setAttribute("stroke-dasharray", "0.09 0.91");
+  gold.setAttribute("stroke-dasharray", "0.12 0.88");
   gold.setAttribute("stroke-dashoffset", "1");
   svg.appendChild(gold);
 }
@@ -1151,7 +1151,7 @@ function armHeroCinematics() {
     if (!svg) return;
     const brush = attachHeroBrushMask(svg, job.letters);
     if (brush) heroBrushJobs.push({ ...brush, ms: job.ms });
-    if (job.sel === ".hero-draw--main") attachGoldWriteStroke(svg);
+    attachGoldWriteStroke(svg);
   });
 }
 

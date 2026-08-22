@@ -6350,8 +6350,8 @@ body,
 /* =============================================================================
    HOME CINEMATICS
    Photo: looping Ken Burns on the frame (not the img) so iOS/Edge actually run it.
-   Titles: brush write-on, then a looping gold stroke on Heavens Agreed
-   (the letters stay still). RSVP: restored gold orbit + wash.
+   Titles: brush write-on, then a slow gold stroke chase — “the” first,
+   then Heavens Agreed, one full circuit, then it loops.
    ============================================================================= */
 @keyframes hero-cinematic-push {
   from {
@@ -6371,12 +6371,48 @@ body,
   }
 }
 
-@keyframes hero-gold-write {
-  from {
+@keyframes hero-gold-chase-soft {
+  0% {
     stroke-dashoffset: 1;
+    opacity: 1;
   }
-  to {
+  24% {
     stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  27% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+  28%,
+  100% {
+    stroke-dashoffset: 1;
+    opacity: 0;
+  }
+}
+
+@keyframes hero-gold-chase-main {
+  0%,
+  29% {
+    stroke-dashoffset: 1;
+    opacity: 0;
+  }
+  31% {
+    stroke-dashoffset: 1;
+    opacity: 1;
+  }
+  93% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  96% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+  97%,
+  100% {
+    stroke-dashoffset: 1;
+    opacity: 0;
   }
 }
 
@@ -6396,20 +6432,34 @@ body,
 .hero-draw-gold {
   fill: none;
   stroke: var(--gold-soft);
-  stroke-width: 1.9px;
+  stroke-width: 1.85px;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-dasharray: 0.09 0.91;
+  stroke-dasharray: 0.12 0.88;
   vector-effect: non-scaling-stroke;
   opacity: 0;
   pointer-events: none;
-  filter: drop-shadow(0 0 6px rgba(210, 184, 130, 0.62));
+  filter: drop-shadow(0 0 7px rgba(210, 184, 130, 0.58));
 }
 
-.scene-run.is-hero-written .hero-draw--main .hero-draw-gold {
-  opacity: 1;
-  animation-name: hero-gold-write !important;
-  animation-duration: 4.6s !important;
+.hero-draw--soft .hero-draw-gold {
+  stroke-width: 1.55px;
+}
+
+.scene-run.is-hero-written .hero-draw--soft .hero-draw-gold,
+.brand-morph-ghost.is-title .hero-draw--soft .hero-draw-gold {
+  animation-name: hero-gold-chase-soft !important;
+  animation-duration: 22s !important;
+  animation-delay: 0s !important;
+  animation-timing-function: linear !important;
+  animation-iteration-count: infinite !important;
+  animation-play-state: running !important;
+}
+
+.scene-run.is-hero-written .hero-draw--main .hero-draw-gold,
+.brand-morph-ghost.is-title .hero-draw--main .hero-draw-gold {
+  animation-name: hero-gold-chase-main !important;
+  animation-duration: 22s !important;
   animation-delay: 0s !important;
   animation-timing-function: linear !important;
   animation-iteration-count: infinite !important;
@@ -6462,6 +6512,7 @@ body,
 
 @media (prefers-reduced-motion: reduce) {
   .home-panel > .scene-run-photo-frame,
+  .scene-run.is-hero-written .hero-draw--soft .hero-draw-gold,
   .scene-run.is-hero-written .hero-draw--main .hero-draw-gold,
   .pill.pill-rsvp::before,
   .pill.pill-rsvp::after,
@@ -6524,16 +6575,6 @@ body,
   font-weight: 400;
   letter-spacing: 0.02em;
   text-align: center;
-}
-
-.brand-morph-ghost.is-title .hero-draw-gold {
-  opacity: 1;
-  animation-name: hero-gold-write !important;
-  animation-duration: 4.6s !important;
-  animation-delay: 0s !important;
-  animation-timing-function: linear !important;
-  animation-iteration-count: infinite !important;
-  animation-play-state: running !important;
 }
 
 .scene-run.is-brand-morphing [data-morph] {
