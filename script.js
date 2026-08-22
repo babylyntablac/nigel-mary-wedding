@@ -36,8 +36,7 @@ function syncScenePhotoMount() {
 }
 
 /* One-shot park: clear inline pan/crop so CSS owns a static hero.
-   Never call from scroll — only init / mq / orientation.
-   Page height is CSS rem (--page-home-h); do not write viewport px. */
+   Never call from scroll — only init / mq / orientation. */
 function parkScenePhoto() {
   if (!scenePhoto || !sceneRun) return;
   syncScenePhotoMount();
@@ -50,13 +49,37 @@ function parkScenePhoto() {
   if (homePanel) homePanel.style.removeProperty("--mobile-hero-h");
 }
 
-/* Cover section bgs (Join / Entourage only): lock <img> to section box in px
-   once. Home/Invite use fixed rem page heights + overflow clip — no lock. */
+/* Cover bgs: lock <img> to the section box in px once. Never on scroll —
+   URL-bar height churn would recrop object-fit:cover (looks like zoom). */
 const joinPanel = document.getElementById("join");
 const joinBgImg = joinPanel?.querySelector(".join-media-photo img") || null;
 const entouragePanel = document.getElementById("entourage");
 const entourageBgImg =
   entouragePanel?.querySelector(".entourage-media-photo img") || null;
+
+let lockedCoverPageH = 0;
+
+function measureStableViewportH() {
+  const layoutH = Math.round(document.documentElement.clientHeight || 0);
+  const innerH = Math.round(window.innerHeight || 0);
+  return Math.max(layoutH, innerH);
+}
+
+function lockMobileCoverPages() {
+  if (!mqSceneNarrow.matches) {
+    lockedCoverPageH = 0;
+    document.documentElement.style.removeProperty("--page-home-h");
+    document.documentElement.style.removeProperty("--page-invite-h");
+    return;
+  }
+  if (lockedCoverPageH > 0) return;
+  const h = measureStableViewportH();
+  if (h < 1) return;
+  lockedCoverPageH = h;
+  const px = `${h}px`;
+  document.documentElement.style.setProperty("--page-home-h", px);
+  document.documentElement.style.setProperty("--page-invite-h", px);
+}
 
 function lockSectionBgSize(section, img) {
   if (!section || !img) return;
@@ -74,8 +97,17 @@ function lockSectionBgSize(section, img) {
 }
 
 function lockCoverSectionBgs() {
+  lockSectionBgSize(homePanel, scenePhoto);
   lockSectionBgSize(joinPanel, joinBgImg);
   lockSectionBgSize(entouragePanel, entourageBgImg);
+}
+
+function syncCoverLayouts({ relockPageH = false } = {}) {
+  parkScenePhoto();
+  if (relockPageH) lockedCoverPageH = 0;
+  lockMobileCoverPages();
+  if (homePanel) void homePanel.offsetHeight;
+  lockCoverSectionBgs();
 }
 
 function scrollToSection(id) {
@@ -315,8 +347,7 @@ if (storyPanel) {
   storyPanel.style.setProperty("--invite-wash", "0.92");
 }
 
-parkScenePhoto();
-lockCoverSectionBgs();
+syncCoverLayouts();
 
 /* Phone: vertical scroll only — block pinch-zoom (shows tiled/looped layers). */
 function preventPinchZoom(event) {
@@ -328,13 +359,19 @@ document.addEventListener("touchmove", preventPinchZoom, { passive: false });
 document.addEventListener("gesturestart", (event) => event.preventDefault());
 document.addEventListener("gesturechange", (event) => event.preventDefault());
 document.addEventListener("gestureend", (event) => event.preventDefault());
-/* After layout / lazy images settle, re-lock once (never on scroll). */
+/* After layout / lazy images settle, re-lock photo boxes (never on scroll). */
 if (typeof window.requestAnimationFrame === "function") {
   window.requestAnimationFrame(() => {
-    window.requestAnimationFrame(lockCoverSectionBgs);
+    window.requestAnimationFrame(() => syncCoverLayouts());
   });
 }
-window.addEventListener("load", lockCoverSectionBgs, { passive: true });
+window.addEventListener("load", () => syncCoverLayouts(), { passive: true });
+if (scenePhoto && !scenePhoto.complete) {
+  scenePhoto.addEventListener("load", () => lockCoverSectionBgs(), {
+    once: true,
+    passive: true,
+  });
+}
 joinPanel?.querySelectorAll(".join-shot img").forEach((shot) => {
   if (shot.complete) return;
   shot.addEventListener("load", lockCoverSectionBgs, {
@@ -357,14 +394,12 @@ window.addEventListener(
     const w = window.innerWidth;
     if (Math.abs(w - lastLayoutWidth) < 1) return;
     lastLayoutWidth = w;
-    parkScenePhoto();
-    lockCoverSectionBgs();
+    syncCoverLayouts({ relockPageH: true });
   },
   { passive: true }
 );
 const onSceneMqChange = () => {
-  parkScenePhoto();
-  lockCoverSectionBgs();
+  syncCoverLayouts({ relockPageH: true });
 };
 if (typeof mqSceneNarrow.addEventListener === "function") {
   mqSceneNarrow.addEventListener("change", onSceneMqChange);
@@ -377,9 +412,8 @@ window.addEventListener(
   "orientationchange",
   () => {
     window.setTimeout(() => {
-      parkScenePhoto();
-      lockCoverSectionBgs();
-    }, 60);
+      syncCoverLayouts({ relockPageH: true });
+    }, 120);
   },
   { passive: true }
 );

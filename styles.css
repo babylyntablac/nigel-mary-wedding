@@ -4770,9 +4770,11 @@ body.is-sealed .hero-meta {
   /* Clearance for fixed bottom RSVP CTA + iOS home indicator */
   :root {
     --mobile-rsvp-cta-space: calc(4.35rem + env(safe-area-inset-bottom, 0px));
-    /* Fixed page boxes — backgrounds clip here; never vh/svh/lvh. */
-    --page-home-h: 100lvh;
-    --page-invite-h: 100lvh;
+    /* Fixed page boxes — backgrounds clip here. Never vh/svh/lvh:
+       URL-bar show/hide recrops object-fit:cover and reads as zoom.
+       JS may override Home/Invite with a one-shot px lock. */
+    --page-home-h: 44rem;
+    --page-invite-h: 50rem;
     --page-love-h: 56rem;
     --page-join-h: 62rem;
     --page-day-h: 52rem;
@@ -4985,7 +4987,7 @@ body.is-sealed .hero-meta {
     --scene-title-travel: 0;
   }
 
-  /* Page 1: fixed rem box; photo clipped to that height only. */
+  /* Page 1: rem/px box (not lvh); photo clipped to that height only. */
   .home-panel {
     position: relative !important;
     top: auto !important;
@@ -5668,8 +5670,8 @@ body.is-sealed .hero-meta {
 
 @media (max-width: 560px) {
   :root {
-    --page-home-h: 100lvh;
-    --page-invite-h: 100lvh;
+    --page-home-h: 42rem;
+    --page-invite-h: 48rem;
     --page-love-h: 72rem;
     --page-join-h: 82rem;
     --page-day-h: 50rem;
