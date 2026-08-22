@@ -120,6 +120,7 @@ function scrollToSection(id) {
   if (id === "home") {
     window.scrollTo({ top: 0, behavior: scrollBehavior });
     setActivePill("home");
+    requestAnimationFrame(() => updateBrandMorph(true));
     return;
   }
 
@@ -127,6 +128,7 @@ function scrollToSection(id) {
     behavior: scrollBehavior,
     block: "start",
   });
+  requestAnimationFrame(() => updateBrandMorph(true));
 }
 
 function setActivePill(id) {
@@ -330,16 +332,379 @@ if (spotifyEmbed) {
   }
 }
 
-/* Brand morph / FLIP ghosts removed — no scroll-driven shared-element handoff. */
-if (sceneRun) {
-  sceneRun.classList.remove(
-    "is-brand-morphing",
-    "is-brand-settled",
-    "is-brand-handing-off"
-  );
-  sceneRun.style.setProperty("--brand-ghost-opacity", "0");
-  sceneRun.style.setProperty("--brand-real-opacity", "0");
+/* HOME → INVITE shared-element morph (scroll-driven FLIP ghosts). */
+const brandMorphPairs = [
+  { id: "title", kind: "title" },
+  { id: "seal", kind: "img" },
+  { id: "meta", kind: "meta" },
+  { id: "place", kind: "place" },
+];
+
+let brandMorphLayer = null;
+let brandMorphGhosts = null;
+let brandMorphState = "idle";
+let brandMorphHomes = null;
+
+function lerp(a, b, t) {
+  return a + (b - a) * t;
 }
+
+function smoothstep(t) {
+  const x = Math.min(1, Math.max(0, t));
+  return x * x * (3 - 2 * x);
+}
+
+function readRect(el) {
+  const r = el.getBoundingClientRect();
+  return {
+    left: r.left,
+    top: r.top,
+    width: r.width,
+    height: r.height,
+  };
+}
+
+function rememberMorphHomes() {
+  if (brandMorphHomes) return;
+  brandMorphHomes = {};
+  brandMorphPairs.forEach(({ id }) => {
+    const from = document.querySelector(`[data-morph="${id}"]`);
+    if (!from) return;
+    brandMorphHomes[id] = { parent: from.parentElement, next: from.nextSibling };
+  });
+}
+
+function restoreMorphHome(id) {
+  const from = document.querySelector(`[data-morph="${id}"]`);
+  const home = brandMorphHomes?.[id];
+  if (!from || !home?.parent) return;
+  if (from.parentElement === home.parent) return;
+  if (home.next && home.next.parentNode === home.parent) {
+    home.parent.insertBefore(from, home.next);
+  } else {
+    home.parent.appendChild(from);
+  }
+}
+
+function settleMorphIntoSlots() {
+  brandMorphPairs.forEach(({ id }) => {
+    if (id === "place") return;
+    const from = document.querySelector(`[data-morph="${id}"]`);
+    const slot = document.querySelector(`[data-morph-target="${id}"]`);
+    if (!from || !slot) return;
+    if (from.parentElement !== slot) slot.appendChild(from);
+    if (id === "title") slot.style.minHeight = "";
+  });
+}
+
+function getInviteMorphProgress() {
+  if (!homePanel || !storyPanel) return 0;
+  if (document.body.classList.contains("is-sealed")) return 0;
+  const vh = window.innerHeight || 1;
+  const top = storyPanel.getBoundingClientRect().top;
+  return Math.min(1, Math.max(0, 1 - top / vh));
+}
+
+function layoutPlaceArc() {
+  const card = document.querySelector(".invite-card");
+  const svg = document.querySelector(".invite-place-arc");
+  const path = document.getElementById("invite-place-path");
+  const textPath = document.getElementById("invite-place-textpath");
+  if (!card || !svg || !path) return;
+  const w = card.clientWidth;
+  const h = card.clientHeight;
+  if (w < 8 || h < 8) return;
+  svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+  svg.setAttribute("width", String(w));
+  svg.setAttribute("height", String(h));
+  const inset = Math.max(22, w * 0.055);
+  const rx = w / 2 - inset;
+  const cx = w / 2;
+  const cy = h - w / 2;
+  const spread = Math.PI * 0.38;
+  const a0 = Math.PI / 2 + spread;
+  const a1 = Math.PI / 2 - spread;
+  const x0 = cx + rx * Math.cos(a0);
+  const y0 = cy + rx * Math.sin(a0);
+  const x1 = cx + rx * Math.cos(a1);
+  const y1 = cy + rx * Math.sin(a1);
+  path.setAttribute("d", `M ${x0} ${y0} A ${rx} ${rx} 0 0 0 ${x1} ${y1}`);
+  if (textPath) {
+    const href = `${window.location.pathname}${window.location.search}#invite-place-path`;
+    textPath.setAttribute("href", href);
+    textPath.setAttributeNS("http://www.w3.org/1999/xlink", "href", href);
+  }
+}
+
+function readPlaceDest() {
+  const card = document.querySelector(".invite-card");
+  if (!card) return null;
+  const r = card.getBoundingClientRect();
+  const band = Math.max(22, r.width * 0.07);
+  return {
+    left: r.left + r.width * 0.1,
+    top: r.bottom - band - Math.max(18, r.width * 0.045),
+    width: r.width * 0.8,
+    height: band,
+  };
+}
+
+function cloneTitleGhost(from) {
+  const ghost = from.cloneNode(true);
+  ghost.removeAttribute("data-morph");
+  ghost.removeAttribute("aria-label");
+  ghost.setAttribute("aria-hidden", "true");
+  ghost.classList.add("brand-morph-ghost", "is-title");
+  ghost.querySelectorAll("defs, mask, .hero-brush, animate").forEach((node) => {
+    node.remove();
+  });
+  ghost.querySelectorAll(".hero-draw-path").forEach((path) => {
+    path.removeAttribute("mask");
+  });
+  return ghost;
+}
+
+function ensureBrandMorphLayer() {
+  if (brandMorphLayer) return brandMorphLayer;
+  rememberMorphHomes();
+  brandMorphLayer = document.createElement("div");
+  brandMorphLayer.className = "brand-morph-layer";
+  brandMorphLayer.setAttribute("aria-hidden", "true");
+  document.body.appendChild(brandMorphLayer);
+
+  brandMorphGhosts = {};
+  brandMorphPairs.forEach(({ id, kind }) => {
+    const from = document.querySelector(`[data-morph="${id}"]`);
+    const to = document.querySelector(`[data-morph-target="${id}"]`);
+    if (!from) return;
+    if (kind !== "place" && !to) return;
+
+    let ghost;
+    if (kind === "title") {
+      ghost = cloneTitleGhost(from);
+    } else if (kind === "img") {
+      ghost = from.cloneNode(true);
+      ghost.removeAttribute("data-morph");
+      ghost.removeAttribute("alt");
+      ghost.className = "brand-morph-ghost is-img";
+    } else if (kind === "meta") {
+      ghost = from.cloneNode(true);
+      ghost.removeAttribute("data-morph");
+      ghost.className = "brand-morph-ghost is-meta";
+      ghost.querySelectorAll("[data-morph]").forEach((el) => {
+        el.removeAttribute("data-morph");
+      });
+      const place = ghost.querySelector(".hero-meta-place");
+      if (place) place.style.display = "none";
+    } else if (kind === "place") {
+      ghost = from.cloneNode(true);
+      ghost.removeAttribute("data-morph");
+      ghost.className = "brand-morph-ghost is-place";
+    } else {
+      return;
+    }
+
+    brandMorphLayer.appendChild(ghost);
+    brandMorphGhosts[id] = { ghost, kind, from, to };
+  });
+
+  return brandMorphLayer;
+}
+
+function paintBrandGhost(entry, t) {
+  const { ghost, kind, from, to } = entry;
+  const fromRect = from ? readRect(from) : null;
+  const toRect = kind === "place" ? readPlaceDest() : to ? readRect(to) : null;
+  if (!fromRect || !toRect || fromRect.width < 1 || toRect.width < 1) {
+    ghost.style.opacity = "0";
+    return;
+  }
+
+  const left = lerp(fromRect.left, toRect.left, t);
+  const top = lerp(fromRect.top, toRect.top, t);
+  const width = lerp(fromRect.width, toRect.width, t);
+  const height = lerp(fromRect.height, toRect.height, t);
+  const inkR = Math.round(lerp(255, 42, t));
+  const inkG = Math.round(lerp(255, 61, t));
+  const inkB = Math.round(lerp(255, 85, t));
+  const ink = `rgb(${inkR}, ${inkG}, ${inkB})`;
+  const inkSoft = `rgba(${inkR}, ${inkG}, ${inkB}, ${lerp(0.88, 0.82, t)})`;
+
+  if (kind === "img") {
+    ghost.style.left = `${left}px`;
+    ghost.style.top = `${top}px`;
+    ghost.style.width = `${width}px`;
+    ghost.style.height = `${height}px`;
+    ghost.style.transform = "";
+    ghost.style.opacity = "1";
+    ghost.style.filter = `drop-shadow(0 4px 14px rgba(0, 0, 0, ${lerp(0.35, 0.12, t)}))`;
+    return;
+  }
+
+  if (kind === "title") {
+    const s = fromRect.width > 0 ? width / fromRect.width : 1;
+    ghost.style.left = `${left}px`;
+    ghost.style.top = `${top}px`;
+    ghost.style.width = `${fromRect.width}px`;
+    ghost.style.height = `${fromRect.height}px`;
+    ghost.style.transform = `scale(${s})`;
+    ghost.style.transformOrigin = "top left";
+    ghost.style.opacity = "1";
+    ghost.querySelectorAll(".hero-draw-path").forEach((path) => {
+      path.style.fill = ink;
+    });
+    ghost.querySelectorAll(".hero-draw").forEach((draw) => {
+      draw.style.filter =
+        t < 0.7
+          ? `drop-shadow(0 3px 22px rgba(0, 0, 0, ${lerp(0.38, 0, t / 0.7)}))`
+          : "none";
+    });
+    return;
+  }
+
+  if (kind === "meta") {
+    const sx = fromRect.width > 0 ? width / fromRect.width : 1;
+    const sy = fromRect.height > 0 ? height / fromRect.height : 1;
+    ghost.style.left = `${left}px`;
+    ghost.style.top = `${top}px`;
+    ghost.style.width = `${fromRect.width}px`;
+    ghost.style.height = `${fromRect.height}px`;
+    ghost.style.transform = `scale(${sx}, ${sy})`;
+    ghost.style.transformOrigin = "top left";
+    ghost.style.opacity = "1";
+    ghost
+      .querySelectorAll(".hero-meta-time, .hero-meta-year, .hero-date-side")
+      .forEach((el) => {
+        el.style.color = inkSoft;
+        el.style.textShadow =
+          t < 0.55 ? `0 2px 12px rgba(0, 0, 0, ${lerp(0.3, 0, t / 0.55)})` : "none";
+      });
+    const dayEl = ghost.querySelector(".hero-date-day");
+    if (dayEl) {
+      dayEl.style.color = ink;
+      dayEl.style.textShadow =
+        t < 0.55 ? `0 2px 12px rgba(0, 0, 0, ${lerp(0.3, 0, t / 0.55)})` : "none";
+    }
+    return;
+  }
+
+  if (kind === "place") {
+    const fromStyle = getComputedStyle(from);
+    const fs = lerp(parseFloat(fromStyle.fontSize) || 14, 12.5, t);
+    ghost.style.left = `${left + width / 2}px`;
+    ghost.style.top = `${top + height / 2}px`;
+    ghost.style.width = "auto";
+    ghost.style.height = "auto";
+    ghost.style.transform = "translate(-50%, -50%)";
+    ghost.style.fontSize = `${fs}px`;
+    ghost.style.color = inkSoft;
+    ghost.style.textShadow =
+      t < 0.55 ? `0 2px 12px rgba(0, 0, 0, ${lerp(0.3, 0, t / 0.55)})` : "none";
+    ghost.style.opacity = String(1 - smoothstep((t - 0.62) / 0.28));
+  }
+}
+
+function syncTitleSlotSize() {
+  const title = document.querySelector('[data-morph="title"]');
+  const slot = document.querySelector('[data-morph-target="title"]');
+  if (!title || !slot || slot.contains(title)) return;
+  const tr = title.getBoundingClientRect();
+  const sw = slot.getBoundingClientRect().width;
+  if (tr.width < 1 || sw < 1) return;
+  slot.style.minHeight = `${(tr.height * sw) / tr.width}px`;
+}
+
+function setArcVisible(on, opacity) {
+  const arc = document.querySelector(".invite-place-arc");
+  if (!arc) return;
+  const value = opacity == null ? (on ? 1 : 0) : opacity;
+  arc.style.opacity = String(value);
+  arc.classList.toggle("is-on", Boolean(on) && value >= 0.97);
+}
+
+function setMorphIdle() {
+  if (brandMorphState === "idle") {
+    setArcVisible(false, 0);
+    return;
+  }
+  brandMorphPairs.forEach(({ id }) => restoreMorphHome(id));
+  sceneRun?.classList.remove("is-brand-morphing", "is-brand-settled");
+  brandMorphState = "idle";
+  if (brandMorphLayer) brandMorphLayer.classList.remove("is-active");
+  setArcVisible(false, 0);
+}
+
+function setMorphSettled() {
+  rememberMorphHomes();
+  settleMorphIntoSlots();
+  layoutPlaceArc();
+  sceneRun?.classList.remove("is-brand-morphing");
+  sceneRun?.classList.add("is-brand-settled");
+  storyPanel?.classList.add("is-inview");
+  brandMorphState = "settled";
+  if (brandMorphLayer) brandMorphLayer.classList.remove("is-active");
+  setArcVisible(true, 1);
+}
+
+function updateBrandMorph() {
+  if (!sceneRun || !homePanel || !storyPanel) return;
+  layoutPlaceArc();
+
+  if (prefersReducedMotion()) {
+    const progress = getInviteMorphProgress();
+    if (progress >= 0.55) setMorphSettled();
+    else setMorphIdle();
+    return;
+  }
+
+  const progress = getInviteMorphProgress();
+  const t = smoothstep(progress);
+
+  if (progress <= 0.02) {
+    setMorphIdle();
+    syncTitleSlotSize();
+    return;
+  }
+
+  if (progress >= 0.985) {
+    setMorphSettled();
+    return;
+  }
+
+  rememberMorphHomes();
+  brandMorphPairs.forEach(({ id }) => restoreMorphHome(id));
+  ensureBrandMorphLayer();
+  syncTitleSlotSize();
+  if (brandMorphState !== "morphing") {
+    sceneRun.classList.add("is-brand-morphing");
+    sceneRun.classList.remove("is-brand-settled");
+    brandMorphState = "morphing";
+  }
+  if (brandMorphLayer) brandMorphLayer.classList.add("is-active");
+  setArcVisible(false, smoothstep((t - 0.52) / 0.32));
+
+  Object.values(brandMorphGhosts || {}).forEach((entry) => {
+    paintBrandGhost(entry, t);
+  });
+}
+
+function tickBrandMorph() {
+  let scheduled = false;
+  const run = () => {
+    scheduled = false;
+    updateBrandMorph();
+  };
+  const request = () => {
+    if (scheduled) return;
+    scheduled = true;
+    requestAnimationFrame(run);
+  };
+  window.addEventListener("scroll", request, { passive: true });
+  window.addEventListener("resize", request, { passive: true });
+  request();
+}
+
+tickBrandMorph();
 
 /* Invite wash/pattern stay at final opacity — never rewritten per scroll frame. */
 if (storyPanel) {
@@ -636,6 +1001,7 @@ function openEnvelope() {
   envelopeEl.setAttribute("aria-hidden", "true");
   if (heroMono) heroMono.style.opacity = "";
   playHeroBrushWrite();
+  requestAnimationFrame(() => updateBrandMorph());
 }
 
 function prefersReducedMotion() {

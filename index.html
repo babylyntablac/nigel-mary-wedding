@@ -139,6 +139,7 @@
             <span class="hero-brand-name">Nigel</span>
             <img
               class="hero-monogram"
+              data-morph="seal"
               src="assets/monogram-cut.png"
               alt="Nigel and Mary monogram"
             />
@@ -146,7 +147,7 @@
           </header>
 
           <div class="hero-center">
-            <h1 class="hero-title" aria-label="The Heavens Agreed">
+            <h1 class="hero-title" data-morph="title" aria-label="The Heavens Agreed">
               <span class="hero-title-soft" aria-hidden="true">
                 <svg class="hero-draw hero-draw--soft" viewBox="0 0 149.11 96" role="presentation">
                   <path class="hero-draw-path" d="M18.85 86Q15.75 86 13.8 85.03Q11.85 84.05 10.93 82.47Q10 80.9 10 79.2Q10 78.4 10.25 76.95Q10.5 75.5 10.9 74L23.1 29L31.1 29L16.85 80.65Q16.7 81.15 16.55 81.83Q16.4 82.5 16.4 83.2Q16.4 85 19.5 85Q22.05 85 24.35 83.93Q26.65 82.85 28.68 80.75Q30.7 78.65 32.53 75.55Q34.35 72.45 35.95 68.5L36.65 68.7Q34.5 74.2 31.88 78.07Q29.25 81.95 26.03 83.97Q22.8 86 18.85 86ZM10.35 39.75L10.35 39L37.35 39L37.35 39.75ZM41.01 85L60.86 10.75L52.76 10.75L52.76 10L69.26 10L49.26 85ZM77.26 86Q73.76 86 71.61 84.38Q69.46 82.75 69.46 79.9Q69.46 79.1 69.68 78.07Q69.91 77.05 70.26 75.8L76.56 54.2Q77.81 49.9 78.28 46.65Q78.76 43.4 77.93 41.58Q77.11 39.75 74.41 39.75Q71.81 39.75 68.73 42.43Q65.66 45.1 62.61 49.67Q59.56 54.25 56.96 59.95Q54.36 65.65 52.76 71.7L52.31 71.7Q53.31 67.75 55.08 63.17Q56.86 58.6 59.23 54.17Q61.61 49.75 64.43 46.1Q67.26 42.45 70.41 40.25Q73.56 38.05 76.81 38.05Q81.16 38.05 83.33 40.13Q85.51 42.2 85.86 45.6Q86.21 49 85.06 53.05L76.96 81.2Q76.86 81.55 76.78 82.03Q76.71 82.5 76.71 82.9Q76.71 84.9 78.76 84.9Q82.76 84.9 85.86 81.3Q88.96 77.7 92.11 69.45L92.81 69.7Q90.66 75.45 88.48 79.05Q86.31 82.65 83.63 84.33Q80.96 86 77.26 86ZM114.51 86Q109.71 86 106.41 83.97Q103.11 81.95 101.41 78.35Q99.71 74.75 99.71 70Q99.71 64.25 101.81 58.58Q103.91 52.9 107.71 48.25Q111.51 43.6 116.64 40.8Q121.76 38 127.76 38Q133.16 38 136.14 40.68Q139.11 43.35 139.11 47.3Q139.11 51.4 136.31 54.55Q133.51 57.7 128.84 59.85Q124.16 62 118.54 63.25Q112.91 64.5 107.21 64.9L107.21 64.2Q111.66 63.9 115.46 63.08Q119.26 62.25 122.24 60.83Q125.21 59.4 127.34 57.25Q129.46 55.1 130.59 52.17Q131.71 49.25 131.71 45.4Q131.71 42.9 130.69 40.83Q129.66 38.75 127.06 38.75Q124.21 38.75 121.64 40.43Q119.06 42.1 116.84 44.97Q114.61 47.85 112.81 51.5Q111.01 55.15 109.74 59.17Q108.46 63.2 107.79 67.2Q107.11 71.2 107.11 74.65Q107.11 80.55 109.44 82.75Q111.76 84.95 115.26 84.95Q119.56 84.95 123.16 83.17Q126.76 81.4 129.61 78.43Q132.46 75.45 134.46 71.75L135.11 72.1Q133.16 75.9 130.19 79.05Q127.21 82.2 123.29 84.1Q119.36 86 114.51 86Z" />
@@ -160,7 +161,7 @@
             </h1>
           </div>
 
-          <footer class="hero-meta">
+          <footer class="hero-meta" data-morph="meta">
             <p class="hero-meta-time">4:00 PM</p>
             <div class="hero-date-block" aria-label="Saturday, September 19, 2026">
               <span class="hero-date-side">Saturday</span>
@@ -168,7 +169,9 @@
               <span class="hero-date-side">September</span>
             </div>
             <p class="hero-meta-year">2026</p>
-            <p class="hero-meta-place">Estancia de Lorenzo · San Mateo, Rizal</p>
+            <p class="hero-meta-place" data-morph="place">
+              Estancia de Lorenzo · San Mateo, Rizal
+            </p>
           </footer>
         </div>
       </section>
@@ -258,28 +261,30 @@
             </div>
           </div>
           <article class="invite-card" aria-label="You are invited to the wedding of Nigel and Mary">
-            <p class="invite-kicker">The wedding of</p>
             <h2 class="invite-title">You’re invited</h2>
-            <img
-              class="invite-seal"
-              src="assets/monogram-cut.png"
-              alt="Nigel and Mary monogram"
-            />
+            <div class="invite-slot invite-slot--title" data-morph-target="title"></div>
+            <div class="invite-slot invite-slot--seal" data-morph-target="seal"></div>
             <p class="invite-names" aria-label="Nigel and Mary">
               <span>Nigel</span>
               <span class="invite-names-amp" aria-hidden="true">&amp;</span>
               <span>Mary</span>
             </p>
-            <footer class="hero-meta">
-              <p class="hero-meta-time">4:00 PM</p>
-              <div class="hero-date-block" aria-label="Saturday, September 19, 2026">
-                <span class="hero-date-side">Saturday</span>
-                <span class="hero-date-day">19</span>
-                <span class="hero-date-side">September</span>
-              </div>
-              <p class="hero-meta-year">2026</p>
-              <p class="hero-meta-place">Estancia de Lorenzo · San Mateo, Rizal</p>
-            </footer>
+            <div class="invite-slot invite-slot--meta" data-morph-target="meta"></div>
+            <svg class="invite-place-arc" aria-hidden="true">
+              <defs>
+                <path id="invite-place-path" fill="none" d="" />
+              </defs>
+              <text class="invite-place-arc-text">
+                <textPath
+                  id="invite-place-textpath"
+                  href="#invite-place-path"
+                  startOffset="50%"
+                  text-anchor="middle"
+                >
+                  Estancia de Lorenzo · San Mateo, Rizal
+                </textPath>
+              </text>
+            </svg>
           </article>
         </div>
       </section>
