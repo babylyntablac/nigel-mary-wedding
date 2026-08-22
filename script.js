@@ -1637,7 +1637,12 @@ function initDayIconGleams() {
   if (prefersReducedMotion()) return;
   document.querySelectorAll(".day-beat-icon svg").forEach((svg, index) => {
     svg.style.setProperty("--icon-i", String(index));
-    svg.querySelectorAll(".day-icon-stroke").forEach((path) => {
+    svg.querySelectorAll(".day-icon-stroke").forEach((path, pathIndex) => {
+      path.style.setProperty("--path-i", String(pathIndex));
+      const ghost = path.cloneNode(true);
+      ghost.removeAttribute("class");
+      ghost.classList.add("day-icon-ghost");
+      path.before(ghost);
       const gleam = path.cloneNode(true);
       gleam.removeAttribute("class");
       gleam.classList.add("day-icon-gleam");

@@ -3467,7 +3467,7 @@ body.is-sealed .hero-meta {
 }
 
 .day-beat-icon {
-  width: clamp(3.15rem, 6.4vh, 4.15rem);
+  width: clamp(3.55rem, 7.1vh, 4.7rem);
   color: var(--ink);
 }
 
@@ -3482,29 +3482,6 @@ body.is-sealed .hero-meta {
   stroke-dasharray: 1;
   stroke-dashoffset: 0;
   opacity: 1;
-  animation: none !important;
-}
-
-@keyframes dayIconForm {
-  0% {
-    stroke-dashoffset: 1;
-    opacity: 0.35;
-  }
-
-  48% {
-    stroke-dashoffset: 0;
-    opacity: 1;
-  }
-
-  72% {
-    stroke-dashoffset: 0;
-    opacity: 1;
-  }
-
-  100% {
-    stroke-dashoffset: 1;
-    opacity: 0.4;
-  }
 }
 
 .day-beat--right .day-beat-icon {
@@ -5609,10 +5586,10 @@ body.is-sealed .hero-meta {
 
   .day-beat,
   .day-terminal {
-    flex: 0 0 3.65rem !important;
-    height: 3.65rem;
-    min-height: 3.65rem;
-    max-height: 3.65rem;
+    flex: 0 0 3.9rem !important;
+    height: 3.9rem;
+    min-height: 3.9rem;
+    max-height: 3.9rem;
     align-items: center;
     justify-content: center;
   }
@@ -5623,7 +5600,7 @@ body.is-sealed .hero-meta {
   }
 
   .day-beat-icon {
-    width: 2.95rem;
+    width: 3.35rem;
   }
 
   .day-beat-title {
@@ -6656,6 +6633,21 @@ html body .scene-run.is-brand-settled .invite-slot [data-morph] {
   }
 }
 
+@keyframes day-icon-form {
+  0% {
+    stroke-dashoffset: 1;
+  }
+  38% {
+    stroke-dashoffset: 0;
+  }
+  62% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: 1;
+  }
+}
+
 html body .love-panel .love-heading,
 html body .love-panel .love-person,
 html body .love-panel .love-amp,
@@ -6891,6 +6883,36 @@ html body .panel:not(.is-inview) .is-title-gleam::after {
   opacity: 0 !important;
 }
 
+html body .day-icon-ghost {
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-dasharray: 1 !important;
+  stroke-dashoffset: 0 !important;
+  opacity: 0.2 !important;
+  animation: none !important;
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+  pointer-events: none;
+}
+
+html body .day-icon-stroke {
+  stroke-dasharray: 1 !important;
+  stroke-dashoffset: 1 !important;
+  opacity: 1 !important;
+  animation-name: day-icon-form !important;
+  animation-duration: 3.05s !important;
+  animation-timing-function: cubic-bezier(0.42, 0, 0.18, 1) !important;
+  animation-delay: calc(var(--icon-i, 0) * 0.26s + var(--path-i, 0) * 0.12s) !important;
+  animation-iteration-count: infinite !important;
+  animation-direction: normal !important;
+  animation-fill-mode: both !important;
+  animation-play-state: running !important;
+}
+
+html body .day-panel:not(.is-inview) .day-icon-stroke {
+  animation-play-state: paused !important;
+}
+
 html body .day-icon-gleam {
   fill: none !important;
   stroke: var(--gold-soft) !important;
@@ -6982,6 +7004,12 @@ html body .invite-slot--title .hero-draw--soft {
   html body .day-icon-gleam {
     animation: none !important;
     opacity: 0 !important;
+  }
+
+  html body .day-icon-stroke {
+    animation: none !important;
+    animation-duration: 0s !important;
+    stroke-dashoffset: 0 !important;
   }
 
   html body .entourage-sparkle {
