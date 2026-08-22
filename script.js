@@ -842,6 +842,13 @@ window.addEventListener(
 );
 
 /* Pill active state + More audio — no style morphs tied to scroll. */
+function panelLooksInview(entry) {
+  if (!entry.isIntersecting) return false;
+  const vh = entry.rootBounds?.height || window.innerHeight || 1;
+  const visible = entry.intersectionRect?.height || 0;
+  return entry.intersectionRatio >= 0.16 || visible >= vh * 0.38;
+}
+
 if (panels.length) {
   const ratios = new Map();
 
@@ -850,7 +857,7 @@ if (panels.length) {
       entries.forEach((entry) => {
         const panel = entry.target;
         ratios.set(panel, entry.intersectionRatio);
-        const nowInview = entry.intersectionRatio >= 0.3;
+        const nowInview = panelLooksInview(entry);
         const wasInview = panel.classList.contains("is-inview");
         panel.classList.toggle("is-inview", nowInview);
 
@@ -1628,3 +1635,187 @@ if (mobileRsvpCta) {
     }
   });
 }
+
+function initTitleGleams() {
+  if (prefersReducedMotion()) return;
+  document
+    .querySelectorAll(
+      ".section-title, .invite-title, .rsvp-title-vertical, .sponsors-script--lead"
+    )
+    .forEach((el) => {
+      const text = (el.textContent || "").replace(/\s+/g, " ").trim();
+      if (!text) return;
+      el.dataset.gleam = text;
+      el.classList.add("is-title-gleam");
+    });
+}
+
+function initDayIconGleams() {
+  if (prefersReducedMotion()) return;
+  document.querySelectorAll(".day-beat-icon svg").forEach((svg, index) => {
+    svg.style.setProperty("--icon-i", String(index));
+    svg.querySelectorAll(".day-icon-stroke").forEach((path) => {
+      const gleam = path.cloneNode(true);
+      gleam.removeAttribute("class");
+      gleam.classList.add("day-icon-gleam");
+      path.after(gleam);
+    });
+  });
+}
+
+function initEntourageSparkles() {
+  const panel = document.getElementById("entourage");
+  const canvas = panel?.querySelector(".entourage-sparkle");
+  if (!panel || !canvas || prefersReducedMotion()) return;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  const colors = ["#d2b882", "#b89a62", "#e8d6a8", "#e5ded0", "#c4a574"];
+  let particles = [];
+  let running = false;
+  let lastSpawn = 0;
+  let width = 0;
+  let height = 0;
+
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    width = panel.clientWidth;
+    height = panel.clientHeight;
+    canvas.width = Math.max(1, Math.floor(width * dpr));
+    canvas.height = Math.max(1, Math.floor(height * dpr));
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function localPoint(event) {
+    const rect = panel.getBoundingClientRect();
+    const point = event.touches?.[0] || event.changedTouches?.[0] || event;
+    return {
+      x: point.clientX - rect.left,
+      y: point.clientY - rect.top,
+    };
+  }
+
+  function spawn(x, y, count) {
+    if (x < 0 || y < 0 || x > width || y > height) return;
+    const n = Math.min(count, 80 - particles.length);
+    for (let i = 0; i < n; i += 1) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 16 + Math.random() * 62;
+      particles.push({
+        x,
+        y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 28,
+        life: 1,
+        decay: 0.014 + Math.random() * 0.022,
+        size: 1.05 + Math.random() * 2.5,
+        rot: Math.random() * Math.PI,
+        spin: (Math.random() - 0.5) * 8,
+        color: colors[(Math.random() * colors.length) | 0],
+        star: Math.random() > 0.42,
+      });
+    }
+    if (!running) {
+      running = true;
+      requestAnimationFrame(tick);
+    }
+  }
+
+  function drawSpark(p) {
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rot);
+    ctx.globalAlpha = Math.max(0, p.life * p.life);
+    ctx.fillStyle = p.color;
+    ctx.shadowColor = p.color;
+    ctx.shadowBlur = 10;
+    if (p.star) {
+      ctx.beginPath();
+      ctx.moveTo(0, -p.size * 2.4);
+      ctx.lineTo(p.size * 0.32, 0);
+      ctx.lineTo(0, p.size * 2.4);
+      ctx.lineTo(-p.size * 0.32, 0);
+      ctx.closePath();
+      ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(-p.size * 2.4, 0);
+      ctx.lineTo(0, p.size * 0.32);
+      ctx.lineTo(p.size * 2.4, 0);
+      ctx.lineTo(0, -p.size * 0.32);
+      ctx.closePath();
+      ctx.fill();
+    } else {
+      ctx.beginPath();
+      ctx.arc(0, 0, p.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  let lastTime = 0;
+  function tick(now) {
+    const dt = Math.min(0.05, lastTime ? (now - lastTime) / 1000 : 0.016);
+    lastTime = now;
+    ctx.clearRect(0, 0, width, height);
+    particles = particles.filter((p) => {
+      p.vy += 48 * dt;
+      p.vx *= 0.985;
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      p.rot += p.spin * dt;
+      p.life -= p.decay * (dt * 60);
+      if (p.life <= 0) return false;
+      drawSpark(p);
+      return true;
+    });
+    if (particles.length) {
+      requestAnimationFrame(tick);
+    } else {
+      running = false;
+      lastTime = 0;
+      ctx.clearRect(0, 0, width, height);
+    }
+  }
+
+  function burst(event, count) {
+    const point = localPoint(event);
+    spawn(point.x, point.y, count);
+  }
+
+  panel.addEventListener(
+    "touchstart",
+    (event) => {
+      lastSpawn = performance.now();
+      burst(event, 22);
+    },
+    { passive: true }
+  );
+  panel.addEventListener(
+    "touchmove",
+    (event) => {
+      const now = performance.now();
+      if (now - lastSpawn < 32) return;
+      lastSpawn = now;
+      burst(event, 4);
+    },
+    { passive: true }
+  );
+  panel.addEventListener("pointerdown", (event) => {
+    if (event.pointerType === "touch") return;
+    burst(event, 14);
+  });
+
+  resize();
+  if (typeof ResizeObserver === "function") {
+    new ResizeObserver(resize).observe(panel);
+  } else {
+    window.addEventListener("resize", resize, { passive: true });
+  }
+}
+
+initTitleGleams();
+initDayIconGleams();
+initEntourageSparkles();
+

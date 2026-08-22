@@ -6594,10 +6594,169 @@ html body .scene-run.is-brand-settled .invite-slot [data-morph] {
   opacity: 1 !important;
 }
 
+/* =============================================================================
+   PAGE ENTER / EXIT + TITLE GLEAM + DAY ICON CHASE + ENTOURAGE SPARKLES
+   Beats the sitewide animation kill. Home / Invite keep their own morph.
+   ============================================================================= */
+@keyframes title-gleam-travel {
+  0%,
+  18% {
+    background-position: 118% 0;
+  }
+  58%,
+  100% {
+    background-position: -18% 0;
+  }
+}
+
+@keyframes day-icon-chase {
+  from {
+    stroke-dashoffset: 1;
+    opacity: 0.72;
+  }
+  to {
+    stroke-dashoffset: 0;
+    opacity: 0.72;
+  }
+}
+
+html body .love-panel .love-stage,
+html body .join-panel .join-stage,
+html body .day-panel > .stage,
+html body .entourage-panel > .sponsors-compose,
+html body .more-panel > .stage,
+html body .rsvp-panel > .stage {
+  transition-property: opacity !important;
+  transition-duration: 0.48s !important;
+  transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1) !important;
+  transition-delay: 0s !important;
+}
+
+html body .love-panel:not(.is-inview) .love-stage,
+html body .join-panel:not(.is-inview) .join-stage,
+html body .day-panel:not(.is-inview) > .stage,
+html body .entourage-panel:not(.is-inview) > .sponsors-compose,
+html body .more-panel:not(.is-inview) > .stage,
+html body .rsvp-panel:not(.is-inview) > .stage {
+  opacity: 0 !important;
+}
+
+html body .love-panel.is-inview .love-stage,
+html body .join-panel.is-inview .join-stage,
+html body .day-panel.is-inview > .stage,
+html body .entourage-panel.is-inview > .sponsors-compose,
+html body .more-panel.is-inview > .stage,
+html body .rsvp-panel.is-inview > .stage {
+  opacity: 1 !important;
+}
+
+html body .is-title-gleam {
+  position: relative !important;
+}
+
+html body .is-title-gleam::after {
+  content: attr(data-gleam);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  font: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  text-align: inherit;
+  text-transform: inherit;
+  white-space: inherit;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  background-image: linear-gradient(
+    105deg,
+    transparent 0%,
+    transparent 40%,
+    rgba(232, 214, 168, 0) 45%,
+    #f3e6c4 49.5%,
+    #d2b882 51%,
+    rgba(184, 154, 98, 0.85) 52.5%,
+    rgba(232, 214, 168, 0) 57%,
+    transparent 62%,
+    transparent 100%
+  );
+  background-size: 240% 100%;
+  background-repeat: no-repeat;
+  background-position: 118% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation-name: title-gleam-travel !important;
+  animation-duration: 7.2s !important;
+  animation-delay: 0s !important;
+  animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1) !important;
+  animation-iteration-count: infinite !important;
+  animation-play-state: running !important;
+}
+
+html body .panel:not(.is-inview) .is-title-gleam::after {
+  animation-play-state: paused !important;
+  opacity: 0 !important;
+}
+
+html body .day-icon-gleam {
+  fill: none !important;
+  stroke: var(--gold-soft) !important;
+  stroke-width: 1.55px !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+  stroke-dasharray: 0.1 0.9 !important;
+  vector-effect: non-scaling-stroke;
+  opacity: 0.72 !important;
+  filter: drop-shadow(0 0 2.5px rgba(210, 184, 130, 0.42));
+  pointer-events: none;
+  animation-name: day-icon-chase !important;
+  animation-duration: 11s !important;
+  animation-delay: calc(var(--icon-i, 0) * 0.7s) !important;
+  animation-timing-function: linear !important;
+  animation-iteration-count: infinite !important;
+  animation-play-state: running !important;
+}
+
+html body .day-panel:not(.is-inview) .day-icon-gleam {
+  animation-play-state: paused !important;
+  opacity: 0 !important;
+}
+
+html body .entourage-sparkle {
+  position: absolute !important;
+  inset: 0;
+  z-index: 6;
+  width: 100%;
+  height: 100%;
+  display: block !important;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .brand-morph-layer,
   .brand-morph-layer.is-active {
     display: none !important;
   }
+
+  html body .love-panel .love-stage,
+  html body .join-panel .join-stage,
+  html body .day-panel > .stage,
+  html body .entourage-panel > .sponsors-compose,
+  html body .more-panel > .stage,
+  html body .rsvp-panel > .stage {
+    opacity: 1 !important;
+    transition: none !important;
+  }
+
+  html body .is-title-gleam::after,
+  html body .day-icon-gleam {
+    animation: none !important;
+    opacity: 0 !important;
+  }
+
+  html body .entourage-sparkle {
+    display: none !important;
+  }
 }
+
 
