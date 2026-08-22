@@ -66,14 +66,17 @@
   scroll-snap-stop: normal !important;
 }
 
-/* Native continuous scroll — never CSS snap. Pill nav uses JS behavior:"smooth". */
+/* Native continuous scroll — never CSS snap. Pill nav uses JS behavior:"smooth".
+   html is the only vertical scroller on desktop. overflow-x:hidden on body /
+   .snap-root computes overflow-y to auto and, with overscroll-behavior:none,
+   eats the mouse wheel before it can chain to the page. */
 html {
   width: 100%;
   max-width: 100%;
-  overflow-x: hidden;
-  overscroll-behavior: none;
+  overflow-x: clip;
+  overflow-y: auto;
   overscroll-behavior-x: none;
-  overscroll-behavior-y: none;
+  overscroll-behavior-y: auto;
   touch-action: pan-y;
   scroll-behavior: auto;
   scroll-snap-type: none;
@@ -88,10 +91,9 @@ body {
   line-height: 1.65;
   width: 100%;
   max-width: 100%;
-  overflow-x: hidden;
-  overscroll-behavior: none;
+  overflow: visible;
   overscroll-behavior-x: none;
-  overscroll-behavior-y: none;
+  overscroll-behavior-y: auto;
   touch-action: pan-y;
   scroll-snap-type: none;
   font-size: 1.0625rem;
@@ -116,17 +118,17 @@ img {
   touch-action: pan-y;
 }
 
-/* Document scroll (class name is historical — no scroll-snap) */
+/* Document scroll (class name is historical — no scroll-snap).
+   Not a scrollport: clip sideways without creating a nested Y scroller. */
 .snap-root {
   height: auto;
-  overflow-x: hidden;
+  overflow-x: clip;
   overflow-y: visible;
   max-width: 100%;
   scroll-snap-type: none;
   scroll-behavior: auto;
-  overscroll-behavior: none;
   overscroll-behavior-x: none;
-  overscroll-behavior-y: none;
+  overscroll-behavior-y: auto;
   touch-action: pan-y;
 }
 
