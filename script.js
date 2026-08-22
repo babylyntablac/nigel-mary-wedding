@@ -635,27 +635,165 @@ function openEnvelope() {
   envelopeEl.classList.add("is-open");
   envelopeEl.setAttribute("aria-hidden", "true");
   if (heroMono) heroMono.style.opacity = "";
-  startHeroCinematics();
+  playHeroBrushWrite();
 }
 
-function prepHeroStrokeDraw() {
-  document.querySelectorAll(".hero-draw-path").forEach((path) => {
-    if (typeof path.getTotalLength !== "function") return;
-    const len = Math.ceil(path.getTotalLength());
-    if (len < 1) return;
-    path.style.setProperty("--draw-len", String(len));
+function prefersReducedMotion() {
+  return (
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
+
+function makeBrushPath(width, height, letters) {
+  const left = width * 0.02;
+  const span = width * 0.96;
+  const step = span / letters;
+  let d = `M ${left} ${height * 0.28}`;
+  for (let i = 0; i < letters; i += 1) {
+    const x0 = left + i * step;
+    const x1 = x0 + step;
+    const xc = (x0 + x1) / 2;
+    const descender = i === 9;
+    const top = height * (descender ? 0.2 : 0.16);
+    const bot = height * (descender ? 0.92 : 0.82);
+    const mid = height * 0.48;
+    d += ` C ${x0 + step * 0.12} ${bot}, ${xc} ${bot}, ${xc} ${mid}`;
+    d += ` C ${xc} ${top}, ${x1} ${top}, ${x1} ${mid}`;
+  }
+  return d;
+}
+
+function attachHeroBrushMask(svg, letters) {
+  const fill = svg.querySelector(".hero-draw-path");
+  if (!fill || !svg.viewBox?.baseVal) return null;
+  const vb = svg.viewBox.baseVal;
+  if (vb.width < 1 || vb.height < 1) return null;
+  const ns = "http://www.w3.org/2000/svg";
+  const id = `hero-brush-${letters}-${Math.random().toString(36).slice(2, 8)}`;
+  const defs = document.createElementNS(ns, "defs");
+  const mask = document.createElementNS(ns, "mask");
+  mask.setAttribute("id", id);
+  mask.setAttribute("maskUnits", "userSpaceOnUse");
+  const cover = document.createElementNS(ns, "rect");
+  cover.setAttribute("x", "0");
+  cover.setAttribute("y", "0");
+  cover.setAttribute("width", String(vb.width));
+  cover.setAttribute("height", String(vb.height));
+  cover.setAttribute("fill", "#000");
+  const brush = document.createElementNS(ns, "path");
+  brush.setAttribute("class", "hero-brush");
+  brush.setAttribute("d", makeBrushPath(vb.width, vb.height, letters));
+  brush.setAttribute("fill", "none");
+  brush.setAttribute("stroke", "#fff");
+  brush.setAttribute("stroke-linecap", "round");
+  brush.setAttribute("stroke-linejoin", "round");
+  brush.setAttribute(
+    "stroke-width",
+    String(Math.max(vb.height * 0.72, (vb.width / letters) * 1.15))
+  );
+  brush.setAttribute("pathLength", "1");
+  brush.setAttribute("stroke-dasharray", "1");
+  brush.setAttribute("stroke-dashoffset", "1");
+  const smil = document.createElementNS(ns, "animate");
+  smil.setAttribute("attributeName", "stroke-dashoffset");
+  smil.setAttribute("from", "1");
+  smil.setAttribute("to", "0");
+  smil.setAttribute("fill", "freeze");
+  smil.setAttribute("calcMode", "spline");
+  smil.setAttribute("keySplines", "0.23 1 0.32 1");
+  smil.setAttribute("keyTimes", "0;1");
+  smil.setAttribute("begin", "indefinite");
+  brush.appendChild(smil);
+  mask.appendChild(cover);
+  mask.appendChild(brush);
+  defs.appendChild(mask);
+  svg.insertBefore(defs, svg.firstChild);
+  const maskUrl = `url("${window.location.pathname}${window.location.search}#${id}")`;
+  fill.setAttribute("mask", maskUrl);
+  return { brush, smil, fill, maskId: id, maskUrl };
+}
+
+function animateBrush(job, durationMs, onDone) {
+  const { brush, smil, fill, maskUrl } = job;
+  const finish = () => {
+    brush.setAttribute("stroke-dashoffset", "0");
+    if (onDone) onDone();
+  };
+  if (smil && typeof smil.beginElement === "function") {
+    smil.setAttribute("dur", `${durationMs / 1000}s`);
+    let ended = false;
+    const onEnd = () => {
+      if (ended) return;
+      ended = true;
+      smil.removeEventListener("endEvent", onEnd);
+      finish();
+    };
+    smil.addEventListener("endEvent", onEnd);
+    smil.beginElement();
+    window.setTimeout(onEnd, durationMs + 80);
+    return;
+  }
+  const easeOut = (t) => 1 - (1 - t) ** 3;
+  const start = performance.now();
+  const tick = (now) => {
+    const t = Math.min(1, (now - start) / durationMs);
+    brush.setAttribute("stroke-dashoffset", String(1 - easeOut(t)));
+    fill.setAttribute("mask", maskUrl);
+    if (t < 1) {
+      window.requestAnimationFrame(tick);
+    } else {
+      finish();
+    }
+  };
+  window.requestAnimationFrame(tick);
+}
+
+let heroCinematicsArmed = false;
+const heroBrushJobs = [];
+
+function armHeroCinematics() {
+  if (heroCinematicsArmed || !sceneRun) return;
+  heroCinematicsArmed = true;
+  if (prefersReducedMotion()) {
+    sceneRun.classList.add("is-hero-static");
+    sceneRun.classList.remove("is-hero-alive", "is-hero-written");
+    return;
+  }
+  sceneRun.classList.add("is-hero-alive");
+  sceneRun.classList.remove("is-hero-static");
+  const jobs = [
+    { sel: ".hero-draw--soft", letters: 3, ms: 1100 },
+    { sel: ".hero-draw--main", letters: 14, ms: 2600 },
+  ];
+  jobs.forEach((job) => {
+    const svg = document.querySelector(job.sel);
+    if (!svg) return;
+    const brush = attachHeroBrushMask(svg, job.letters);
+    if (brush) heroBrushJobs.push({ ...brush, ms: job.ms });
   });
 }
 
-function startHeroCinematics() {
-  if (!sceneRun) return;
-  prepHeroStrokeDraw();
-  const reduce =
-    typeof window.matchMedia === "function" &&
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  sceneRun.classList.toggle("is-hero-static", reduce);
-  sceneRun.classList.toggle("is-hero-alive", !reduce);
+function playHeroBrushWrite() {
+  if (!sceneRun || sceneRun.classList.contains("is-hero-static")) return;
+  if (!heroBrushJobs.length) {
+    sceneRun.classList.add("is-hero-written");
+    return;
+  }
+  let remaining = heroBrushJobs.length;
+  let settled = false;
+  const done = () => {
+    remaining -= 1;
+    if (remaining > 0 || settled) return;
+    settled = true;
+    sceneRun.classList.add("is-hero-written");
+  };
+  heroBrushJobs.forEach((job) => {
+    animateBrush(job, job.ms, done);
+  });
 }
+
+armHeroCinematics();
 
 (function initEnvelopeLoadGate() {
   const envelope = document.getElementById("envelope");
