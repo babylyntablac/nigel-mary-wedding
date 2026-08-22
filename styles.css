@@ -5391,21 +5391,16 @@ body.is-sealed .hero-meta {
     left: 0 !important;
     right: 0 !important;
     width: min(34rem, calc(100% - 2rem)) !important;
-    height: fit-content !important;
+    height: 100% !important;
     min-height: 0 !important;
-    max-height: calc(100% - 1rem) !important;
+    max-height: 100% !important;
     margin: auto !important;
     padding: 1.35rem 1rem !important;
     transform: none !important;
     box-sizing: border-box;
     overflow: visible;
-  }
-
-  .day-panel .day-rail,
-  .day-panel .day-rail-track {
-    height: auto !important;
-    max-height: none !important;
-    flex: 0 0 auto;
+    display: flex !important;
+    flex-direction: column;
   }
 
   .day-intro .section-title {
@@ -5414,6 +5409,24 @@ body.is-sealed .hero-meta {
 
   .day-rail {
     width: min(22rem, 100%);
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+
+  .day-panel .day-rail-track {
+    flex: 1 1 auto !important;
+    height: 100% !important;
+    max-height: none !important;
+    justify-content: stretch;
+  }
+
+  .day-beat,
+  .day-terminal {
+    flex: 1 1 0 !important;
+    min-height: 0;
+    align-items: center;
   }
 
   .day-beat {
@@ -5423,6 +5436,11 @@ body.is-sealed .hero-meta {
 
   .day-beat-icon {
     width: 2.95rem;
+  }
+
+  .day-beat-title {
+    font-size: 0.72rem;
+    line-height: 1.2;
   }
 
   /* Hamburger replaces the right pill rail */
