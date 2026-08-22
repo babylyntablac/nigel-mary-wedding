@@ -1592,9 +1592,12 @@ body.is-sealed .hero-meta {
 
 .invite-slot--title .hero-title-soft,
 .scene-run .invite-slot--title .hero-title-soft {
-  margin-left: 0;
+  margin-left: 0.18em;
+  margin-bottom: -0.22em;
+  font-size: 0.72rem;
   color: #2a3d55;
   text-shadow: none;
+  justify-self: start;
 }
 
 .invite-slot--title .hero-title-main,
@@ -1604,8 +1607,8 @@ body.is-sealed .hero-meta {
 }
 
 .invite-slot--title .hero-draw--soft {
-  width: 22%;
-  height: auto;
+  width: auto;
+  height: 1em;
 }
 
 .invite-slot--title .hero-draw--main {
@@ -6620,34 +6623,192 @@ html body .scene-run.is-brand-settled .invite-slot [data-morph] {
   }
 }
 
-html body .love-panel .love-stage,
-html body .join-panel .join-stage,
-html body .day-panel > .stage,
-html body .entourage-panel > .sponsors-compose,
-html body .more-panel > .stage,
-html body .rsvp-panel > .stage {
-  transition-property: opacity !important;
-  transition-duration: 0.48s !important;
-  transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1) !important;
+html body .love-panel .love-heading,
+html body .love-panel .love-person,
+html body .love-panel .love-amp,
+html body .love-panel .love-story,
+html body .join-panel .join-header,
+html body .join-panel .join-date,
+html body .join-panel .join-hashtag,
+html body .join-panel .join-palette,
+html body .join-panel .join-laurel,
+html body .join-panel .join-hour,
+html body .join-panel .join-footer,
+html body .day-panel .day-intro,
+html body .day-panel .day-beat,
+html body .day-panel .day-terminal,
+html body .day-panel .day-foot,
+html body .entourage-panel .sponsors-block,
+html body .entourage-panel .sponsors-parents .sponsors-side,
+html body .entourage-panel .sponsors-parents-flora,
+html body .entourage-panel .sponsors-cols .sponsors-list,
+html body .more-panel .stage-intro,
+html body .more-panel .more-listen,
+html body .more-panel .stage-look,
+html body .rsvp-panel .rsvp-title-col,
+html body .rsvp-panel .rsvp-countdown,
+html body .rsvp-panel .rsvp-count-unit,
+html body .rsvp-panel .rsvp-deck,
+html body .rsvp-panel .rsvp-form,
+html body .rsvp-panel .rsvp-gifts,
+html body .story-panel .invite-title,
+html body .story-panel .invite-names {
+  transition-property: opacity, transform !important;
+  transition-duration: 0.52s, 0.72s !important;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1) !important;
   transition-delay: 0s !important;
 }
 
-html body .love-panel:not(.is-inview) .love-stage,
-html body .join-panel:not(.is-inview) .join-stage,
-html body .day-panel:not(.is-inview) > .stage,
-html body .entourage-panel:not(.is-inview) > .sponsors-compose,
-html body .more-panel:not(.is-inview) > .stage,
-html body .rsvp-panel:not(.is-inview) > .stage {
-  opacity: 0 !important;
+html body .love-panel.is-inview .love-heading,
+html body .love-panel.is-inview .love-person,
+html body .love-panel.is-inview .love-amp,
+html body .love-panel.is-inview .love-story,
+html body .join-panel.is-inview .join-header,
+html body .join-panel.is-inview .join-date,
+html body .join-panel.is-inview .join-hashtag,
+html body .join-panel.is-inview .join-palette,
+html body .join-panel.is-inview .join-laurel,
+html body .join-panel.is-inview .join-hour,
+html body .join-panel.is-inview .join-footer,
+html body .day-panel.is-inview .day-intro,
+html body .day-panel.is-inview .day-beat,
+html body .day-panel.is-inview .day-terminal,
+html body .day-panel.is-inview .day-foot,
+html body .entourage-panel.is-inview .sponsors-block,
+html body .entourage-panel.is-inview .sponsors-parents .sponsors-side,
+html body .entourage-panel.is-inview .sponsors-parents-flora,
+html body .entourage-panel.is-inview .sponsors-cols .sponsors-list,
+html body .more-panel.is-inview .stage-intro,
+html body .more-panel.is-inview .more-listen,
+html body .more-panel.is-inview .stage-look,
+html body .rsvp-panel.is-inview .rsvp-title-col,
+html body .rsvp-panel.is-inview .rsvp-countdown,
+html body .rsvp-panel.is-inview .rsvp-count-unit,
+html body .rsvp-panel.is-inview .rsvp-deck,
+html body .rsvp-panel.is-inview .rsvp-form,
+html body .rsvp-panel.is-inview .rsvp-gifts,
+html body .story-panel.is-inview .invite-title,
+html body .story-panel.is-inview .invite-names {
+  opacity: 1 !important;
+  transform: none !important;
 }
 
-html body .love-panel.is-inview .love-stage,
-html body .join-panel.is-inview .join-stage,
-html body .day-panel.is-inview > .stage,
-html body .entourage-panel.is-inview > .sponsors-compose,
-html body .more-panel.is-inview > .stage,
-html body .rsvp-panel.is-inview > .stage {
-  opacity: 1 !important;
+html body .love-panel:not(.is-inview) .love-heading,
+html body .join-panel:not(.is-inview) .join-header,
+html body .join-panel:not(.is-inview) .join-date,
+html body .join-panel:not(.is-inview) .join-hashtag,
+html body .join-panel:not(.is-inview) .join-palette,
+html body .day-panel:not(.is-inview) .day-intro,
+html body .entourage-panel:not(.is-inview) .sponsors-block:first-child,
+html body .more-panel:not(.is-inview) .stage-intro,
+html body .rsvp-panel:not(.is-inview) .rsvp-countdown,
+html body .story-panel:not(.is-inview) .invite-title {
+  opacity: 0 !important;
+  transform: translate3d(0, -16px, 0) !important;
+}
+
+html body .love-panel:not(.is-inview) .love-person--bride,
+html body .join-panel:not(.is-inview) .join-hour:first-child,
+html body .day-panel:not(.is-inview) .day-beat--left,
+html body .entourage-panel:not(.is-inview) .sponsors-parents .sponsors-side:first-child,
+html body .entourage-panel:not(.is-inview) .sponsors-cols .sponsors-list:first-child,
+html body .more-panel:not(.is-inview) .more-listen,
+html body .rsvp-panel:not(.is-inview) .rsvp-title-col,
+html body .rsvp-panel:not(.is-inview) .rsvp-form {
+  opacity: 0 !important;
+  transform: translate3d(-22px, 10px, 0) !important;
+}
+
+html body .love-panel:not(.is-inview) .love-person--groom,
+html body .join-panel:not(.is-inview) .join-hour:last-child,
+html body .day-panel:not(.is-inview) .day-beat--right,
+html body .entourage-panel:not(.is-inview) .sponsors-parents .sponsors-side:last-child,
+html body .entourage-panel:not(.is-inview) .sponsors-cols .sponsors-list:last-child,
+html body .more-panel:not(.is-inview) .stage-look,
+html body .rsvp-panel:not(.is-inview) .rsvp-gifts {
+  opacity: 0 !important;
+  transform: translate3d(22px, 10px, 0) !important;
+}
+
+html body .love-panel:not(.is-inview) .love-amp,
+html body .love-panel:not(.is-inview) .love-story,
+html body .join-panel:not(.is-inview) .join-laurel,
+html body .join-panel:not(.is-inview) .join-footer,
+html body .day-panel:not(.is-inview) .day-terminal,
+html body .day-panel:not(.is-inview) .day-foot,
+html body .entourage-panel:not(.is-inview) .sponsors-parents-flora,
+html body .entourage-panel:not(.is-inview) .sponsors-block:not(:first-child),
+html body .rsvp-panel:not(.is-inview) .rsvp-deck,
+html body .story-panel:not(.is-inview) .invite-names {
+  opacity: 0 !important;
+  transform: translate3d(0, 18px, 0) !important;
+}
+
+html body .love-panel.is-inview .love-heading,
+html body .join-panel.is-inview .join-header,
+html body .day-panel.is-inview .day-intro,
+html body .story-panel.is-inview .invite-title {
+  transition-delay: 0.02s !important;
+}
+
+html body .love-panel.is-inview .love-person--bride,
+html body .love-panel.is-inview .love-person--groom,
+html body .join-panel.is-inview .join-date,
+html body .rsvp-panel.is-inview .rsvp-title-col {
+  transition-delay: 0.08s !important;
+}
+
+html body .love-panel.is-inview .love-amp,
+html body .join-panel.is-inview .join-hashtag,
+html body .join-panel.is-inview .join-palette,
+html body .entourage-panel.is-inview .sponsors-parents .sponsors-side,
+html body .more-panel.is-inview .more-listen,
+html body .more-panel.is-inview .stage-look {
+  transition-delay: 0.14s !important;
+}
+
+html body .love-panel.is-inview .love-story,
+html body .join-panel.is-inview .join-laurel,
+html body .join-panel.is-inview .join-hour:first-child,
+html body .day-panel.is-inview .day-beat:nth-child(1),
+html body .rsvp-panel.is-inview .rsvp-countdown,
+html body .story-panel.is-inview .invite-names {
+  transition-delay: 0.18s !important;
+}
+
+html body .join-panel.is-inview .join-hour:last-child,
+html body .day-panel.is-inview .day-beat:nth-child(2),
+html body .entourage-panel.is-inview .sponsors-parents-flora,
+html body .rsvp-panel.is-inview .rsvp-count-unit:nth-child(1),
+html body .rsvp-panel.is-inview .rsvp-form {
+  transition-delay: 0.22s !important;
+}
+
+html body .join-panel.is-inview .join-footer,
+html body .day-panel.is-inview .day-beat:nth-child(3),
+html body .entourage-panel.is-inview .sponsors-principals,
+html body .rsvp-panel.is-inview .rsvp-count-unit:nth-child(2),
+html body .rsvp-panel.is-inview .rsvp-gifts {
+  transition-delay: 0.26s !important;
+}
+
+html body .day-panel.is-inview .day-beat:nth-child(4),
+html body .rsvp-panel.is-inview .rsvp-count-unit:nth-child(3),
+html body .rsvp-panel.is-inview .rsvp-deck {
+  transition-delay: 0.3s !important;
+}
+
+html body .day-panel.is-inview .day-beat:nth-child(5),
+html body .day-panel.is-inview .day-terminal,
+html body .rsvp-panel.is-inview .rsvp-count-unit:nth-child(4) {
+  transition-delay: 0.34s !important;
+}
+
+html body .day-panel.is-inview .day-foot,
+html body .entourage-panel.is-inview .sponsors-block:nth-of-type(4),
+html body .entourage-panel.is-inview .sponsors-block:nth-of-type(5),
+html body .entourage-panel.is-inview .sponsors-block:nth-of-type(6) {
+  transition-delay: 0.38s !important;
 }
 
 html body .is-title-gleam {
@@ -6732,19 +6893,55 @@ html body .entourage-sparkle {
   mix-blend-mode: screen;
 }
 
+html body .invite-slot--title .hero-title-soft {
+  font-size: 0.72rem !important;
+  margin-left: 0.18em !important;
+  margin-bottom: -0.22em !important;
+}
+
+html body .invite-slot--title .hero-draw--soft {
+  width: auto !important;
+  height: 1em !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .brand-morph-layer,
   .brand-morph-layer.is-active {
     display: none !important;
   }
 
-  html body .love-panel .love-stage,
-  html body .join-panel .join-stage,
-  html body .day-panel > .stage,
-  html body .entourage-panel > .sponsors-compose,
-  html body .more-panel > .stage,
-  html body .rsvp-panel > .stage {
+  html body .love-panel .love-heading,
+  html body .love-panel .love-person,
+  html body .love-panel .love-amp,
+  html body .love-panel .love-story,
+  html body .join-panel .join-header,
+  html body .join-panel .join-date,
+  html body .join-panel .join-hashtag,
+  html body .join-panel .join-palette,
+  html body .join-panel .join-laurel,
+  html body .join-panel .join-hour,
+  html body .join-panel .join-footer,
+  html body .day-panel .day-intro,
+  html body .day-panel .day-beat,
+  html body .day-panel .day-terminal,
+  html body .day-panel .day-foot,
+  html body .entourage-panel .sponsors-block,
+  html body .entourage-panel .sponsors-parents .sponsors-side,
+  html body .entourage-panel .sponsors-parents-flora,
+  html body .entourage-panel .sponsors-cols .sponsors-list,
+  html body .more-panel .stage-intro,
+  html body .more-panel .more-listen,
+  html body .more-panel .stage-look,
+  html body .rsvp-panel .rsvp-title-col,
+  html body .rsvp-panel .rsvp-countdown,
+  html body .rsvp-panel .rsvp-count-unit,
+  html body .rsvp-panel .rsvp-deck,
+  html body .rsvp-panel .rsvp-form,
+  html body .rsvp-panel .rsvp-gifts,
+  html body .story-panel .invite-title,
+  html body .story-panel .invite-names {
     opacity: 1 !important;
+    transform: none !important;
     transition: none !important;
   }
 
