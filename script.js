@@ -344,6 +344,7 @@ let brandMorphLayer = null;
 let brandMorphGhosts = null;
 let brandMorphState = "idle";
 let brandMorphHomes = null;
+let brandMorphFromRects = null;
 
 function lerp(a, b, t) {
   return a + (b - a) * t;
@@ -352,6 +353,11 @@ function lerp(a, b, t) {
 function smoothstep(t) {
   const x = Math.min(1, Math.max(0, t));
   return x * x * (3 - 2 * x);
+}
+
+function smootherstep(t) {
+  const x = Math.min(1, Math.max(0, t));
+  return x * x * x * (x * (x * 6 - 15) + 10);
 }
 
 function readRect(el) {
@@ -505,15 +511,27 @@ function ensureBrandMorphLayer() {
     }
 
     brandMorphLayer.appendChild(ghost);
-    brandMorphGhosts[id] = { ghost, kind, from, to };
+    brandMorphGhosts[id] = { id, ghost, kind, from, to };
   });
 
   return brandMorphLayer;
 }
 
+function captureMorphFromRects() {
+  if (!brandMorphFromRects) brandMorphFromRects = {};
+  brandMorphPairs.forEach(({ id }) => {
+    const from = document.querySelector(`[data-morph="${id}"]`);
+    if (!from) return;
+    const rect = readRect(from);
+    if (rect.width >= 1 && rect.height >= 1) {
+      brandMorphFromRects[id] = rect;
+    }
+  });
+}
+
 function paintBrandGhost(entry, t) {
-  const { ghost, kind, from, to } = entry;
-  const fromRect = from ? readRect(from) : null;
+  const { id, ghost, kind, from, to } = entry;
+  const fromRect = brandMorphFromRects?.[id] || (from ? readRect(from) : null);
   const toRect = kind === "place" ? readPlaceDest() : to ? readRect(to) : null;
   if (!fromRect || !toRect || fromRect.width < 1 || toRect.width < 1) {
     ghost.style.opacity = "0";
@@ -628,9 +646,20 @@ function setMorphIdle() {
     return;
   }
   brandMorphPairs.forEach(({ id }) => restoreMorphHome(id));
-  sceneRun?.classList.remove("is-brand-morphing", "is-brand-settled");
+  sceneRun?.classList.remove(
+    "is-brand-morphing",
+    "is-brand-settled",
+    "is-brand-handing-off"
+  );
+  sceneRun?.style.setProperty("--brand-source-opacity", "1");
+  sceneRun?.style.setProperty("--brand-real-opacity", "0");
+  sceneRun?.style.setProperty("--brand-ghost-opacity", "0");
   brandMorphState = "idle";
-  if (brandMorphLayer) brandMorphLayer.classList.remove("is-active");
+  brandMorphFromRects = null;
+  if (brandMorphLayer) {
+    brandMorphLayer.style.opacity = "0";
+    brandMorphLayer.classList.remove("is-active");
+  }
   setArcVisible(false, 0);
 }
 
@@ -638,11 +667,18 @@ function setMorphSettled() {
   rememberMorphHomes();
   settleMorphIntoSlots();
   layoutPlaceArc();
-  sceneRun?.classList.remove("is-brand-morphing");
+  sceneRun?.classList.remove("is-brand-morphing", "is-brand-handing-off");
   sceneRun?.classList.add("is-brand-settled");
+  sceneRun?.style.setProperty("--brand-source-opacity", "0");
+  sceneRun?.style.setProperty("--brand-real-opacity", "1");
+  sceneRun?.style.setProperty("--brand-ghost-opacity", "0");
   storyPanel?.classList.add("is-inview");
   brandMorphState = "settled";
-  if (brandMorphLayer) brandMorphLayer.classList.remove("is-active");
+  if (brandMorphLayer) {
+    brandMorphLayer.style.setProperty("--brand-ghost-opacity", "0");
+    brandMorphLayer.style.opacity = "0";
+    brandMorphLayer.classList.remove("is-active");
+  }
   setArcVisible(true, 1);
 }
 
@@ -658,33 +694,55 @@ function updateBrandMorph() {
   }
 
   const progress = getInviteMorphProgress();
-  const t = smoothstep(progress);
+  const sourceFade = 1 - smootherstep((progress - 0.02) / 0.1);
+  const ghostIn = smootherstep((progress - 0.08) / 0.12);
+  const ghostOut = 1 - smootherstep((progress - 0.72) / 0.22);
+  const ghostOpacity = ghostIn * ghostOut;
+  const realOpacity = 1 - ghostOut;
+  const travelT = smootherstep((progress - 0.2) / 0.52);
 
-  if (progress <= 0.02) {
+  sceneRun.style.setProperty("--brand-source-opacity", sourceFade.toFixed(3));
+  sceneRun.style.setProperty("--brand-real-opacity", realOpacity.toFixed(3));
+  sceneRun.style.setProperty("--brand-ghost-opacity", ghostOpacity.toFixed(3));
+
+  if (progress <= 0.01) {
     setMorphIdle();
     syncTitleSlotSize();
     return;
   }
 
-  if (progress >= 0.985) {
+  if (progress >= 0.995 && realOpacity >= 0.98 && ghostOpacity <= 0.02) {
     setMorphSettled();
     return;
   }
 
   rememberMorphHomes();
-  brandMorphPairs.forEach(({ id }) => restoreMorphHome(id));
   ensureBrandMorphLayer();
-  syncTitleSlotSize();
-  if (brandMorphState !== "morphing") {
-    sceneRun.classList.add("is-brand-morphing");
+  if (progress >= 0.72) {
+    if (!brandMorphFromRects) {
+      brandMorphPairs.forEach(({ id }) => restoreMorphHome(id));
+      captureMorphFromRects();
+    }
+    settleMorphIntoSlots();
+    sceneRun.classList.add("is-brand-morphing", "is-brand-handing-off");
     sceneRun.classList.remove("is-brand-settled");
     brandMorphState = "morphing";
+  } else {
+    brandMorphPairs.forEach(({ id }) => restoreMorphHome(id));
+    captureMorphFromRects();
+    syncTitleSlotSize();
+    sceneRun.classList.add("is-brand-morphing");
+    sceneRun.classList.remove("is-brand-settled", "is-brand-handing-off");
+    brandMorphState = "morphing";
   }
-  if (brandMorphLayer) brandMorphLayer.classList.add("is-active");
-  setArcVisible(false, smoothstep((t - 0.52) / 0.32));
+  if (brandMorphLayer) {
+    brandMorphLayer.style.setProperty("--brand-ghost-opacity", ghostOpacity.toFixed(3));
+    brandMorphLayer.classList.toggle("is-active", ghostOpacity > 0.02);
+  }
+  setArcVisible(false, smootherstep((progress - 0.48) / 0.3));
 
   Object.values(brandMorphGhosts || {}).forEach((entry) => {
-    paintBrandGhost(entry, t);
+    paintBrandGhost(entry, travelT);
   });
 }
 

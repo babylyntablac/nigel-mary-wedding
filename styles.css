@@ -806,6 +806,7 @@ body.is-nav-open {
   --scene-title-travel: 0;
   --brand-ghost-opacity: 0;
   --brand-real-opacity: 0;
+  --brand-source-opacity: 1;
 }
 
 .scene-run-photo-frame,
@@ -1039,41 +1040,8 @@ body.is-nav-open {
   transition: none;
 }
 
-/* During morph (pre-handoff): hide sources + targets — ghosts carry the brand */
-.scene-run.is-brand-morphing:not(.is-brand-handing-off) .hero-brand,
-.scene-run.is-brand-morphing:not(.is-brand-handing-off) .home-panel > .hero .hero-meta,
-.scene-run.is-brand-morphing:not(.is-brand-handing-off) [data-morph],
-.scene-run.is-brand-morphing:not(.is-brand-handing-off) [data-morph-target],
-.scene-run.is-brand-morphing:not(.is-brand-handing-off) .invite-seal,
-.scene-run.is-brand-morphing:not(.is-brand-handing-off) .invite-names,
-.scene-run.is-brand-morphing:not(.is-brand-handing-off) .invite-card > .hero-meta {
-  opacity: 0 !important;
-  visibility: hidden !important;
-  transition: none !important;
-  animation: none !important;
-  transform: none !important;
-}
-
-/* Crossfade window: real Invite targets rise while ghosts still cover (never both invisible) */
-.scene-run.is-brand-morphing.is-brand-handing-off .home-panel .hero-brand,
-.scene-run.is-brand-morphing.is-brand-handing-off .home-panel .hero-meta[data-morph],
-.scene-run.is-brand-morphing.is-brand-handing-off .home-panel [data-morph] {
-  opacity: 0 !important;
-  visibility: hidden !important;
-  pointer-events: none;
-  transition: none !important;
-}
-
-.scene-run.is-brand-morphing.is-brand-handing-off [data-morph-target],
-.scene-run.is-brand-morphing.is-brand-handing-off .invite-seal,
-.scene-run.is-brand-morphing.is-brand-handing-off .invite-names,
-.scene-run.is-brand-morphing.is-brand-handing-off .invite-card > .hero-meta {
-  opacity: var(--brand-real-opacity, 0) !important;
-  visibility: visible !important;
-  transition: none !important;
-  animation: none !important;
-  transform: none !important;
-}
+/* Home → Invite fades are driven by --brand-*-opacity at the end of this file.
+   Do not force visibility:hidden here — that snaps the brand off in one frame. */
 
 .scene-run.is-brand-morphing .invite-compose {
   opacity: 1 !important;
@@ -1087,7 +1055,8 @@ body.is-nav-open {
   visibility: visible;
 }
 
-.scene-run.is-brand-settled .home-panel .hero-brand,
+.scene-run.is-brand-settled .home-panel .hero-title[data-morph],
+.scene-run.is-brand-settled .home-panel .hero-monogram[data-morph],
 .scene-run.is-brand-settled .home-panel .hero-meta[data-morph] {
   opacity: 0 !important;
   visibility: hidden !important;
@@ -6548,7 +6517,7 @@ body,
 
 .brand-morph-layer.is-active {
   display: block !important;
-  opacity: 1 !important;
+  opacity: var(--brand-ghost-opacity, 1) !important;
   visibility: visible !important;
 }
 
@@ -6577,28 +6546,46 @@ body,
   text-align: center;
 }
 
-.scene-run.is-brand-morphing [data-morph] {
-  opacity: 0 !important;
-  visibility: hidden !important;
-}
-
-.scene-run.is-brand-morphing .hero-brand,
-.scene-run.is-brand-morphing .hero-brand-name,
-.scene-run.is-brand-settled .hero-brand,
-.scene-run.is-brand-settled .hero-brand-name {
+.scene-run.is-brand-morphing .invite-slot,
+.scene-run.is-brand-handing-off .invite-slot,
+.scene-run.is-brand-settled .invite-slot,
+html body .scene-run.is-brand-morphing .invite-slot,
+html body .scene-run.is-brand-settled .invite-slot {
   opacity: 1 !important;
   visibility: visible !important;
 }
 
-.scene-run.is-brand-morphing .invite-title,
-.scene-run.is-brand-morphing .invite-names,
-.scene-run.is-brand-settled .invite-title,
-.scene-run.is-brand-settled .invite-names {
+html body .scene-run.is-brand-morphing .home-panel [data-morph],
+html body .scene-run.is-brand-morphing .home-panel .hero .hero-title[data-morph],
+html body .scene-run.is-brand-morphing .home-panel .hero .hero-monogram[data-morph],
+html body .scene-run.is-brand-morphing .home-panel .hero .hero-meta[data-morph] {
+  opacity: var(--brand-source-opacity, 0) !important;
+  visibility: visible !important;
+}
+
+html body .scene-run.is-brand-morphing .invite-slot [data-morph],
+html body .scene-run.is-brand-handing-off .invite-slot [data-morph] {
+  opacity: var(--brand-real-opacity, 0) !important;
+  visibility: visible !important;
+}
+
+html body .scene-run.is-brand-morphing .home-panel .hero-brand,
+html body .scene-run.is-brand-morphing .home-panel .hero-brand-name,
+html body .scene-run.is-brand-settled .home-panel .hero-brand,
+html body .scene-run.is-brand-settled .home-panel .hero-brand-name {
   opacity: 1 !important;
   visibility: visible !important;
 }
 
-.scene-run.is-brand-settled .invite-slot [data-morph] {
+html body .scene-run.is-brand-morphing .invite-title,
+html body .scene-run.is-brand-morphing .invite-names,
+html body .scene-run.is-brand-settled .invite-title,
+html body .scene-run.is-brand-settled .invite-names {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+html body .scene-run.is-brand-settled .invite-slot [data-morph] {
   opacity: 1 !important;
   visibility: visible !important;
 }
