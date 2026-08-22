@@ -820,6 +820,24 @@ body.is-nav-open {
   height: 100%;
 }
 
+/* Wash lives on the photo, not a separate hero overlay — always full-bleed. */
+.home-panel > .scene-run-photo-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(12, 16, 14, 0.42) 0%,
+      rgba(12, 16, 14, 0.12) 28%,
+      rgba(12, 16, 14, 0.08) 48%,
+      rgba(12, 16, 14, 0.28) 72%,
+      rgba(12, 16, 14, 0.55) 100%
+    );
+}
+
 .scene-run-photo {
   display: block;
   width: 100%;
@@ -865,23 +883,6 @@ body.is-nav-open {
   overflow: hidden;
   padding: 2rem 1.5rem 2.25rem;
   box-sizing: border-box;
-}
-
-.hero-veil {
-  position: absolute;
-  inset: 0;
-  grid-area: 1 / 1 / -1 / -1;
-  z-index: 0;
-  pointer-events: none;
-  background:
-    linear-gradient(
-      180deg,
-      rgba(12, 16, 14, 0.42) 0%,
-      rgba(12, 16, 14, 0.12) 28%,
-      rgba(12, 16, 14, 0.08) 48%,
-      rgba(12, 16, 14, 0.28) 72%,
-      rgba(12, 16, 14, 0.55) 100%
-    );
 }
 
 .hero-brand {
