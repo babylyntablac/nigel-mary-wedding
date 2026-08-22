@@ -2707,7 +2707,7 @@ body.is-sealed .hero-meta {
 }
 
 .join-shot--reception img {
-  object-position: center 42%;
+  object-position: 70% 46%;
 }
 
 .join-shot:hover img {
@@ -3477,6 +3477,7 @@ body.is-sealed .hero-meta {
   height: auto;
   display: block;
   overflow: visible;
+  shape-rendering: geometricPrecision;
 }
 
 .day-icon-stroke {
@@ -6642,25 +6643,14 @@ html body .scene-run.is-brand-settled .invite-slot [data-morph] {
   }
 }
 
-@keyframes day-icon-chase {
-  from {
-    stroke-dashoffset: 1;
-    opacity: 0.72;
-  }
-  to {
-    stroke-dashoffset: 0;
-    opacity: 0.72;
-  }
-}
-
 @keyframes day-icon-form {
   0% {
     stroke-dashoffset: 1;
   }
-  38% {
+  58% {
     stroke-dashoffset: 0;
   }
-  62% {
+  84% {
     stroke-dashoffset: 0;
   }
   100% {
@@ -6903,26 +6893,25 @@ html body .panel:not(.is-inview) .is-title-gleam::after {
   opacity: 0 !important;
 }
 
-html body .day-icon-ghost {
-  fill: none !important;
-  stroke: currentColor !important;
-  stroke-dasharray: 1 !important;
-  stroke-dashoffset: 0 !important;
-  opacity: 0.2 !important;
-  animation: none !important;
-  animation-duration: 0s !important;
-  animation-delay: 0s !important;
-  pointer-events: none;
+html body .day-beat-icon svg {
+  overflow: visible;
+  shape-rendering: geometricPrecision;
 }
 
 html body .day-icon-stroke {
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-width: 1.7 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
   stroke-dasharray: 1 !important;
   stroke-dashoffset: 1 !important;
   opacity: 1 !important;
+  filter: none !important;
   animation-name: day-icon-form !important;
-  animation-duration: 3.05s !important;
-  animation-timing-function: cubic-bezier(0.42, 0, 0.18, 1) !important;
-  animation-delay: calc(var(--icon-i, 0) * 0.26s + var(--path-i, 0) * 0.12s) !important;
+  animation-duration: 3.2s !important;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.15, 1) !important;
+  animation-delay: calc(var(--icon-i, 0) * 0.2s + var(--path-i, 0) * 0.22s) !important;
   animation-iteration-count: infinite !important;
   animation-direction: normal !important;
   animation-fill-mode: both !important;
@@ -6931,30 +6920,6 @@ html body .day-icon-stroke {
 
 html body .day-panel:not(.is-inview) .day-icon-stroke {
   animation-play-state: paused !important;
-}
-
-html body .day-icon-gleam {
-  fill: none !important;
-  stroke: var(--gold-soft) !important;
-  stroke-width: 1.55px !important;
-  stroke-linecap: round !important;
-  stroke-linejoin: round !important;
-  stroke-dasharray: 0.1 0.9 !important;
-  vector-effect: non-scaling-stroke;
-  opacity: 0.72 !important;
-  filter: drop-shadow(0 0 2.5px rgba(210, 184, 130, 0.42));
-  pointer-events: none;
-  animation-name: day-icon-chase !important;
-  animation-duration: 11s !important;
-  animation-delay: calc(var(--icon-i, 0) * 0.7s) !important;
-  animation-timing-function: linear !important;
-  animation-iteration-count: infinite !important;
-  animation-play-state: running !important;
-}
-
-html body .day-panel:not(.is-inview) .day-icon-gleam {
-  animation-play-state: paused !important;
-  opacity: 0 !important;
 }
 
 html body .entourage-sparkle {
@@ -7020,8 +6985,7 @@ html body .invite-slot--title .hero-draw--soft {
     transition: none !important;
   }
 
-  html body .is-title-gleam::after,
-  html body .day-icon-gleam {
+  html body .is-title-gleam::after {
     animation: none !important;
     opacity: 0 !important;
   }
