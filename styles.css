@@ -1912,7 +1912,8 @@ body.is-sealed .hero-meta {
 }
 
 .love-person--groom .love-pill img {
-  object-position: center 20%;
+  object-position: 60% 18%;
+  filter: grayscale(1) contrast(1.08) brightness(0.86);
 }
 
 .love-amp {
