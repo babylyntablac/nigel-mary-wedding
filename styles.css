@@ -909,6 +909,8 @@ body.is-nav-open {
   display: flex;
   align-items: center;
   justify-content: center;
+  align-self: start;
+  justify-self: center;
   gap: clamp(0.55rem, 1.5vw, 1rem);
   opacity: 1;
 }
@@ -4977,7 +4979,7 @@ body.is-sealed .hero-meta {
     position: relative;
     min-height: 100%;
     height: 100%;
-    padding: 3.25rem 1.5rem 4.75rem;
+    padding: 0;
     overflow: hidden;
     box-sizing: border-box;
   }
@@ -5000,6 +5002,8 @@ body.is-sealed .hero-meta {
 
   .home-panel .hero-brand {
     grid-row: 1;
+    align-self: start;
+    justify-self: center;
   }
 
   .home-panel .hero-center {
@@ -5536,7 +5540,7 @@ body.is-sealed .hero-meta {
   }
 
   .home-panel .hero {
-    padding: 3rem 1.25rem 4.5rem;
+    padding: 0;
   }
 
   .home-panel .hero-center {
