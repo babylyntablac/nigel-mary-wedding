@@ -6274,6 +6274,30 @@ html body #envelope.envelope.is-fading {
   transform: translateY(-50%) !important;
 }
 
+@media (max-width: 1100px) {
+  html body .pill-nav {
+    transform: none !important;
+    top: 0 !important;
+    right: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-height: none !important;
+  }
+
+  html body .pill-nav.is-open .pill.pill-rsvp {
+    overflow: hidden !important;
+  }
+
+  html body .pill-nav.is-open .pill.pill-rsvp::before {
+    inset: 0 !important;
+    transform: none !important;
+    animation: none !important;
+    animation-duration: 0s !important;
+  }
+}
+
 .envelope-seal {
   transform: translate(-50%, -50%) !important;
 }
@@ -6898,14 +6922,14 @@ html body .day-beat-icon svg {
   shape-rendering: geometricPrecision;
 }
 
-html body .day-icon-stroke {
+html body .day-panel .day-icon-stroke,
+html body .day-panel.is-inview .day-icon-stroke {
   fill: none !important;
   stroke: currentColor !important;
   stroke-width: 1.7 !important;
   stroke-linecap: round !important;
   stroke-linejoin: round !important;
   stroke-dasharray: 1 !important;
-  stroke-dashoffset: 1 !important;
   opacity: 1 !important;
   filter: none !important;
   animation-name: day-icon-form !important;
@@ -6914,12 +6938,13 @@ html body .day-icon-stroke {
   animation-delay: calc(var(--icon-i, 0) * 0.2s + var(--path-i, 0) * 0.22s) !important;
   animation-iteration-count: infinite !important;
   animation-direction: normal !important;
-  animation-fill-mode: both !important;
+  animation-fill-mode: none !important;
   animation-play-state: running !important;
 }
 
 html body .day-panel:not(.is-inview) .day-icon-stroke {
   animation-play-state: paused !important;
+  stroke-dashoffset: 0 !important;
 }
 
 html body .entourage-sparkle {
