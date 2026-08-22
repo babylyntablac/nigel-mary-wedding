@@ -1059,14 +1059,42 @@ function openEnvelope() {
   const heroMono = document.querySelector(".hero-monogram");
   if (!envelopeEl) return;
 
-  /* Instant open — no WAAPI flight, flap tween, or delayed fade. */
+  const finish = () => {
+    document.documentElement.classList.remove("is-envelope-exiting");
+    document.body.classList.remove("is-sealed", "is-envelope-exiting");
+    envelopeEl.classList.remove("is-opening", "is-fading");
+    envelopeEl.classList.add("is-open");
+    envelopeEl.setAttribute("aria-hidden", "true");
+    if (heroMono) heroMono.style.opacity = "";
+    playHeroBrushWrite();
+    requestAnimationFrame(() => updateBrandMorph());
+  };
+
+  if (prefersReducedMotion()) {
+    finish();
+    return;
+  }
+
+  document.documentElement.classList.add("is-envelope-exiting");
+  document.body.classList.add("is-envelope-exiting");
   document.body.classList.remove("is-sealed");
-  envelopeEl.classList.remove("is-opening");
-  envelopeEl.classList.add("is-open");
-  envelopeEl.setAttribute("aria-hidden", "true");
-  if (heroMono) heroMono.style.opacity = "";
-  playHeroBrushWrite();
-  requestAnimationFrame(() => updateBrandMorph());
+  envelopeEl.style.pointerEvents = "none";
+  void envelopeEl.offsetWidth;
+  envelopeEl.classList.add("is-fading");
+
+  let settled = false;
+  const done = () => {
+    if (settled) return;
+    settled = true;
+    envelopeEl.removeEventListener("transitionend", onEnd);
+    finish();
+  };
+  const onEnd = (event) => {
+    if (event.target !== envelopeEl || event.propertyName !== "opacity") return;
+    done();
+  };
+  envelopeEl.addEventListener("transitionend", onEnd);
+  window.setTimeout(done, 900);
 }
 
 function prefersReducedMotion() {

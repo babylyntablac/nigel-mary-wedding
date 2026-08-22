@@ -1912,7 +1912,7 @@ body.is-sealed .hero-meta {
 }
 
 .love-person--groom .love-pill img {
-  object-position: center 12%;
+  object-position: center 20%;
 }
 
 .love-amp {
@@ -6242,6 +6242,25 @@ body,
   pointer-events: none !important;
 }
 
+html.is-envelope-exiting,
+body.is-envelope-exiting {
+  overflow: hidden !important;
+}
+
+body.is-envelope-exiting {
+  height: 100svh !important;
+}
+
+html body #envelope.envelope.is-fading {
+  opacity: 0 !important;
+  visibility: visible !important;
+  pointer-events: none !important;
+  transition-property: opacity !important;
+  transition-duration: 0.72s !important;
+  transition-delay: 0s !important;
+  transition-timing-function: cubic-bezier(0.33, 0, 0.2, 1) !important;
+}
+
 .envelope.is-opening .envelope-flap,
 .envelope.is-opening .envelope-flap-edge {
   transform: none !important;
@@ -7014,6 +7033,12 @@ html body .invite-slot--title .hero-draw--soft {
 
   html body .entourage-sparkle {
     display: none !important;
+  }
+
+  html body #envelope.envelope.is-fading {
+    transition: none !important;
+    transition-duration: 0s !important;
+    opacity: 0 !important;
   }
 }
 
