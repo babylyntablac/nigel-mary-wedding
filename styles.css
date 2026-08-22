@@ -71,9 +71,13 @@ html {
   width: 100%;
   max-width: 100%;
   overflow-x: hidden;
+  overscroll-behavior: none;
   overscroll-behavior-x: none;
+  overscroll-behavior-y: none;
+  touch-action: pan-y;
   scroll-behavior: auto;
   scroll-snap-type: none;
+  background: var(--paper-bg);
 }
 
 body {
@@ -85,8 +89,9 @@ body {
   width: 100%;
   max-width: 100%;
   overflow-x: hidden;
+  overscroll-behavior: none;
   overscroll-behavior-x: none;
-  overscroll-behavior-y: auto;
+  overscroll-behavior-y: none;
   touch-action: pan-y;
   scroll-snap-type: none;
   font-size: 1.0625rem;
@@ -108,6 +113,7 @@ a {
 img {
   display: block;
   max-width: 100%;
+  touch-action: pan-y;
 }
 
 /* Document scroll (class name is historical — no scroll-snap) */
@@ -118,7 +124,9 @@ img {
   max-width: 100%;
   scroll-snap-type: none;
   scroll-behavior: auto;
+  overscroll-behavior: none;
   overscroll-behavior-x: none;
+  overscroll-behavior-y: none;
   touch-action: pan-y;
 }
 
@@ -4777,7 +4785,9 @@ body.is-sealed .hero-meta {
   body,
   .snap-root {
     overflow-x: hidden;
+    overscroll-behavior: none;
     overscroll-behavior-x: none;
+    overscroll-behavior-y: none;
     scroll-behavior: auto;
     scroll-snap-type: none;
     touch-action: pan-y;

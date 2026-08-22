@@ -317,6 +317,17 @@ if (storyPanel) {
 
 parkScenePhoto();
 lockCoverSectionBgs();
+
+/* Phone: vertical scroll only — block pinch-zoom (shows tiled/looped layers). */
+function preventPinchZoom(event) {
+  if (event.touches && event.touches.length > 1) {
+    event.preventDefault();
+  }
+}
+document.addEventListener("touchmove", preventPinchZoom, { passive: false });
+document.addEventListener("gesturestart", (event) => event.preventDefault());
+document.addEventListener("gesturechange", (event) => event.preventDefault());
+document.addEventListener("gestureend", (event) => event.preventDefault());
 /* After layout / lazy images settle, re-lock once (never on scroll). */
 if (typeof window.requestAnimationFrame === "function") {
   window.requestAnimationFrame(() => {
