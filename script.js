@@ -664,6 +664,20 @@ function makeBrushPath(width, height, letters) {
   return d;
 }
 
+function attachGoldWriteStroke(svg) {
+  const fill = svg.querySelector(".hero-draw-path");
+  if (!fill) return;
+  const gold = fill.cloneNode(false);
+  gold.setAttribute("class", "hero-draw-gold");
+  gold.setAttribute("d", fill.getAttribute("d") || "");
+  gold.removeAttribute("mask");
+  gold.setAttribute("fill", "none");
+  gold.setAttribute("pathLength", "1");
+  gold.setAttribute("stroke-dasharray", "0.09 0.91");
+  gold.setAttribute("stroke-dashoffset", "1");
+  svg.appendChild(gold);
+}
+
 function attachHeroBrushMask(svg, letters) {
   const fill = svg.querySelector(".hero-draw-path");
   if (!fill || !svg.viewBox?.baseVal) return null;
@@ -771,6 +785,7 @@ function armHeroCinematics() {
     if (!svg) return;
     const brush = attachHeroBrushMask(svg, job.letters);
     if (brush) heroBrushJobs.push({ ...brush, ms: job.ms });
+    if (job.sel === ".hero-draw--main") attachGoldWriteStroke(svg);
   });
 }
 

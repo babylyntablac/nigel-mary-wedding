@@ -757,7 +757,7 @@ body.is-nav-open {
     #2f4638 74%,
     #4b1d24 100%
   );
-  background-size: 100% 100%;
+  background-size: 260% 260%;
   animation: none;
   z-index: -1;
 }
@@ -4906,8 +4906,6 @@ body.is-sealed .hero-meta {
   .day-panel.is-inview .day-icon-stroke,
   .love-panel.is-inview .love-pill,
   .love-panel.is-inview .love-amp,
-  .mobile-rsvp-cta::before,
-  .mobile-rsvp-cta::after,
   .swatch-ambient,
   .swatch-glint,
   .sponsors-compose.is-inview,
@@ -6220,8 +6218,6 @@ body,
 }
 
 /* Pseudo-elements that only existed for looping motion */
-.pill-rsvp::before,
-.pill-rsvp::after,
 .join-swatch::before,
 .join-swatch::after {
   animation: none !important;
@@ -6251,9 +6247,9 @@ body,
 
 /* =============================================================================
    HOME CINEMATICS
-   Photo: Ken Burns on the frame (not the img) so iOS/Edge actually run it.
-   Starts immediately — linear, no delay, no pause.
-   Titles: brush write-on (mask), then a slow drift once written.
+   Photo: looping Ken Burns on the frame (not the img) so iOS/Edge actually run it.
+   Titles: brush write-on, then a looping gold stroke on Heavens Agreed
+   (the letters stay still). RSVP: restored gold orbit + wash.
    ============================================================================= */
 @keyframes hero-cinematic-push {
   from {
@@ -6273,12 +6269,12 @@ body,
   }
 }
 
-@keyframes hero-title-drift {
+@keyframes hero-gold-write {
   from {
-    transform: translate3d(0, 0, 0) scale(1);
+    stroke-dashoffset: 1;
   }
   to {
-    transform: translate3d(0, -2.5%, 0) scale(1.03);
+    stroke-dashoffset: 0;
   }
 }
 
@@ -6288,17 +6284,6 @@ body,
   animation-name: hero-cinematic-push !important;
   animation-duration: 22s !important;
   animation-delay: 0s !important;
-  animation-timing-function: linear !important;
-  animation-fill-mode: forwards !important;
-  animation-play-state: running !important;
-}
-
-.scene-run.is-hero-written .hero-title {
-  transform-origin: center center;
-  will-change: transform !important;
-  animation-name: hero-title-drift !important;
-  animation-duration: 12s !important;
-  animation-delay: 0s !important;
   animation-timing-function: var(--ease-in-out) !important;
   animation-iteration-count: infinite !important;
   animation-direction: alternate !important;
@@ -6306,11 +6291,63 @@ body,
   animation-play-state: running !important;
 }
 
+.hero-draw-gold {
+  fill: none;
+  stroke: var(--gold-soft);
+  stroke-width: 1.9px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 0.09 0.91;
+  vector-effect: non-scaling-stroke;
+  opacity: 0;
+  pointer-events: none;
+  filter: drop-shadow(0 0 6px rgba(210, 184, 130, 0.62));
+}
+
+.scene-run.is-hero-written .hero-draw--main .hero-draw-gold {
+  opacity: 1;
+  animation-name: hero-gold-write !important;
+  animation-duration: 4.6s !important;
+  animation-delay: 0s !important;
+  animation-timing-function: linear !important;
+  animation-iteration-count: infinite !important;
+  animation-play-state: running !important;
+}
+
+.pill.pill-rsvp::before,
+.mobile-rsvp-cta::before {
+  transform-origin: center center;
+  animation-name: rsvp-orbit !important;
+  animation-duration: 9s !important;
+  animation-delay: 0s !important;
+  animation-timing-function: linear !important;
+  animation-iteration-count: infinite !important;
+  animation-play-state: running !important;
+}
+
+.pill.pill-rsvp::after,
+.pill.pill-rsvp.is-active::after,
+.mobile-rsvp-cta::after {
+  animation-name: rsvp-wash !important;
+  animation-duration: 7s !important;
+  animation-delay: 0s !important;
+  animation-timing-function: var(--ease-in-out) !important;
+  animation-iteration-count: infinite !important;
+  animation-play-state: running !important;
+}
+
 .scene-run.is-hero-static .home-panel > .scene-run-photo-frame,
-.scene-run.is-hero-static .hero-title {
+.scene-run.is-hero-static .hero-draw-gold {
   animation: none !important;
+}
+
+.scene-run.is-hero-static .home-panel > .scene-run-photo-frame {
   transform: none !important;
   will-change: auto !important;
+}
+
+.scene-run.is-hero-static .hero-draw-gold {
+  opacity: 0 !important;
 }
 
 @media (max-width: 560px) {
@@ -6323,8 +6360,20 @@ body,
 
 @media (prefers-reduced-motion: reduce) {
   .home-panel > .scene-run-photo-frame,
-  .scene-run.is-hero-written .hero-title {
+  .scene-run.is-hero-written .hero-draw--main .hero-draw-gold,
+  .pill.pill-rsvp::before,
+  .pill.pill-rsvp::after,
+  .pill.pill-rsvp.is-active::after,
+  .mobile-rsvp-cta::before,
+  .mobile-rsvp-cta::after {
     animation: none !important;
+  }
+
+  .hero-draw-gold {
+    opacity: 0 !important;
+  }
+
+  .home-panel > .scene-run-photo-frame {
     transform: none !important;
     will-change: auto !important;
   }
