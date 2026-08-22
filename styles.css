@@ -857,19 +857,22 @@ body.is-nav-open {
   min-height: 100%;
   height: 100%;
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 1fr 1fr 1fr;
   align-items: center;
   justify-items: center;
   color: var(--white);
   overflow: hidden;
-  /* Rem-only padding — zero vh so hero box / cover crop stay fixed.
-     Meta stays in grid row 3 (document flow), not absolute/fixed to viewport. */
   padding: 2rem 1.5rem 2.25rem;
+  box-sizing: border-box;
 }
 
 .hero-veil {
   position: absolute;
   inset: 0;
+  grid-area: 1 / 1 / -1 / -1;
+  z-index: 0;
+  pointer-events: none;
   background:
     linear-gradient(
       180deg,
@@ -881,11 +884,25 @@ body.is-nav-open {
     );
 }
 
+.hero-brand {
+  grid-row: 1;
+}
+
+.hero-center {
+  grid-row: 2;
+}
+
+.hero-meta {
+  grid-row: 3;
+}
+
 .hero-brand,
 .hero-center,
 .hero-meta {
   position: relative;
   z-index: 2;
+  align-self: center;
+  justify-self: center;
 }
 
 .hero-brand {
@@ -916,9 +933,9 @@ body.is-nav-open {
 .hero-center {
   display: grid;
   place-items: center;
-  align-content: start;
+  align-content: center;
   width: 100%;
-  padding-top: 4.5rem;
+  padding-top: 0;
   will-change: auto;
 }
 
@@ -4951,35 +4968,41 @@ body.is-sealed .hero-meta {
   }
 
   .home-panel .hero {
-    /* Absolute slots only — no grid 1fr / env() padding that reflows mid-scroll. */
-    display: block;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 1fr 1fr 1fr;
+    align-items: center;
+    justify-items: center;
     position: relative;
     min-height: 100%;
     height: 100%;
-    padding: 0;
+    padding: 3.25rem 1.5rem 4.75rem;
     overflow: hidden;
+    box-sizing: border-box;
   }
 
-  /* Pin brand / title / meta to the fixed --page-home-h box (rem only). */
-  .home-panel .hero-brand {
-    position: absolute !important;
-    top: 2rem;
-    left: 0;
-    right: 0;
-    width: 100%;
-    margin: 0;
-    transform: none !important;
-  }
-
-  .home-panel .hero-center {
-    position: absolute !important;
-    top: 13.5rem;
-    left: 0;
-    right: 0;
+  .home-panel .hero-brand,
+  .home-panel .hero-center,
+  .home-panel .hero-meta {
+    position: relative !important;
+    top: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    left: auto !important;
     width: 100%;
     margin: 0;
     padding: 0 !important;
     transform: none !important;
+    justify-self: center;
+    align-self: center;
+  }
+
+  .home-panel .hero-brand {
+    grid-row: 1;
+  }
+
+  .home-panel .hero-center {
+    grid-row: 2;
   }
 
   .home-panel .hero-title {
@@ -4987,17 +5010,10 @@ body.is-sealed .hero-meta {
   }
 
   .home-panel .hero-meta {
-    position: absolute !important;
-    top: auto !important;
-    bottom: 5.75rem;
-    left: 0;
-    right: 0;
+    grid-row: 3;
     width: min(22rem, calc(100% - 2rem));
     max-width: none;
     margin-inline: auto;
-    padding: 0;
-    transform: none !important;
-    justify-self: auto;
   }
 
   .scene-run .hero-title-main {
@@ -5518,19 +5534,17 @@ body.is-sealed .hero-meta {
     box-sizing: border-box;
   }
 
-  /*
-   * Home title + meta: absolute rem pins on #home (see ≤1100 block).
-   * Do not revert to relative/grid flow here.
-   */
+  .home-panel .hero {
+    padding: 3rem 1.25rem 4.5rem;
+  }
+
   .home-panel .hero-center {
-    top: 12.25rem;
     padding-top: 0 !important;
     padding-inline-end: 0;
     box-sizing: border-box;
   }
 
   .home-panel .hero-meta {
-    bottom: 5.5rem;
     width: min(22rem, calc(100% - 1.5rem));
   }
 
