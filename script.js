@@ -635,6 +635,26 @@ function openEnvelope() {
   envelopeEl.classList.add("is-open");
   envelopeEl.setAttribute("aria-hidden", "true");
   if (heroMono) heroMono.style.opacity = "";
+  startHeroCinematics();
+}
+
+function prepHeroStrokeDraw() {
+  document.querySelectorAll(".hero-draw-path").forEach((path) => {
+    if (typeof path.getTotalLength !== "function") return;
+    const len = Math.ceil(path.getTotalLength());
+    if (len < 1) return;
+    path.style.setProperty("--draw-len", String(len));
+  });
+}
+
+function startHeroCinematics() {
+  if (!sceneRun) return;
+  prepHeroStrokeDraw();
+  const reduce =
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  sceneRun.classList.toggle("is-hero-static", reduce);
+  sceneRun.classList.toggle("is-hero-alive", !reduce);
 }
 
 (function initEnvelopeLoadGate() {

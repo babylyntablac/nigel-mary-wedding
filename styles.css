@@ -1112,6 +1112,7 @@ body.is-nav-open {
   max-width: min(94vw, 48rem);
   color: var(--white);
   opacity: 1;
+  overflow: visible;
 }
 
 .hero-title-soft {
@@ -1123,7 +1124,6 @@ body.is-nav-open {
   font-style: italic;
   line-height: 1;
   letter-spacing: 0.02em;
-  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.35);
 }
 
 .hero-title-main {
@@ -1134,7 +1134,35 @@ body.is-nav-open {
   font-optical-sizing: auto;
   line-height: 0.92;
   letter-spacing: -0.025em;
-  text-shadow: 0 3px 28px rgba(0, 0, 0, 0.4);
+}
+
+.hero-draw {
+  display: block;
+  overflow: visible;
+  filter: drop-shadow(0 3px 22px rgba(0, 0, 0, 0.38));
+}
+
+.hero-draw--soft {
+  height: 1em;
+  width: auto;
+}
+
+.hero-draw--main {
+  height: 1em;
+  width: auto;
+  max-width: 100%;
+}
+
+.hero-draw-path {
+  fill: #fff;
+  fill-opacity: 1;
+  stroke: #fff;
+  stroke-opacity: 0;
+  stroke-width: 1.35px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  paint-order: stroke fill;
 }
 
 .hero-meta {
@@ -4880,7 +4908,6 @@ body.is-sealed .hero-meta {
 
   .hero-monogram,
   .envelope-sprig,
-  .scene-run-photo,
   .day-panel.is-inview .day-icon-stroke,
   .love-panel.is-inview .love-pill,
   .love-panel.is-inview .love-amp,
@@ -4905,7 +4932,7 @@ body.is-sealed .hero-meta {
   .join-panel.is-inview .join-shot:hover img,
   .join-media-photo img,
   .join-panel.is-inview.join-on-photo .join-media-photo img,
-  .scene-run-photo,
+  .scene-run:not(.is-hero-alive) .scene-run-photo,
   .home-panel.is-inview .hero-center,
   .scene-run .home-panel:not(.is-inview) .hero-center,
   .scene-run .hero-brand,
@@ -5086,8 +5113,10 @@ body.is-sealed .hero-meta {
     max-width: none !important;
     object-fit: cover !important;
     object-position: center 32% !important;
+  }
+
+  .scene-run:not(.is-hero-alive) .scene-run-photo {
     transform: none !important;
-    transform-origin: center center !important;
     animation: none !important;
     animation-play-state: paused !important;
   }
@@ -6194,7 +6223,7 @@ body,
   transform: none !important;
 }
 
-.scene-run-photo,
+.scene-run:not(.is-hero-alive) .scene-run-photo,
 .scene-run-photo-frame,
 .join-shot img,
 .more-frame img {
@@ -6230,3 +6259,107 @@ body,
   animation: none !important;
   opacity: 0 !important;
 }
+
+/* =============================================================================
+   HOME CINEMATICS — allowed exception after envelope open.
+   Photo: transform scale only (never width/height / object-fit recrop).
+   Titles: SVG stroke-draw, then fill. Trigger: .scene-run.is-hero-alive
+   ============================================================================= */
+@keyframes hero-cinematic-push {
+  from {
+    transform: scale(1.05);
+  }
+  to {
+    transform: scale(1.12);
+  }
+}
+
+@keyframes hero-stroke-draw {
+  from {
+    stroke-dashoffset: var(--draw-len);
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes hero-title-fill {
+  from {
+    fill-opacity: 0;
+  }
+  to {
+    fill-opacity: 1;
+  }
+}
+
+@keyframes hero-stroke-fade {
+  from {
+    stroke-opacity: 1;
+  }
+  to {
+    stroke-opacity: 0;
+  }
+}
+
+.scene-run.is-hero-alive .scene-run-photo {
+  transform-origin: center 32%;
+  will-change: transform !important;
+  animation: hero-cinematic-push 24s var(--ease-in-out) both !important;
+  animation-duration: 24s !important;
+  animation-delay: 0s !important;
+}
+
+.home-panel:not(.is-inview) .scene-run-photo {
+  animation-play-state: paused !important;
+}
+
+.scene-run.is-hero-alive .hero-draw-path {
+  fill-opacity: 0;
+  stroke-dasharray: var(--draw-len);
+  stroke-dashoffset: var(--draw-len);
+}
+
+.scene-run.is-hero-alive .hero-title-soft .hero-draw-path {
+  animation:
+    hero-stroke-draw 1s var(--ease-out) 0.12s both,
+    hero-title-fill 0.5s var(--ease-out) 0.95s both,
+    hero-stroke-fade 0.45s var(--ease-out) 1.05s both !important;
+  animation-duration: 1s, 0.5s, 0.45s !important;
+  animation-delay: 0.12s, 0.95s, 1.05s !important;
+}
+
+.scene-run.is-hero-alive .hero-title-main .hero-draw-path {
+  animation:
+    hero-stroke-draw 2s var(--ease-out) 0.72s both,
+    hero-title-fill 0.55s var(--ease-out) 2.45s both,
+    hero-stroke-fade 0.45s var(--ease-out) 2.55s both !important;
+  animation-duration: 2s, 0.55s, 0.45s !important;
+  animation-delay: 0.72s, 2.45s, 2.55s !important;
+}
+
+.scene-run.is-hero-static .hero-draw-path {
+  fill-opacity: 1 !important;
+  stroke-opacity: 0 !important;
+  animation: none !important;
+}
+
+@media (max-width: 560px) {
+  .scene-run.is-hero-alive .scene-run-photo {
+    transform-origin: center 30%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene-run.is-hero-alive .scene-run-photo {
+    animation: none !important;
+    transform: none !important;
+    will-change: auto !important;
+  }
+
+  .scene-run.is-hero-alive .hero-draw-path {
+    animation: none !important;
+    fill-opacity: 1 !important;
+    stroke-opacity: 0 !important;
+  }
+}
+
