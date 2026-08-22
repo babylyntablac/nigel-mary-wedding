@@ -4087,18 +4087,23 @@ body.is-sealed .hero-meta {
 }
 
 .more-frame {
+  position: relative;
   margin: 0;
   overflow: hidden;
   min-width: 0;
   min-height: 0;
+  height: 100%;
   background: color-mix(in srgb, var(--paper-deep) 70%, #d5ddd6);
 }
 
 .more-frame-motion {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
   transform-origin: center center;
+  will-change: transform;
 }
 
 /* 3-column masonry: tall/short | short/tall | tall/short */
@@ -6964,61 +6969,65 @@ html body .invite-slot--title .hero-draw--soft {
 
 @keyframes gallery-pan-left {
   from {
-    transform: scale(1.16) translate3d(5.5%, 0, 0);
+    transform: scale(1.22) translate3d(10%, 0, 0);
   }
   to {
-    transform: scale(1.16) translate3d(-5.5%, 0, 0);
+    transform: scale(1.22) translate3d(-10%, 0, 0);
   }
 }
 
 @keyframes gallery-zoom-in {
   from {
-    transform: scale(1.04);
+    transform: scale(1.08);
   }
   to {
-    transform: scale(1.18);
+    transform: scale(1.32);
   }
 }
 
 @keyframes gallery-zoom-out {
   from {
-    transform: scale(1.18);
+    transform: scale(1.32);
   }
   to {
-    transform: scale(1.04);
+    transform: scale(1.08);
   }
 }
 
-html body .more-frame:nth-child(1) .more-frame-motion,
-html body .more-frame:nth-child(5) .more-frame-motion {
+html body .more-mosaic .more-frame--pan-left .more-frame-motion {
   animation-name: gallery-pan-left !important;
-  animation-duration: 22s !important;
+  animation-duration: 10s !important;
   animation-delay: 0s !important;
   animation-timing-function: ease-in-out !important;
   animation-iteration-count: infinite !important;
   animation-direction: alternate !important;
+  animation-fill-mode: both !important;
   animation-play-state: running !important;
+  will-change: transform !important;
 }
 
-html body .more-frame:nth-child(2) .more-frame-motion {
+html body .more-mosaic .more-frame--zoom-out .more-frame-motion {
   animation-name: gallery-zoom-out !important;
-  animation-duration: 18s !important;
+  animation-duration: 9s !important;
   animation-delay: 0s !important;
   animation-timing-function: ease-in-out !important;
   animation-iteration-count: infinite !important;
   animation-direction: alternate !important;
+  animation-fill-mode: both !important;
   animation-play-state: running !important;
+  will-change: transform !important;
 }
 
-html body .more-frame:nth-child(3) .more-frame-motion,
-html body .more-frame:nth-child(4) .more-frame-motion {
+html body .more-mosaic .more-frame--zoom-in .more-frame-motion {
   animation-name: gallery-zoom-in !important;
-  animation-duration: 20s !important;
+  animation-duration: 9s !important;
   animation-delay: 0s !important;
   animation-timing-function: ease-in-out !important;
   animation-iteration-count: infinite !important;
   animation-direction: alternate !important;
+  animation-fill-mode: both !important;
   animation-play-state: running !important;
+  will-change: transform !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

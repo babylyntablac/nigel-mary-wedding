@@ -1706,7 +1706,56 @@ function initEntourageSparkles() {
   }
 }
 
+function initGalleryMotion() {
+  if (prefersReducedMotion()) return;
+  const items = [...document.querySelectorAll(".more-frame-motion")].flatMap((el) => {
+    const frame = el.closest(".more-frame");
+    if (!frame) return [];
+    if (frame.classList.contains("more-frame--pan-left")) {
+      return [{ el, mode: "pan-left", period: 10000 }];
+    }
+    if (frame.classList.contains("more-frame--zoom-out")) {
+      return [{ el, mode: "zoom-out", period: 9000 }];
+    }
+    if (frame.classList.contains("more-frame--zoom-in")) {
+      return [{ el, mode: "zoom-in", period: 9000 }];
+    }
+    return [];
+  });
+  if (!items.length) return;
+
+  const pingpong = (ms, period) => {
+    const cycle = period * 2;
+    let u = (ms % cycle) / period;
+    if (u > 1) u = 2 - u;
+    return u * u * (3 - 2 * u);
+  };
+
+  const start = performance.now();
+  const tick = (now) => {
+    const elapsed = now - start;
+    items.forEach(({ el, mode, period }) => {
+      const u = pingpong(elapsed, period);
+      let transform = "none";
+      if (mode === "pan-left") {
+        const x = 10 - 20 * u;
+        transform = `translate3d(${x}%, 0, 0) scale(1.22)`;
+      } else if (mode === "zoom-in") {
+        const s = 1.08 + 0.24 * u;
+        transform = `scale(${s})`;
+      } else if (mode === "zoom-out") {
+        const s = 1.32 - 0.24 * u;
+        transform = `scale(${s})`;
+      }
+      el.style.setProperty("transform", transform, "important");
+    });
+    window.requestAnimationFrame(tick);
+  };
+  window.requestAnimationFrame(tick);
+}
+
 initTitleGleams();
 initDayIconGleams();
 initEntourageSparkles();
+initGalleryMotion();
 
