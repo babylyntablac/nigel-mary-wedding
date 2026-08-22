@@ -225,113 +225,6 @@ document.querySelectorAll('a[href^="#"]').forEach((link) => {
   });
 });
 
-/* More page — HTML5 preview of Slower I Go (local copy of iTunes ~30s preview) */
-const MORE_PREVIEW_URL = `${import.meta.env?.BASE_URL ?? ""}assets/slower-i-go-preview.m4a`;
-const MORE_FADE_MS = 1200;
-const MORE_TARGET_VOLUME = 0.65;
-
-const morePanel = document.querySelector('[data-panel="more"]');
-const moreAudio = new Audio(MORE_PREVIEW_URL);
-moreAudio.preload = "none";
-moreAudio.loop = true;
-moreAudio.volume = 0;
-
-let moreAudioUnlocked = false;
-let moreAudioWanted = false;
-let moreFadeRaf = null;
-/* True after user engages Spotify embed — blocks preview until leaving More */
-let morePausedForSpotify = false;
-
-function unlockMoreAudio() {
-  if (moreAudioUnlocked) return;
-  moreAudioUnlocked = true;
-  if (moreAudio.preload !== "auto") {
-    moreAudio.preload = "auto";
-    moreAudio.load();
-  }
-  moreAudio.volume = 0;
-  const playPromise = moreAudio.play();
-  if (playPromise && typeof playPromise.then === "function") {
-    playPromise
-      .then(() => {
-        moreAudio.pause();
-        moreAudio.currentTime = 0;
-        if (moreAudioWanted) fadeMoreAudio(true);
-      })
-      .catch(() => {
-        moreAudioUnlocked = false;
-      });
-  }
-}
-
-function fadeMoreAudio(fadeIn) {
-  if (moreFadeRaf) {
-    cancelAnimationFrame(moreFadeRaf);
-    moreFadeRaf = null;
-  }
-
-  moreAudioWanted = fadeIn;
-  const from = moreAudio.volume;
-  const to = fadeIn ? MORE_TARGET_VOLUME : 0;
-  const start = performance.now();
-
-  if (fadeIn) {
-    if (!moreAudioUnlocked) return;
-    const playPromise = moreAudio.play();
-    if (playPromise && typeof playPromise.catch === "function") {
-      playPromise.catch(() => {});
-    }
-  }
-
-  function tick(now) {
-    const t = Math.min(1, (now - start) / MORE_FADE_MS);
-    const eased = t * (2 - t);
-    moreAudio.volume = from + (to - from) * eased;
-    if (t < 1) {
-      moreFadeRaf = requestAnimationFrame(tick);
-      return;
-    }
-    moreFadeRaf = null;
-    if (!fadeIn) {
-      moreAudio.pause();
-    }
-  }
-
-  moreFadeRaf = requestAnimationFrame(tick);
-}
-
-function setMoreAudioActive(active) {
-  if (active && morePausedForSpotify) return;
-  if (active && moreAudio.preload !== "auto") {
-    moreAudio.preload = "auto";
-    moreAudio.load();
-  }
-  fadeMoreAudio(Boolean(active));
-}
-
-function pauseMorePreviewForSpotify() {
-  if (morePausedForSpotify) return;
-  morePausedForSpotify = true;
-  fadeMoreAudio(false);
-}
-
-const spotifyEmbed = document.querySelector("[data-spotify-embed]");
-if (spotifyEmbed) {
-  const catcher = spotifyEmbed.querySelector(".playlist-spotify-catcher");
-  const engageSpotify = () => {
-    pauseMorePreviewForSpotify();
-    spotifyEmbed.classList.add("is-spotify-engaged");
-  };
-
-  if (catcher) {
-    /* Hide catcher on pointerdown so the following click can reach the iframe */
-    catcher.addEventListener("pointerdown", engageSpotify);
-  } else {
-    spotifyEmbed.addEventListener("pointerdown", pauseMorePreviewForSpotify);
-    spotifyEmbed.addEventListener("focusin", pauseMorePreviewForSpotify);
-  }
-}
-
 /* HOME → INVITE shared-element morph (scroll-driven FLIP ghosts). */
 const brandMorphPairs = [
   { id: "title", kind: "title" },
@@ -841,7 +734,7 @@ window.addEventListener(
   { passive: true }
 );
 
-/* Pill active state + More audio — no style morphs tied to scroll. */
+/* Pill active state — no style morphs tied to scroll. */
 function panelLooksInview(entry) {
   if (!entry.isIntersecting) return false;
   const vh = entry.rootBounds?.height || window.innerHeight || 1;
@@ -858,16 +751,7 @@ if (panels.length) {
         const panel = entry.target;
         ratios.set(panel, entry.intersectionRatio);
         const nowInview = panelLooksInview(entry);
-        const wasInview = panel.classList.contains("is-inview");
         panel.classList.toggle("is-inview", nowInview);
-
-        if (panel === morePanel && wasInview !== nowInview) {
-          if (!nowInview) {
-            morePausedForSpotify = false;
-            spotifyEmbed?.classList.remove("is-spotify-engaged");
-          }
-          setMoreAudioActive(nowInview);
-        }
       });
 
       let bestPanel = null;
@@ -1053,7 +937,6 @@ function waitForEnvelopeResources() {
 function openEnvelope() {
   if (!envelopeReady || envelopeOpened) return;
   envelopeOpened = true;
-  unlockMoreAudio();
 
   const envelopeEl = document.getElementById("envelope");
   const heroMono = document.querySelector(".hero-monogram");

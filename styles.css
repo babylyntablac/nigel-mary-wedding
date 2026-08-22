@@ -4156,20 +4156,6 @@ body.is-sealed .hero-meta {
   border-radius: 0.65rem;
 }
 
-/* Captures first pointer so we can fade the local preview; then yields to the iframe */
-.playlist-spotify-catcher {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  border-radius: 0.65rem;
-  cursor: pointer;
-}
-
-.playlist-slot.is-spotify-engaged .playlist-spotify-catcher {
-  display: none;
-  pointer-events: none;
-}
-
 .rsvp-form {
   display: grid;
   grid-template-columns: 1fr;
@@ -6969,6 +6955,73 @@ html body .invite-slot--title .hero-draw--soft {
   height: 1em !important;
 }
 
+@keyframes gallery-pan-left {
+  from {
+    transform: scale(1.16) translate3d(5.5%, 0, 0);
+  }
+  to {
+    transform: scale(1.16) translate3d(-5.5%, 0, 0);
+  }
+}
+
+@keyframes gallery-zoom-in {
+  from {
+    transform: scale(1.04);
+  }
+  to {
+    transform: scale(1.18);
+  }
+}
+
+@keyframes gallery-zoom-out {
+  from {
+    transform: scale(1.18);
+  }
+  to {
+    transform: scale(1.04);
+  }
+}
+
+html body .more-panel.is-inview .more-frame:nth-child(1) img,
+html body .more-panel.is-inview .more-frame:nth-child(5) img {
+  animation-name: gallery-pan-left !important;
+  animation-duration: 22s !important;
+  animation-delay: 0s !important;
+  animation-timing-function: ease-in-out !important;
+  animation-iteration-count: infinite !important;
+  animation-direction: alternate !important;
+  animation-play-state: running !important;
+}
+
+html body .more-panel.is-inview .more-frame:nth-child(2) img {
+  animation-name: gallery-zoom-out !important;
+  animation-duration: 18s !important;
+  animation-delay: 0s !important;
+  animation-timing-function: ease-in-out !important;
+  animation-iteration-count: infinite !important;
+  animation-direction: alternate !important;
+  animation-play-state: running !important;
+}
+
+html body .more-panel.is-inview .more-frame:nth-child(3) img,
+html body .more-panel.is-inview .more-frame:nth-child(4) img {
+  animation-name: gallery-zoom-in !important;
+  animation-duration: 20s !important;
+  animation-delay: 0s !important;
+  animation-timing-function: ease-in-out !important;
+  animation-iteration-count: infinite !important;
+  animation-direction: alternate !important;
+  animation-play-state: running !important;
+}
+
+html body .more-frame:nth-child(6) img {
+  filter: grayscale(1) contrast(1.08) !important;
+}
+
+html body .more-panel:not(.is-inview) .more-frame img {
+  animation-play-state: paused !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .brand-morph-layer,
   .brand-morph-layer.is-active {
@@ -7029,6 +7082,12 @@ html body .invite-slot--title .hero-draw--soft {
     transition: none !important;
     transition-duration: 0s !important;
     opacity: 0 !important;
+  }
+
+  html body .more-panel .more-frame img {
+    animation: none !important;
+    animation-duration: 0s !important;
+    transform: none !important;
   }
 }
 
