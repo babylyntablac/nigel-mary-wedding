@@ -1931,8 +1931,9 @@ body.is-sealed .hero-meta {
   position: relative;
   overflow: hidden;
   background: var(--satin-green);
-  display: flex;
-  align-items: center;
+  display: block;
+  height: auto;
+  min-height: 0;
   color: var(--ink);
 }
 
@@ -3207,20 +3208,29 @@ body.is-sealed .hero-meta {
   background: var(--entourage-overlay);
 }
 
-.day-panel,
-.more-panel,
-.rsvp-panel {
+.day-panel {
   display: flex;
-  align-items: center;
+  align-items: stretch;
 }
 
 .more-panel {
   position: relative;
   z-index: auto;
+  display: block;
+  /* Content-only height — same pattern as Join Us. */
+  height: auto;
+  min-height: 0;
+  overflow: hidden;
 }
 
-.day-panel {
-  align-items: stretch;
+.rsvp-panel {
+  position: relative;
+  overflow: hidden;
+  background: var(--satin-green);
+  display: block;
+  height: auto;
+  min-height: 0;
+  color: var(--ink);
 }
 
 .day-stage {
@@ -4755,8 +4765,6 @@ body.is-sealed .hero-meta {
     --page-join-h: 62rem;
     --page-day-h: 52rem;
     --page-entourage-h: 88rem;
-    --page-more-h: 78rem;
-    --page-rsvp-h: 68rem;
   }
 
   /* Phone/tablet: free native vertical scroll only — no snap, no sideways rubber-band.
@@ -5253,28 +5261,29 @@ body.is-sealed .hero-meta {
     overflow: visible;
   }
 
-  /* Page 7 (More): same as page 1/2 — fixed rem box + centered stage. */
+  /* More: content defines height (Join Us pattern). Stage in normal flow. */
   .more-panel {
     position: relative !important;
     display: block !important;
-    height: var(--page-more-h) !important;
-    min-height: var(--page-more-h) !important;
-    max-height: var(--page-more-h) !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
     overflow: hidden !important;
     padding: 0 !important;
   }
 
   .more-panel > .stage {
-    position: absolute !important;
-    top: 0 !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
+    position: relative !important;
+    top: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
     width: min(42rem, calc(100% - 2rem)) !important;
-    height: fit-content;
-    max-height: calc(100% - 1rem);
-    margin: auto !important;
-    padding: 1.75rem 1rem !important;
+    height: auto !important;
+    max-height: none !important;
+    margin: 0 auto !important;
+    padding: 2.25rem 0.75rem 5.5rem !important;
+    justify-content: flex-start;
     transform: none !important;
     box-sizing: border-box;
     overflow: visible;
@@ -5285,28 +5294,28 @@ body.is-sealed .hero-meta {
     height: 14rem !important;
   }
 
-  /* Page 8 (RSVP): same as page 1/2 — fixed rem box + centered stage. */
+  /* RSVP: content defines height (Join Us pattern). Stage in normal flow. */
   .rsvp-panel {
     position: relative !important;
     display: block !important;
-    height: var(--page-rsvp-h) !important;
-    min-height: var(--page-rsvp-h) !important;
-    max-height: var(--page-rsvp-h) !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
     overflow: hidden !important;
     padding: 0 !important;
   }
 
   .rsvp-panel > .rsvp-stage {
-    position: absolute !important;
-    top: 0 !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
+    position: relative !important;
+    top: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
     width: min(40rem, calc(100% - 2rem)) !important;
-    height: fit-content;
-    max-height: calc(100% - 1rem);
-    margin: auto !important;
-    padding: 1.75rem 1rem !important;
+    height: auto !important;
+    max-height: none !important;
+    margin: 0 auto !important;
+    padding: 2.25rem 0.75rem 5.5rem !important;
     transform: none !important;
     box-sizing: border-box;
     overflow: visible;
@@ -5645,8 +5654,6 @@ body.is-sealed .hero-meta {
     --page-join-h: 82rem;
     --page-day-h: 50rem;
     --page-entourage-h: 92rem;
-    --page-more-h: 92rem;
-    --page-rsvp-h: 78rem;
   }
 
   .envelope-stage {
@@ -5784,7 +5791,7 @@ body.is-sealed .hero-meta {
 
   .more-panel > .stage {
     width: min(100%, calc(100% - 1.5rem)) !important;
-    padding: 1.5rem 0.75rem !important;
+    padding: 1.85rem 0.75rem 5.25rem !important;
   }
 
   .more-panel .playlist-slot iframe {
@@ -5794,7 +5801,7 @@ body.is-sealed .hero-meta {
 
   .rsvp-panel > .rsvp-stage {
     width: min(100%, calc(100% - 1.5rem)) !important;
-    padding: 1.5rem 0.75rem !important;
+    padding: 1.85rem 0.75rem 5.25rem !important;
   }
 
   .love-pill {
