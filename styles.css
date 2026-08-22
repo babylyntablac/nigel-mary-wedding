@@ -844,9 +844,10 @@ body.is-nav-open {
   position: relative;
   top: auto;
   z-index: auto;
-  /* Desktop: one screen. ≤1100 uses fixed rem --page-home-h + overflow clip. */
+  /* One viewport tall — max is the screen, never taller. */
   min-height: 100lvh;
   height: 100lvh;
+  max-height: 100lvh;
   overflow: hidden;
   background-color: transparent;
 }
@@ -1312,10 +1313,11 @@ body.is-sealed .hero-meta {
   grid-template-rows: 1fr;
   place-items: center;
   align-content: stretch;
-  /* Desktop: content height. ≤1100 uses fixed rem --page-invite-h + overflow clip. */
-  min-height: 0;
-  height: auto;
-  overflow: visible;
+  /* One viewport tall — max is the screen, never taller. */
+  min-height: 100lvh;
+  height: 100lvh;
+  max-height: 100lvh;
+  overflow: hidden;
   color: var(--ink);
   background-color: #f3eee4;
   padding: 0 clamp(1rem, 4vw, 2rem);
@@ -4724,8 +4726,8 @@ body.is-sealed .hero-meta {
   :root {
     --mobile-rsvp-cta-space: calc(4.35rem + env(safe-area-inset-bottom, 0px));
     /* Fixed page boxes — backgrounds clip here; never vh/svh/lvh. */
-    --page-home-h: 44rem;
-    --page-invite-h: 50rem;
+    --page-home-h: 100lvh;
+    --page-invite-h: 100lvh;
     --page-love-h: 56rem;
     --page-join-h: 62rem;
     --page-day-h: 52rem;
@@ -5614,8 +5616,8 @@ body.is-sealed .hero-meta {
 
 @media (max-width: 560px) {
   :root {
-    --page-home-h: 42rem;
-    --page-invite-h: 48rem;
+    --page-home-h: 100lvh;
+    --page-invite-h: 100lvh;
     --page-love-h: 72rem;
     --page-join-h: 82rem;
     --page-day-h: 50rem;
