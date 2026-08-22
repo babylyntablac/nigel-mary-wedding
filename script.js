@@ -1354,23 +1354,6 @@ if (qrImg) {
   qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&color=4b1d24&bgcolor=e5ded0&data=${encodeURIComponent(formUrl)}`;
 }
 
-/* Gifts QR — uses assets/gifts-qr.png when present, else a placeholder code */
-const giftsQr = document.getElementById("gifts-qr");
-if (giftsQr) {
-  const fallback = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=8&color=4b1d24&bgcolor=e5ded0&data=${encodeURIComponent("Monetary gift for Nigel & Mary — thank you!")}`;
-  giftsQr.addEventListener("error", () => {
-    giftsQr.src = fallback;
-  });
-  // Probe missing local asset quickly
-  fetch(`${import.meta.env?.BASE_URL ?? ""}assets/gifts-qr.png`, { method: "HEAD" })
-    .then((res) => {
-      if (!res.ok) giftsQr.src = fallback;
-    })
-    .catch(() => {
-      giftsQr.src = fallback;
-    });
-}
-
 /* Childhood photos — show a note in place of any frame whose image is missing */
 document.querySelectorAll("img[data-photo-fallback]").forEach((img) => {
   const markEmpty = () => {

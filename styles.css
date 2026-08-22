@@ -2705,6 +2705,10 @@ body.is-sealed .hero-meta {
   transition: none;
 }
 
+.join-shot--reception img {
+  object-position: center 42%;
+}
+
 .join-shot:hover img {
   transform: none;
 }
@@ -3078,6 +3082,24 @@ body.is-sealed .hero-meta {
   margin-bottom: 0.45rem;
 }
 
+.info-gifts-qr-wrap--pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: start;
+  gap: 0.55rem;
+  width: 100%;
+  max-width: 20rem;
+  margin-inline: auto;
+}
+
+.info-gifts-qr-card {
+  margin: 0;
+  display: grid;
+  justify-items: center;
+  gap: 0.28rem;
+  min-width: 0;
+}
+
 .info-gifts-flower {
   position: absolute;
   left: -2.75rem;
@@ -3097,6 +3119,17 @@ body.is-sealed .hero-meta {
   padding: 0.35rem;
   border: var(--frame);
   box-shadow: none;
+}
+
+.info-gifts-qr-wrap--pair .info-gifts-qr {
+  width: 100%;
+  height: auto;
+  aspect-ratio: auto;
+  object-fit: contain;
+  padding: 0;
+  border: 0;
+  background: none;
+  border-radius: 0.4rem;
 }
 
 .info-gifts-snap {
