@@ -911,6 +911,9 @@ body.is-nav-open {
   justify-content: center;
   align-self: start;
   justify-self: center;
+  /* 2rem = 32px 8pt-grid inset — enough air from the crop, not a second header bar. */
+  padding-top: 2rem;
+  box-sizing: border-box;
   gap: clamp(0.55rem, 1.5vw, 1rem);
   opacity: 1;
 }
@@ -5004,6 +5007,7 @@ body.is-sealed .hero-meta {
     grid-row: 1;
     align-self: start;
     justify-self: center;
+    padding: 2rem 0 0 !important;
   }
 
   .home-panel .hero-center {
